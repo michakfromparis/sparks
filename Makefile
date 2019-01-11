@@ -1,7 +1,11 @@
 # constants
-OUTPUT_NAME=$(shell basename $(CURDIR))        # default to current directory name
-IMPORT_PATH=$(subst $(GOPATH)/src/,,$(CURDIR)) # substracting GOPATH from current directory
-OUTPUT_DIRECTORY=$(CURDIR)/build               # build output directory
+
+# default to current directory name
+OUTPUT_NAME=$(shell basename $(CURDIR))
+# substracting GOPATH from current directory to deduct import path. i.e. github.com/user/project
+IMPORT_PATH=$(subst $(GOPATH)/src/,,$(CURDIR))
+# build output directory
+OUTPUT_DIRECTORY=$(CURDIR)/build
 
 # host os detection
 HOST_OS=unknown

@@ -1,9 +1,11 @@
 package main
 
-import "github.com/michaKFromParis/sparks/cmd"
-import "github.com/michaKFromParis/sparks/sys"
+import (
+	"github.com/michaKFromParis/sparks/cmd"
+	"github.com/michaKFromParis/sparks/log"
+)
 
 func main() {
-	sys.Init()
+	log.Init()
 	cmd.Execute()
 }

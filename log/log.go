@@ -1,6 +1,4 @@
-// from https://github.com/antonfisher/nested-logrus-formatter/blob/master/formatter.go
-
-package sys
+package log
 
 import (
 	"bytes"
@@ -9,8 +7,19 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Sirupsen/logrus"
+	log "github.com/Sirupsen/logrus"
 )
+
+func Init() {
+	log.SetFormatter(&Formatter{
+		HideKeys:        true,
+		FieldsOrder:     []string{"component", "category"},
+		TimestampFormat: "15:04:05",
+	})
+	log.Info("Initialized logger")
+}
+
+// FROM https://github.com/antonfisher/nested-logrus-formatter/blob/master/formatter.go
 
 // Formatter - logrus formatter, implements logrus.Formatter
 type Formatter struct {
@@ -23,7 +32,7 @@ type Formatter struct {
 }
 
 // Format an log entry
-func (f *Formatter) Format(entry *logrus.Entry) ([]byte, error) {
+func (f *Formatter) Format(entry *log.Entry) ([]byte, error) {
 	levelColor := getColorByLevel(entry.Level)
 
 	timestampFormat := f.TimestampFormat
@@ -74,7 +83,7 @@ func (f *Formatter) Format(entry *logrus.Entry) ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-func (f *Formatter) writeFields(b *bytes.Buffer, entry *logrus.Entry) {
+func (f *Formatter) writeFields(b *bytes.Buffer, entry *log.Entry) {
 	if len(entry.Data) != 0 {
 		fields := make([]string, 0, len(entry.Data))
 		for field := range entry.Data {
@@ -89,7 +98,7 @@ func (f *Formatter) writeFields(b *bytes.Buffer, entry *logrus.Entry) {
 	}
 }
 
-func (f *Formatter) writeOrderedFields(b *bytes.Buffer, entry *logrus.Entry) {
+func (f *Formatter) writeOrderedFields(b *bytes.Buffer, entry *log.Entry) {
 	length := len(entry.Data)
 	foundFieldsMap := map[string]bool{}
 	for _, field := range f.FieldsOrder {
@@ -116,7 +125,7 @@ func (f *Formatter) writeOrderedFields(b *bytes.Buffer, entry *logrus.Entry) {
 	}
 }
 
-func (f *Formatter) writeField(b *bytes.Buffer, entry *logrus.Entry, field string) {
+func (f *Formatter) writeField(b *bytes.Buffer, entry *log.Entry, field string) {
 	if f.HideKeys {
 		fmt.Fprintf(b, "[%v] ", entry.Data[field])
 	} else {
@@ -131,13 +140,13 @@ const (
 	colorGray   = 37
 )
 
-func getColorByLevel(level logrus.Level) int {
+func getColorByLevel(level log.Level) int {
 	switch level {
-	case logrus.DebugLevel:
+	case log.DebugLevel:
 		return colorGray
-	case logrus.WarnLevel:
+	case log.WarnLevel:
 		return colorYellow
-	case logrus.ErrorLevel, logrus.FatalLevel, logrus.PanicLevel:
+	case log.ErrorLevel, log.FatalLevel, log.PanicLevel:
 		return colorRed
 	default:
 		return colorBlue
