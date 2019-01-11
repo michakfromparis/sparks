@@ -1,30 +1,62 @@
+# Constants
 OUTPUT_NAME=$(shell basename $(CURDIR))
-OUTPUT_PATH=$(GOPATH)/bin/$(OUTPUT_NAME)
+IMPORT_PATH=$(subst $(GOPATH)/src/,,$(CURDIR))
+OUTPUT_DIRECTORY=$(CURDIR)/build
+# OUTPUT_DIRECTORY=$(HOME)/.cache/go-docker-build/$(OUTPUT_NAME)
+
+# Host OS Detection
+HOST_OS=unknown
+ifeq ($(OS),Windows_NT)
+	HOST_OS=windows
+else
+	UNAME=$(shell uname -s)
+	ifeq ($(UNAME),Linux)
+		HOST_OS=linux
+	endif
+	ifeq ($(UNAME),Darwin)
+		HOST_OS=osx
+	endif
+endif
+
 
 all: test build
 
-deps:
-	go get -d
-	go get golang.org/x/tools/cmd/goimports
+check:
+	@if [ "$(HOST_OS)" = 'unknown' ]; then echo "FATAL: Could not detect HOST_OS"; exit 1; fi
 
-style:
+deps: check
+	go get -u golang.org/x/tools/cmd/goimports
+
+deps-dev: check deps
+	go get -u github.com/spf13/cobra/cobra
+
+style: check
 	goimports -l -w .
 
-build: style
-	go build -v -o $(OUTPUT_PATH)
+build: check style
+	go build -v -o "$(OUTPUT_DIRECTORY)/$(HOST_OS)/$(OUTPUT_NAME)"
+	@du -h "$(OUTPUT_DIRECTORY)/$(HOST_OS)/$(OUTPUT_NAME)"
 	
-test:
+build-docker: check
+	mkdir -p "$(OUTPUT_DIRECTORY)/linux"
+	docker run --rm -it                         \
+		-v "$(GOPATH)/src":/go/src              \
+		-v "$(OUTPUT_DIRECTORY)/linux":/build   \
+		-w "/go/src/$(IMPORT_PATH)"             \
+		golang:latest                           \
+		make build-docker-linux
+	@du -h "$(OUTPUT_DIRECTORY)/linux/$(OUTPUT_NAME)"
+
+build-docker-linux: check deps
+	go build -v -o "/build/$(OUTPUT_NAME)"
+
+test: check
 	go test -v ./...
 
-clean:
+clean: check
 	go clean
-	rm -f $(OUTPUT_PATH)
+	rm -rf "$(OUTPUT_DIRECTORY)"
 
-run: build
-	$(OUTPUT_PATH)
+run: check build
+	"$(OUTPUT_DIRECTORY)/$(HOST_OS)/$(OUTPUT_NAME)"
 
-# Cross compilation
-# build-linux:
-#         CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o $(BINARY_UNIX) -v
-# docker-build:
-#         docker run --rm -it -v "$(GOPATH)":/go -w /go/src/bitbucket.org/rsohlich/makepost golang:latest go build -o "$(BINARY_UNIX)" -v    
