@@ -1,10 +1,9 @@
-# Constants
-OUTPUT_NAME=$(shell basename $(CURDIR))
-IMPORT_PATH=$(subst $(GOPATH)/src/,,$(CURDIR))
-OUTPUT_DIRECTORY=$(CURDIR)/build
-# OUTPUT_DIRECTORY=$(HOME)/.cache/go-docker-build/$(OUTPUT_NAME)
+# constants
+OUTPUT_NAME=$(shell basename $(CURDIR))        # default to current directory name
+IMPORT_PATH=$(subst $(GOPATH)/src/,,$(CURDIR)) # substracting GOPATH from current directory
+OUTPUT_DIRECTORY=$(CURDIR)/build               # build output directory
 
-# Host OS Detection
+# host os detection
 HOST_OS=unknown
 ifeq ($(OS),Windows_NT)
 	HOST_OS=windows
@@ -19,24 +18,37 @@ else
 endif
 
 
+# default to test and build
 all: test build
 
+# check build environment consistency
 check:
 	@if [ "$(HOST_OS)" = 'unknown' ]; then echo "FATAL: Could not detect HOST_OS"; exit 1; fi
 
+# install build dependencies
 deps: check
-	go get -u golang.org/x/tools/cmd/goimports
+	go get -d
+	go get golang.org/x/tools/cmd/goimports
 
+
+# install development build dependencies
 deps-dev: check deps
-	go get -u github.com/spf13/cobra/cobra
+	go get github.com/spf13/cobra/cobra
 
-style: check
+# format go code
+format: check
 	goimports -l -w .
 
-build: check style
+# build
+build: check format install
 	go build -v -o "$(OUTPUT_DIRECTORY)/$(HOST_OS)/$(OUTPUT_NAME)"
 	@du -h "$(OUTPUT_DIRECTORY)/$(HOST_OS)/$(OUTPUT_NAME)"
-	
+
+# install into "$(GOPATH)/bin"
+install:
+	@cp "$(OUTPUT_DIRECTORY)/$(HOST_OS)/$(OUTPUT_NAME)" "$(GOPATH)/bin/"
+
+# build linux binary inside a docker container
 build-docker: check
 	mkdir -p "$(OUTPUT_DIRECTORY)/linux"
 	docker run --rm -it                         \
@@ -47,16 +59,19 @@ build-docker: check
 		make build-docker-linux
 	@du -h "$(OUTPUT_DIRECTORY)/linux/$(OUTPUT_NAME)"
 
+# linux build called inside the docker container
 build-docker-linux: check deps
 	go build -v -o "/build/$(OUTPUT_NAME)"
 
+# run tests
 test: check
 	go test -v ./...
 
+# clean build artefacts
 clean: check
 	go clean
 	rm -rf "$(OUTPUT_DIRECTORY)"
 
+# run built binary
 run: check build
 	"$(OUTPUT_DIRECTORY)/$(HOST_OS)/$(OUTPUT_NAME)"
-
