@@ -1,19 +1,23 @@
 OUTPUT_NAME=$(shell basename $(CURDIR))
+OUTPUT_PATH=$(GOPATH)/bin/$(OUTPUT_NAME)
 
 all: test build
 
 deps:
-	go get -d
+	@go get -d
 
-build: 
-	@go build -v -o $(OUTPUT_NAME)
-test: 
+build:
+	@go build -v -o $(OUTPUT_PATH)
+	
+test:
 	@go test -v ./...
-clean: 
+
+clean:
 	@go clean
-	@rm -f $(OUTPUT_NAME)
+	@rm -f $(OUTPUT_PATH)
+
 run:	build
-	@./$(OUTPUT_NAME)
+	@$(OUTPUT_PATH)
 
 # Cross compilation
 # build-linux:
