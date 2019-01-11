@@ -4,14 +4,20 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-func initLogger() {
-	formatter := new(log.TextFormatter)
-	formatter.TimestampFormat = "02-01-2006 15:04:05"
-	formatter.FullTimestamp = true
-	log.SetFormatter(formatter)
+func Init() {
+	initLogger()
 }
 
-func Init() {
-	log.Info("Initializing...")
-	initLogger()
+func initLogger() {
+	log.SetFormatter(&Formatter{
+		HideKeys:        true,
+		FieldsOrder:     []string{"component", "category"},
+		TimestampFormat: "15:04:05",
+		// FieldsOrder     []string // default: fields sorted alphabetically
+		// TimestampFormat string   // default: time.StampMilli = "Jan _2 15:04:05.000"
+		// HideKeys        bool     // show [fieldValue] instead of [fieldKey:fieldValue]
+		// NoColors        bool     // disable colors
+		// NoFieldsColors  bool     // color only level, default is level + fields
+		// ShowFullLevel   bool     // true to show full level [WARNING] instead [WARN]
+	})
 }
