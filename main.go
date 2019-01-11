@@ -18,6 +18,6 @@ import "github.com/michaKFromParis/sparks/cmd"
 import "github.com/michaKFromParis/sparks/sys"
 
 func main() {
-  sys.Init()
+	sys.Init()
 	cmd.Execute()
 }

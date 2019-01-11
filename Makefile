@@ -4,20 +4,24 @@ OUTPUT_PATH=$(GOPATH)/bin/$(OUTPUT_NAME)
 all: test build
 
 deps:
-	@go get -d
+	go get -d
+	go get golang.org/x/tools/cmd/goimports
 
-build:
-	@go build -v -o $(OUTPUT_PATH)
+style:
+	goimports -l -w .
+
+build: style
+	go build -v -o $(OUTPUT_PATH)
 	
 test:
-	@go test -v ./...
+	go test -v ./...
 
 clean:
-	@go clean
-	@rm -f $(OUTPUT_PATH)
+	go clean
+	rm -f $(OUTPUT_PATH)
 
-run:	build
-	@$(OUTPUT_PATH)
+run: build
+	$(OUTPUT_PATH)
 
 # Cross compilation
 # build-linux:
