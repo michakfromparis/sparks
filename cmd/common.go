@@ -4,6 +4,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/michaKFromParis/sparks/config"
 	"github.com/michaKFromParis/sparks/platform"
+	"github.com/michaKFromParis/sparks/utils"
 )
 
 func precmd() {
@@ -17,14 +18,15 @@ func precmd() {
 	}
 	// setting default platform if no platform selected
 	if c == 0 {
+
+		default_platform := utils.GetOs()
 		i = 0
 		for name, _ := range platform.Platforms {
-			if name == "osx" {
+			if name == default_platform {
 				enabledPlatforms[i] = true
 			}
 			i++
 		}
-		config.Platforms["osx"] = true
 	}
 	// setting default configuration if no configuration selected
 	if !config.Debug && !config.Release && !config.Shipping {
