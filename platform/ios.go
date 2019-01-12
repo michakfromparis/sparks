@@ -1,5 +1,11 @@
 package platform
 
+import (
+	"fmt"
+
+	log "github.com/Sirupsen/logrus"
+)
+
 type Ios struct {
 }
 
@@ -21,21 +27,23 @@ func (p Ios) Deps() {
 func (p Ios) Clean() {
 
 }
-func (p Ios) Prebuild() {
+func (p Ios) Build(configuration Configuration) {
+	log.Info(fmt.Sprintf("Building %s-%s", p.Title(), configuration))
+	p.prebuild()
+	p.generate()
+	p.compile()
+	p.postbuild()
+}
+
+func (p Ios) prebuild() {
 
 }
-func (p Ios) Generate() {
+func (p Ios) generate() {
 
 }
-func (p Ios) Build() {
+func (p Ios) compile() {
 
 }
-func (p Ios) Sign() {
-
-}
-func (p Ios) Wrap() {
-
-}
-func (p Ios) Postbuild() {
+func (p Ios) postbuild() {
 
 }

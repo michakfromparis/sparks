@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"path"
 
+	"github.com/michaKFromParis/sparks/platform"
 	"github.com/michaKFromParis/sparks/utils"
 )
 
@@ -22,9 +23,9 @@ func Init() {
 
 func Format() string {
 	platforms := ""
-	for platform, enabled := range Platforms {
-		if enabled {
-			platforms += platform + " "
+	for _, name := range platform.PlatformNames {
+		if Platforms[name] {
+			platforms += name + " "
 		}
 	}
 	return fmt.Sprintf(

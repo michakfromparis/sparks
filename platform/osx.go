@@ -1,6 +1,10 @@
 package platform
 
-import log "github.com/Sirupsen/logrus"
+import (
+	"fmt"
+
+	log "github.com/Sirupsen/logrus"
+)
 
 type Osx struct {
 }
@@ -23,21 +27,23 @@ func (p Osx) Deps() {
 func (p Osx) Clean() {
 
 }
-func (p Osx) Prebuild() {
+func (p Osx) Build(configuration Configuration) {
+	log.Info(fmt.Sprintf("Building %s-%s", p.Title(), configuration))
+	p.prebuild()
+	p.generate()
+	p.compile()
+	p.postbuild()
+}
+
+func (p Osx) prebuild() {
 
 }
-func (p Osx) Generate() {
+func (p Osx) generate() {
 
 }
-func (p Osx) Build() {
+func (p Osx) compile() {
 
 }
-func (p Osx) Sign() {
-
-}
-func (p Osx) Wrap() {
-
-}
-func (p Osx) Postbuild() {
+func (p Osx) postbuild() {
 
 }

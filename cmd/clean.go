@@ -33,7 +33,11 @@ to quickly create a Cobra application.`,
 }
 
 func clean(cmd *cobra.Command, args []string) {
-	log.Info("Building")
+	precmd()
+
+	log.Info("Cleaning")
+
+	postcmd()
 }
 
 func init() {
