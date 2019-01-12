@@ -33,6 +33,7 @@ check:
 deps: check
 	go get -d
 	go get golang.org/x/tools/cmd/goimports
+	go get github.com/kisielk/errcheck
 
 
 # install development build dependencies
@@ -43,8 +44,12 @@ deps-dev: check deps
 format: check
 	-goimports -l -w .
 
+# check for untested errors in code
+errcheck: check
+	-errcheck $(IMPORT_PATH)
+
 # build
-build: check format
+build: check format errcheck
 	go build -v -o "$(OUTPUT_DIRECTORY)/$(HOST_OS)/$(OUTPUT_NAME)"
 	@du -h "$(OUTPUT_DIRECTORY)/$(HOST_OS)/$(OUTPUT_NAME)"
 
