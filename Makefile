@@ -41,15 +41,15 @@ deps-dev: check deps
 
 # format go code
 format: check
-	goimports -l -w .
+	-goimports -l -w .
 
 # build
-build: check format install
+build: check format
 	go build -v -o "$(OUTPUT_DIRECTORY)/$(HOST_OS)/$(OUTPUT_NAME)"
 	@du -h "$(OUTPUT_DIRECTORY)/$(HOST_OS)/$(OUTPUT_NAME)"
 
 # install into "$(GOPATH)/bin"
-install:
+install: build
 	@cp "$(OUTPUT_DIRECTORY)/$(HOST_OS)/$(OUTPUT_NAME)" "$(GOPATH)/bin/"
 
 # build linux binary inside a docker container

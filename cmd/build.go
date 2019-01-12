@@ -16,10 +16,15 @@ package cmd
 
 import (
 	log "github.com/Sirupsen/logrus"
+	"github.com/michaKFromParis/sparks/config"
+	"github.com/michaKFromParis/sparks/platform"
 	"github.com/spf13/cobra"
 )
 
-// buildCmd represents the build command
+var debug, release, shipping, osx, ios bool
+
+var enabledPlatforms []bool
+
 var buildCmd = &cobra.Command{
 	Use:   "build",
 	Short: "A brief description of your command",
@@ -32,12 +37,46 @@ to quickly create a Cobra application.`,
 	Run: build,
 }
 
+func configure_platforms() {
+	i := 0
+	for _, p := range platform.Platforms {
+		if enabledPlatforms[i] {
+			config.Platforms[p.Name()] = true
+		}
+		i++
+	}
+}
+
 func build(cmd *cobra.Command, args []string) {
-	log.Info("Building")
+	configure_platforms()
+	i := 0
+	for _, p := range platform.Platforms {
+		if enabledPlatforms[i] {
+
+			log.Info("Building " + p.Title())
+			p.Prebuild()
+			p.Generate()
+			p.Build()
+			p.Postbuild()
+		}
+		i++
+	}
 }
 
 func init() {
+
 	rootCmd.AddCommand(buildCmd)
+
+	enabledPlatforms = make([]bool, len(platform.Platforms))
+	i := 0
+	for _, p := range platform.Platforms {
+		buildCmd.Flags().BoolVarP(&enabledPlatforms[i], p.Name(), p.Opt(), false, "Build "+p.Title()+" platform")
+		i++
+	}
+
+	buildCmd.Flags().BoolVarP(&config.Debug, "debug", "d", false, "Build debug configuration")
+	buildCmd.Flags().BoolVarP(&config.Release, "release", "r", true, "Build release configuration")
+	buildCmd.Flags().BoolVarP(&config.Shipping, "shipping", "s", false, "Build shipping configuration")
 
 	// Here you will define your flags and configuration settings.
 

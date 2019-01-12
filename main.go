@@ -1,11 +1,15 @@
 package main
 
 import (
+	log "github.com/Sirupsen/logrus"
 	"github.com/michaKFromParis/sparks/cmd"
-	"github.com/michaKFromParis/sparks/log"
+	"github.com/michaKFromParis/sparks/config"
+	"github.com/michaKFromParis/sparks/logger"
 )
 
 func main() {
-	log.Init()
+	logger.Init()
+	config.Init()
 	cmd.Execute()
+	log.Info(config.Format())
 }
