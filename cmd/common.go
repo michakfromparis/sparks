@@ -41,8 +41,13 @@ func precmd() {
 		}
 		i++
 	}
-	log.Info(config.Format())
+	log.Info(config.String())
 
 }
+
+func LoadProjectConfig() {
+
+}
+
 func postcmd() {
 }

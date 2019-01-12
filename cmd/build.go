@@ -26,7 +26,7 @@ var enabledPlatforms []bool
 
 var buildCmd = &cobra.Command{
 	Use:   "build",
-	Short: "A brief description of your command",
+	Short: "Build a sparks product",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
@@ -70,9 +70,11 @@ func init() {
 		i++
 	}
 
+	buildCmd.Flags().StringVarP(&config.OutputDirectory, "output", "", "", "Output directory for all selected builds")
 	buildCmd.Flags().BoolVarP(&config.Debug, "debug", "d", false, "Build debug configuration")
 	buildCmd.Flags().BoolVarP(&config.Release, "release", "r", false, "Build release configuration")
 	buildCmd.Flags().BoolVarP(&config.Shipping, "shipping", "s", false, "Build shipping configuration")
+	buildCmd.Flags().SortFlags = false
 
 	// Here you will define your flags and configuration settings.
 
