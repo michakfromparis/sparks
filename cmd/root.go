@@ -17,7 +17,10 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path"
 
+	log "github.com/Sirupsen/logrus"
+	"github.com/michaKFromParis/sparks/errx"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -28,7 +31,7 @@ var cfgFile string
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "sparks",
-	Short: "A brief description of your application",
+	Short: "command line interface to the sparks framework",
 	Long: `A longer description that spans multiple lines and likely contains
 examples and usage of using your application. For example:
 
@@ -55,11 +58,12 @@ func init() {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.sparks.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.sparks/config.yaml)")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.Flags().SortFlags = false
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -71,19 +75,20 @@ func initConfig() {
 		// Find home directory.
 		home, err := homedir.Dir()
 		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+			errx.Fatal(err, "Could not determine home directory")
 		}
 
 		// Search config in home directory with name ".sparks" (without extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigName(".sparks")
+		viper.AddConfigPath(path.Join(home, ".sparks"))
+		viper.SetConfigName("config")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	if err := viper.ReadInConfig(); err != nil {
+		errx.Warning(err, "Could not read config from: "+viper.ConfigFileUsed())
+	} else {
+		log.Debug("Loaded config from: " + viper.ConfigFileUsed())
 	}
 }

@@ -10,13 +10,14 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-func Init() {
+func Init() error {
 	log.SetFormatter(&Formatter{
 		HideKeys:        true,
 		FieldsOrder:     []string{"component", "category"},
 		TimestampFormat: "15:04:05",
 	})
 	log.Info("Initialized logger")
+	return nil
 }
 
 // FROM https://github.com/antonfisher/nested-logrus-formatter/blob/master/formatter.go
