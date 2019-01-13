@@ -65,6 +65,8 @@ func init_build() {
 		i++
 	}
 
+	buildCmd.Flags().StringVarP(&config.ProductName, "name", "", "", "Product name")
+	buildCmd.Flags().StringVarP(&config.SourceDirectory, "source", "", "", "Source directory")
 	buildCmd.Flags().StringVarP(&config.OutputDirectory, "output", "", "", "Output directory for all selected builds")
 	buildCmd.Flags().SortFlags = false
 }
