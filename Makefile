@@ -1,11 +1,18 @@
 # constants
 
+# default source directory
+SOURCE_DIRECTORY=$(GOPATH)/src
+# default build output directory
+OUTPUT_DIRECTORY=$(CURDIR)/build
 # default to current directory name
 OUTPUT_NAME=$(shell basename $(CURDIR))
-# substracting GOPATH from current directory to deduct import path. i.e. github.com/user/project
-IMPORT_PATH=$(subst $(GOPATH)/src/,,$(CURDIR))
-# build output directory
-OUTPUT_DIRECTORY=$(CURDIR)/build
+# substracting GOPATH from source directory to deduct import path. i.e. github.com/user/project
+IMPORT_PATH=$(subst $(SOURCE_DIRECTORY)/,,$(CURDIR))
+
+# GOPATH must be set
+ifndef GOPATH
+$(error GOPATH is not set)
+endif
 
 # host os detection
 HOST_OS=unknown
@@ -20,7 +27,6 @@ else
 		HOST_OS=osx
 	endif
 endif
-
 
 # default to test and build
 all: test build
@@ -38,6 +44,7 @@ deps: check
 
 # install development build dependencies
 deps-dev: check deps
+	go get golang.org/x/tools/cmd/gorename
 	# go get github.com/spf13/cobra/cobra
 
 # format go code
@@ -75,7 +82,7 @@ run-docker: check
 		golang:latest                           \
 		/build/$(OUTPUT_NAME) $(ARGS)
 
-# linux build called inside the docker container
+# linux build inside a docker container, see build-docker rule above
 build-docker-linux: check deps
 	go build -v -o "/build/$(OUTPUT_NAME)"
 
