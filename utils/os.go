@@ -26,7 +26,7 @@ func (o Os) String() string {
 
 func GetOs() (Os, error) {
 	switch os := runtime.GOOS; os {
-	case "daw-rwin":
+	case "darwin":
 		return Osx, nil
 	case "linux":
 		return Linux, nil

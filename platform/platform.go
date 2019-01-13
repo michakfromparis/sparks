@@ -1,41 +1,19 @@
 package platform
 
-type Configuration int
+import "github.com/michaKFromParis/sparks/sparks"
 
-const (
-	Debug Configuration = iota + 1
-	Release
-	Shipping
-)
-
-func (c Configuration) String() string {
-	return [...]string{"Debug", "Release", "Shipping"}[c-1]
+func RegisterPlatforms() {
+	sparks.RegisterPlatform(Osx{})
+	sparks.RegisterPlatform(Ios{})
+	sparks.RegisterPlatform(WebGl{})
 }
 
-type Platform interface {
-	// name() string
-	Name() string
-	Opt() string
-	Title() string
-
-	Deps()
-	Clean()
-	Build(Configuration)
-}
-
-// var Platforms = []Platform{
-// 	Osx{},
-// 	Ios{},
-// }
-
-var Platforms = map[string]Platform{
-	"osx":   Osx{},
-	"ios":   Ios{},
-	"webgl": WebGl{},
-}
-
-var PlatformNames = []string{
-	"osx",
-	"ios",
-	"webgl",
+func SetEnabledPlatforms(enabledPlatforms []bool) {
+	i := 0
+	for _, name := range sparks.PlatformNames {
+		if i < len(enabledPlatforms) && enabledPlatforms[i] {
+			sparks.Platforms[name].SetEnabled(true)
+		}
+		i++
+	}
 }

@@ -6,7 +6,7 @@ import (
 )
 
 var depsCmd = &cobra.Command{
-	Run: deps,
+	Run:   deps,
 	Use:   "deps",
 	Short: "Install system dependencies",
 	Long: `A longer description that spans multiple lines and likely contains examples
@@ -17,9 +17,8 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 }
 
-func deps(cmd *cobra.Command, args []string) error {
+func deps(cmd *cobra.Command, args []string) {
 	log.Info("Installing dependencies")
-	return nil
 }
 
 func init() {

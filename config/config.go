@@ -5,7 +5,6 @@ import (
 	"path"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/michaKFromParis/sparks/platform"
 	"github.com/michaKFromParis/sparks/utils"
 )
 
@@ -27,12 +26,12 @@ func Init() error {
 }
 
 func String() string {
-	platforms := ""
-	for _, name := range platform.PlatformNames {
-		if Platforms[name] {
-			platforms += name + " "
-		}
-	}
+	// platforms := ""
+	// for _, name := range platform.PlatformNames {
+	// 	if Platforms[name] {
+	// 		platforms += name + " "
+	// 	}
+	// }
 	return fmt.Sprintf(
 		`Loaded Configuration:
 ProductName: %s
@@ -40,6 +39,6 @@ SourceDirectory: %s
 OutputDirectory: %s
 Debug: %t
 Release: %t
-Shipping: %t
-Platforms: %s`, ProductName, SourceDirectory, OutputDirectory, Debug, Release, Shipping, platforms)
+Shipping: %t`, ProductName, SourceDirectory, OutputDirectory, Debug, Release, Shipping)
+	// Platforms: %s`, ProductName, SourceDirectory, OutputDirectory, Debug, Release, Shipping, platforms)
 }

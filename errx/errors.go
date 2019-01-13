@@ -15,17 +15,25 @@ func Warning(err error, message string) {
 	}
 }
 
-func Error(err error, message string) {
+func Error(message string) {
+	log.Error(message)
+}
+
+func ErrorX(err error, message string) {
 	if err != nil {
 		log.Errorf("%+v", errorx.Decorate(err, message))
 	} else {
-		log.Error(message)
+		Error(message)
 	}
 }
 
-func Fatal(err error, message string) {
+func Fatal(err error) {
+	log.Fatalf("%v", err)
+}
+
+func FatalF(err error, message string) {
 	if err != nil {
-		log.Fatalf("%+v", errorx.Decorate(err, message))
+		Fatal(errorx.Decorate(err, message))
 	} else {
 		log.Fatal(message)
 	}
