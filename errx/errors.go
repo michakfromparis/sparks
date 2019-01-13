@@ -19,7 +19,7 @@ func Error(message string) {
 	log.Error(message)
 }
 
-func ErrorX(err error, message string) {
+func Errorf(err error, message string) {
 	if err != nil {
 		log.Errorf("%+v", errorx.Decorate(err, message))
 	} else {
@@ -31,7 +31,7 @@ func Fatal(err error) {
 	log.Fatalf("%v", err)
 }
 
-func FatalF(err error, message string) {
+func Fatalf(err error, message string) {
 	if err != nil {
 		Fatal(errorx.Decorate(err, message))
 	} else {

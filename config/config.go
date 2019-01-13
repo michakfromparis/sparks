@@ -25,7 +25,7 @@ func Init() error {
 
 	var err error
 	if SourceDirectory, err = utils.Pwd(); err != nil {
-		errx.FatalF(err, "could not determine current working directory")
+		errx.Fatalf(err, "could not determine current working directory")
 	}
 	OutputDirectory = path.Join(SourceDirectory, "build")
 	Platforms = make(map[string]bool)
@@ -34,6 +34,12 @@ func Init() error {
 }
 
 func String() string {
+	// platforms := ""
+	// for _, name := range platform.PlatformNames {
+	// 	if Platforms[name] {
+	// 		platforms += name + " "
+	// 	}
+	// }
 	return fmt.Sprintf(`Loaded Configuration:
 ProductName: %s
 SourceDirectory: %s
@@ -42,6 +48,7 @@ Debug: %t
 Release: %t
 Shipping: %t
 Verbose: %t
-Platforms: %s`, ProductName, SourceDirectory, OutputDirectory, Debug, Release, Shipping, Verbose, platforms)
+Platforms: %s`, ProductName, SourceDirectory, OutputDirectory, Debug, Release, Shipping, Verbose)
+	// Platforms: %s`, ProductName, SourceDirectory, OutputDirectory, Debug, Release, Shipping, Verbose, platforms)
 
 }
