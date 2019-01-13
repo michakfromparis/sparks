@@ -34,7 +34,7 @@ deps: check
 	go get -d
 	go get golang.org/x/tools/cmd/goimports
 	go get github.com/kisielk/errcheck
-
+	go get github.com/maruel/panicparse
 
 # install development build dependencies
 deps-dev: check deps
@@ -42,11 +42,11 @@ deps-dev: check deps
 
 # format go code
 format: check
-	-goimports -l -w .
+	# -goimports -l -w .
 
 # check for untested errors in code
 errcheck: check
-	-errcheck $(IMPORT_PATH)
+	-errcheck ./...
 
 # build
 build: check format errcheck
@@ -83,4 +83,4 @@ clean: check
 
 # run built binary
 run: check build
-	"$(OUTPUT_DIRECTORY)/$(HOST_OS)/$(OUTPUT_NAME)"
+	"$(OUTPUT_DIRECTORY)/$(HOST_OS)/$(OUTPUT_NAME)" $(COMMAND_ARGS) 2>&1 | panicparse
