@@ -32,7 +32,7 @@ func Init() error {
 	return nil
 }
 
-// FROM https://github.com/antonfisher/nested-logrus-formatter/blob/master/formatter.go
+// modified FROM https://github.com/antonfisher/nested-logrus-formatter/blob/master/formatter.go
 
 // Formatter - logrus formatter, implements logrus.Formatter
 type Formatter struct {
