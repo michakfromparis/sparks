@@ -34,10 +34,12 @@ func String() string {
 		}
 	}
 	return fmt.Sprintf(
-		`SourceDirectory: %s
-		 OutputDirectory: %s
-		 Debug: %t
-		 Release: %t
-		 Shipping: %t
-		 Platforms: %s`, SourceDirectory, OutputDirectory, Debug, Release, Shipping, platforms)
+		`Loaded Configuration:
+ProductName: %s
+SourceDirectory: %s
+OutputDirectory: %s
+Debug: %t
+Release: %t
+Shipping: %t
+Platforms: %s`, ProductName, SourceDirectory, OutputDirectory, Debug, Release, Shipping, platforms)
 }

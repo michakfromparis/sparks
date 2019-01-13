@@ -8,15 +8,27 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/michaKFromParis/sparks/utils"
 )
 
 func Init() error {
+
 	log.SetFormatter(&Formatter{
 		HideKeys:        true,
+		ShowFullLevel:   true,
 		FieldsOrder:     []string{"component", "category"},
 		TimestampFormat: "15:04:05",
 	})
-	log.Info("Initialized logger")
+	log.SetLevel(log.TraceLevel)
+
+	log.Infof("Initialized logger at level %s", log.GetLevel().String())
+	// log.Trace("Trace Sample")
+	// log.Debug("Debug Sample")
+	// log.Info("Info Sample")
+	// log.Warn("Warning Sample")
+	// log.Error("Error Sample")
+	// log.Fatal("Critical Sample")
+	// log.Panic("Panic Sample")
 	return nil
 }
 
@@ -32,9 +44,54 @@ type Formatter struct {
 	ShowFullLevel   bool     // true to show full level [WARNING] instead [WARN]
 }
 
+// Color numbers for stdout
+const (
+	Black = (iota + 30)
+	Red
+	Green
+	Yellow
+	Blue
+	Magenta
+	Cyan
+	White
+)
+
+func ColorSeq(color int) string {
+	return fmt.Sprintf("\033[%dm", color)
+}
+
+func ColorSeqFaint(color int) string {
+	return fmt.Sprintf("\033[2m\033[%dm", color)
+}
+
+func ColorSeqBold(color int) string {
+	return fmt.Sprintf("\033[%d;1m", color)
+}
+
+func getColorByLevel(level log.Level) (string, string) {
+	switch level {
+	case log.TraceLevel:
+		return ColorSeq(Blue), ColorSeqFaint(White)
+	case log.DebugLevel:
+		return ColorSeq(Cyan), ColorSeqFaint(White)
+	case log.InfoLevel:
+		return ColorSeq(Green), ColorSeq(White)
+	case log.WarnLevel:
+		return ColorSeq(Yellow), ColorSeq(White)
+	case log.ErrorLevel:
+		return ColorSeq(Red), ColorSeqBold(White)
+	case log.FatalLevel, log.PanicLevel:
+		return ColorSeqBold(Red), ColorSeqBold(White)
+	default:
+		return ColorSeq(White), ColorSeq(White)
+	}
+}
+
 // Format an log entry
 func (f *Formatter) Format(entry *log.Entry) ([]byte, error) {
-	levelColor := getColorByLevel(entry.Level)
+	timeColor := ColorSeq(Yellow)
+	resetColor := ColorSeq(0)
+	levelColor, messageColor := getColorByLevel(entry.Level)
 
 	timestampFormat := f.TimestampFormat
 	if timestampFormat == "" {
@@ -44,27 +101,17 @@ func (f *Formatter) Format(entry *log.Entry) ([]byte, error) {
 	// output buffer
 	b := &bytes.Buffer{}
 
-	// write time
-	b.WriteString(entry.Time.Format(timestampFormat))
+	b.WriteString(fmt.Sprintf("[%s%s%s]", timeColor, entry.Time.Format(timestampFormat), resetColor))
 
 	// write level
-	level := strings.ToUpper(entry.Level.String())
-
-	if !f.NoColors {
-		fmt.Fprintf(b, "\x1b[%dm", levelColor)
-	}
-
-	b.WriteString(" [")
+	level := strings.Title(entry.Level.String())
 	if f.ShowFullLevel {
-		b.WriteString(level)
+		level = fmt.Sprintf("%-7s", level)
 	} else {
-		b.WriteString(level[:4])
+		level = level[:4]
 	}
-	b.WriteString("] ")
 
-	if !f.NoColors && f.NoFieldsColors {
-		b.WriteString("\x1b[0m")
-	}
+	b.WriteString(fmt.Sprintf("[%s%s%s] ", levelColor, level, resetColor))
 
 	// write fields
 	if f.FieldsOrder == nil {
@@ -72,15 +119,13 @@ func (f *Formatter) Format(entry *log.Entry) ([]byte, error) {
 	} else {
 		f.writeOrderedFields(b, entry)
 	}
-
 	if !f.NoColors && !f.NoFieldsColors {
-		b.WriteString("\x1b[0m")
+		b.WriteString(ColorSeq(0))
 	}
 
 	// write message
-	b.WriteString(entry.Message)
-	b.WriteByte('\n')
-
+	b.WriteString(fmt.Sprintf("%s%s%s", messageColor, entry.Message, resetColor))
+	b.WriteString(utils.LineBreak)
 	return b.Bytes(), nil
 }
 
@@ -90,9 +135,7 @@ func (f *Formatter) writeFields(b *bytes.Buffer, entry *log.Entry) {
 		for field := range entry.Data {
 			fields = append(fields, field)
 		}
-
 		sort.Strings(fields)
-
 		for _, field := range fields {
 			f.writeField(b, entry, field)
 		}
@@ -131,25 +174,5 @@ func (f *Formatter) writeField(b *bytes.Buffer, entry *log.Entry, field string) 
 		fmt.Fprintf(b, "[%v] ", entry.Data[field])
 	} else {
 		fmt.Fprintf(b, "[%s:%v] ", field, entry.Data[field])
-	}
-}
-
-const (
-	colorRed    = 31
-	colorYellow = 33
-	colorBlue   = 36
-	colorGray   = 37
-)
-
-func getColorByLevel(level log.Level) int {
-	switch level {
-	case log.DebugLevel:
-		return colorGray
-	case log.WarnLevel:
-		return colorYellow
-	case log.ErrorLevel, log.FatalLevel, log.PanicLevel:
-		return colorRed
-	default:
-		return colorBlue
 	}
 }
