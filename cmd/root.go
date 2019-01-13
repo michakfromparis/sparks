@@ -33,5 +33,5 @@ func Execute() error {
 func init_root() {
 	log.Trace("root init")
 	rootCmd.Flags().SortFlags = false
-	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose log level")
+	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose log level. One of (panic, fatal, error, warning, debug, trace)")
 }

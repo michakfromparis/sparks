@@ -3,10 +3,12 @@ package logger
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"sort"
 	"strings"
 	"time"
 
+	"github.com/Sirupsen/logrus"
 	log "github.com/Sirupsen/logrus"
 	"github.com/michaKFromParis/sparks/utils"
 )
@@ -20,8 +22,9 @@ func Init() {
 		TimestampFormat: "15:04:05",
 	})
 	log.SetLevel(log.TraceLevel)
+	log.SetOutput(os.Stdout)
 
-	log.Infof("Initialized logger at level %s", log.GetLevel().String())
+	log.Infof("initialized logger at level %s", log.GetLevel().String())
 	// log.Trace("Trace Sample")
 	// log.Debug("Debug Sample")
 	// log.Info("Info Sample")
@@ -174,4 +177,17 @@ func (f *Formatter) writeField(b *bytes.Buffer, entry *log.Entry, field string) 
 	} else {
 		fmt.Fprintf(b, "[%s:%v] ", field, entry.Data[field])
 	}
+}
+
+type stderrHook struct {
+	logger *logrus.Logger
+}
+
+func (h *stderrHook) Levels() []logrus.Level {
+	return []logrus.Level{logrus.PanicLevel, logrus.FatalLevel, logrus.ErrorLevel, logrus.WarnLevel}
+}
+
+func (h *stderrHook) Fire(entry *logrus.Entry) error {
+	entry.Logger = h.logger
+	return nil
 }

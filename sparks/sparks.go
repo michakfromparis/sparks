@@ -15,7 +15,6 @@ func Shutdown() {
 }
 
 func LoadProjectConfig() {
-
 }
 
 func Build() {

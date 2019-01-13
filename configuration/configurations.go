@@ -1,6 +1,9 @@
 package configuration
 
-import "github.com/michaKFromParis/sparks/sparks"
+import (
+	log "github.com/Sirupsen/logrus"
+	"github.com/michaKFromParis/sparks/sparks"
+)
 
 func RegisterConfigurations() {
 	sparks.RegisterConfiguration(Debug{})
@@ -8,11 +11,12 @@ func RegisterConfigurations() {
 	sparks.RegisterConfiguration(Shipping{})
 }
 
-func SetEnabledConfigurations(enabledConfigurations []bool) {
+func SetEnabledConfigurations(configurations []bool) {
 	i := 0
 	for _, name := range sparks.ConfigurationNames {
-		if i < len(enabledConfigurations) && enabledConfigurations[i] {
+		if i < len(configurations) && configurations[i] {
 			sparks.Configurations[name].SetEnabled(true)
+			log.Debug("enabling configuration " + sparks.Configurations[name].Title())
 		}
 		i++
 	}

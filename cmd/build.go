@@ -44,8 +44,8 @@ func init_build() {
 
 	enabledPlatforms = make([]bool, len(sparks.Platforms))
 	enabledConfigurations = make([]bool, len(sparks.Configurations))
-	log.Infof("platforms: %d", len(sparks.Platforms))
-	log.Infof("configurations: %d", len(sparks.Configurations))
+	log.Tracef("registered platforms: %d", len(sparks.Platforms))
+	log.Tracef("registered configurations: %d", len(sparks.Configurations))
 
 	i := 0
 	for _, name := range sparks.PlatformNames {
