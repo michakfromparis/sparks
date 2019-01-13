@@ -38,7 +38,7 @@ deps: check
 
 # install development build dependencies
 deps-dev: check deps
-	go get github.com/spf13/cobra/cobra
+	# go get github.com/spf13/cobra/cobra
 
 # format go code
 format: check
@@ -68,6 +68,13 @@ build-docker: check
 		make build-docker-linux
 	@du -h "$(OUTPUT_DIRECTORY)/linux/$(OUTPUT_NAME)"
 
+# build linux binary inside a docker container
+run-docker: check
+	docker run --rm -it                         \
+		-v "$(OUTPUT_DIRECTORY)/linux":/build   \
+		golang:latest                           \
+		/build/$(OUTPUT_NAME) $(ARGS)
+
 # linux build called inside the docker container
 build-docker-linux: check deps
 	go build -v -o "/build/$(OUTPUT_NAME)"
@@ -83,4 +90,4 @@ clean: check
 
 # run built binary
 run: check build
-	"$(OUTPUT_DIRECTORY)/$(HOST_OS)/$(OUTPUT_NAME)" $(COMMAND_ARGS) 2>&1 | panicparse
+	"$(OUTPUT_DIRECTORY)/$(HOST_OS)/$(OUTPUT_NAME)" $(ARGS) 2>&1 | panicparse

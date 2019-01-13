@@ -3,20 +3,12 @@ package sparks
 import (
 	"github.com/michaKFromParis/sparks/config"
 	"github.com/michaKFromParis/sparks/errx"
-	"github.com/michaKFromParis/sparks/logger"
 )
 
 func Init() {
-
-	if err := logger.Init(); err != nil {
-		errx.FatalF(err, "Logger initialization failed")
-	}
 	if err := config.Init(); err != nil {
 		errx.FatalF(err, "Configuration initialization failed")
 	}
-	// if err := platform.Init(); err != nil {
-	// 	errx.FatalF(err, "Platforms initialization failed")
-	// }
 }
 
 func Shutdown() {

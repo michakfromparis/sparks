@@ -11,7 +11,7 @@ import (
 	"github.com/michaKFromParis/sparks/utils"
 )
 
-func Init() error {
+func Init() {
 
 	log.SetFormatter(&Formatter{
 		HideKeys:        true,
@@ -29,7 +29,6 @@ func Init() error {
 	// log.Error("Error Sample")
 	// log.Fatal("Critical Sample")
 	// log.Panic("Panic Sample")
-	return nil
 }
 
 // modified FROM https://github.com/antonfisher/nested-logrus-formatter/blob/master/formatter.go
