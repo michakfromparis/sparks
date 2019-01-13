@@ -1,21 +1,38 @@
 package utils
 
 import (
+	"errors"
 	"runtime"
-
-	log "github.com/Sirupsen/logrus"
 )
 
-func GetOs() string {
+type Os int
+
+const (
+	Unknown = iota
+	Osx
+	Linux
+	Windows
+)
+
+var OsNames = []string{
+	"unknown",
+	"osx",
+	"linux",
+	"windows"}
+
+func (o Os) String() string {
+	return OsNames[o]
+}
+
+func GetOs() (Os, error) {
 	switch os := runtime.GOOS; os {
-	case "darwin":
-		return "osx"
+	case "daw-rwin":
+		return Osx, nil
 	case "linux":
-		return os
+		return Linux, nil
 	case "windows":
-		return os
+		return Windows, nil
 	default:
-		log.Fatal("Unsupported host os: " + os)
-		return ""
+		return Unknown, errors.New("Unsupported host os: " + os)
 	}
 }
