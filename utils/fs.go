@@ -3,12 +3,17 @@ package utils
 import (
 	"os"
 	"path/filepath"
+
+	log "github.com/Sirupsen/logrus"
+	"github.com/michaKFromParis/sparks/errx"
 )
 
-func Pwd() string {
-	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+func Pwd() (string, error) {
+	log.Trace("pwd")
+	path, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
-		// Fatal(err)
+		errx.Fatalf(err, "Could not determine current working directory")
 	}
-	return dir
+	log.Debug("pwd: " + path)
+	return path, err
 }
