@@ -6,7 +6,7 @@ import (
 	"github.com/michaKFromParis/sparks/logger"
 )
 
-func Initialize() {
+func Init() {
 
 	if err := logger.Init(); err != nil {
 		errx.FatalF(err, "Logger initialization failed")
@@ -29,10 +29,10 @@ func LoadProjectConfig() {
 func Build() {
 	for _, platformName := range PlatformNames {
 		platform := Platforms[platformName]
-		if platform.Enabled() {
+		if platform != nil && platform.Enabled() {
 			for _, configurationName := range ConfigurationNames {
 				configuration := Configurations[configurationName]
-				if configuration.Enabled() {
+				if configuration != nil && configuration.Enabled() {
 					platform.Build(configuration)
 				}
 			}

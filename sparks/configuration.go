@@ -22,6 +22,6 @@ var ConfigurationNames = []string{
 }
 
 func RegisterConfiguration(configuration Configuration) {
-	log.Info("Registering configuration: " + configuration.Name())
+	log.Debug("Registering configuration: " + configuration.Title())
 	Configurations[configuration.Name()] = configuration
 }

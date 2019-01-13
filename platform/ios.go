@@ -12,49 +12,53 @@ type Ios struct {
 	enabled bool
 }
 
-func (p Ios) Name() string {
+func (i Ios) Name() string {
 	return "ios"
 }
 
-func (p Ios) Title() string {
+func (i Ios) Title() string {
 	return "iOS"
 }
 
-func (p Ios) Opt() string {
+func (i Ios) Opt() string {
 	return "i"
 }
 
-func (p Ios) Enabled() bool {
-	return p.enabled
+func (i Ios) String() string {
+	return i.Title()
 }
 
-func (p Ios) SetEnabled(enabled bool) {
-	p.enabled = enabled
+func (i Ios) Enabled() bool {
+	return i.enabled
 }
 
-func (p Ios) Deps() {
-
-}
-func (p Ios) Clean() {
-
-}
-func (p Ios) Build(configuration sparks.Configuration) {
-	log.Info(fmt.Sprintf("Building %s-%s", p.Title(), configuration))
-	p.prebuild()
-	p.generate()
-	p.compile()
-	p.postbuild()
+func (i Ios) SetEnabled(enabled bool) {
+	i.enabled = enabled
 }
 
-func (p Ios) prebuild() {
+func (i Ios) Deps() {
 
 }
-func (p Ios) generate() {
+func (i Ios) Clean() {
 
 }
-func (p Ios) compile() {
+func (i Ios) Build(configuration sparks.Configuration) {
+	log.Info(fmt.Sprintf("Building %s-%s", i.Title(), configuration))
+	i.prebuild()
+	i.generate()
+	i.compile()
+	i.postbuild()
+}
+
+func (i Ios) prebuild() {
 
 }
-func (p Ios) postbuild() {
+func (i Ios) generate() {
+
+}
+func (i Ios) compile() {
+
+}
+func (i Ios) postbuild() {
 
 }

@@ -42,7 +42,7 @@ deps-dev: check deps
 
 # format go code
 format: check
-	# -goimports -l -w .
+	-goimports -l -w .
 
 # check for untested errors in code
 errcheck: check

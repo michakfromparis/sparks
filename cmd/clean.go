@@ -24,7 +24,8 @@ func clean(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func init() {
+func init_clean() {
+	log.Trace("clean init")
 	rootCmd.AddCommand(cleanCmd)
 
 	// Here you will define your flags and configuration settings.

@@ -24,6 +24,10 @@ func (p Osx) Opt() string {
 	return "o"
 }
 
+func (p Osx) String() string {
+	return p.Title()
+}
+
 func (p Osx) Enabled() bool {
 	return p.enabled
 }

@@ -1,4 +1,4 @@
-package configurations
+package configuration
 
 type Release struct {
 	enabled bool

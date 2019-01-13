@@ -1,4 +1,4 @@
-package configurations
+package configuration
 
 type Shipping struct {
 	enabled bool

@@ -21,6 +21,7 @@ func deps(cmd *cobra.Command, args []string) {
 	log.Info("Installing dependencies")
 }
 
-func init() {
+func init_deps() {
+	log.Trace("deps init")
 	rootCmd.AddCommand(depsCmd)
 }

@@ -2,8 +2,9 @@ package cmd
 
 import (
 	log "github.com/Sirupsen/logrus"
+	"github.com/michaKFromParis/sparks/config"
+	"github.com/michaKFromParis/sparks/configuration"
 	"github.com/michaKFromParis/sparks/platform"
-	"github.com/michaKFromParis/sparks/configurations"
 	"github.com/michaKFromParis/sparks/sparks"
 	"github.com/spf13/cobra"
 )
@@ -29,17 +30,16 @@ var enabledPlatforms []bool
 var enabledConfigurations []bool
 
 func build(cmd *cobra.Command, args []string) {
-	platform.RegisterPlatforms()
 	platform.SetEnabledPlatforms(enabledPlatforms)
-	configurations.SetEnabledConfigurations(enabledConfigurations)
-	sparks.Initialize()
+	configuration.SetEnabledConfigurations(enabledConfigurations)
+	sparks.Init()
 	sparks.Build()
 	sparks.Shutdown()
 }
 
-func init() {
+func init_build() {
 
-	log.Info("QQQ")
+	log.Trace("build init")
 	rootCmd.AddCommand(buildCmd)
 
 	enabledPlatforms = make([]bool, len(sparks.Platforms))
@@ -47,23 +47,24 @@ func init() {
 	log.Infof("platforms: %d", len(sparks.Platforms))
 	log.Infof("configurations: %d", len(sparks.Configurations))
 
-	// i := 0
-	// for _, name := range sparks.PlatformNames {
-	// 	p := sparks.Platforms[name]
-	// 	buildCmd.Flags().BoolVarP(&enabledPlatforms[i], p.Name(), p.Opt(), false, "Build "+p.Title()+" platform")
-	// 	i++
-	// }
+	i := 0
+	for _, name := range sparks.PlatformNames {
+		p := sparks.Platforms[name]
+		if p != nil && i < len(enabledPlatforms) {
+			buildCmd.Flags().BoolVarP(&enabledPlatforms[i], p.Name(), p.Opt(), false, "Build "+p.Title()+" platform")
+		}
+		i++
+	}
 
-	// i = 0
-	// for _, name := range sparks.ConfigurationNames {
-	// 	c := sparks.Configurations[name]
-	// 	buildCmd.Flags().BoolVarP(&enabledConfigurations[i], c.Name(), c.Opt(), false, "Build "+c.Title()+" configuration")
-	// 	i++
-	// }
+	i = 0
+	for _, name := range sparks.ConfigurationNames {
+		c := sparks.Configurations[name]
+		if c != nil && i < len(enabledConfigurations) {
+			buildCmd.Flags().BoolVarP(&enabledConfigurations[i], c.Name(), c.Opt(), false, "Build "+c.Title()+" configuration")
+		}
+		i++
+	}
 
-	// buildCmd.Flags().StringVarP(&config.OutputDirectory, "output", "", "", "Output directory for all selected builds")
-	// buildCmd.Flags().BoolVarP(&config.Debug, "debug", "d", false, "Build debug configuration")
-	// buildCmd.Flags().BoolVarP(&config.Release, "release", "r", false, "Build release configuration")
-	// buildCmd.Flags().BoolVarP(&config.Shipping, "shipping", "s", false, "Build shipping configuration")
-	// buildCmd.Flags().SortFlags = false
+	buildCmd.Flags().StringVarP(&config.OutputDirectory, "output", "", "", "Output directory for all selected builds")
+	buildCmd.Flags().SortFlags = false
 }

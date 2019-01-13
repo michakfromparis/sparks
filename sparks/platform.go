@@ -26,6 +26,6 @@ var PlatformNames = []string{
 }
 
 func RegisterPlatform(platform Platform) {
-	log.Info("Registering platform: " + platform.Name())
+	log.Debug("Registering platform: " + platform.Title())
 	Platforms[platform.Name()] = platform
 }
