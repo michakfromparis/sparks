@@ -3,7 +3,9 @@ package utils
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os/exec"
+	"regexp"
 	"runtime"
 	"strings"
 
@@ -43,10 +45,10 @@ func GetOs() (Os, error) {
 	}
 }
 
-func Execute(name string, args ...string) (string, error) {
-	fullCommand := fmt.Sprintf("%s %s", name, strings.Join(args[:], " "))
+func Execute(filename string, args ...string) (string, error) {
+	fullCommand := fmt.Sprintf("%s %s", filename, strings.Join(args[:], " "))
 	log.Debugf("executing %s", fullCommand)
-	cmd := exec.Command(name, args...)
+	cmd := exec.Command(filename, args...)
 	bytes, err := cmd.CombinedOutput()
 	if err != nil {
 		errx.Fatalf(err, "failed to execute "+fullCommand)
@@ -54,4 +56,24 @@ func Execute(name string, args ...string) (string, error) {
 	out := string(bytes)
 	log.Tracef("combined output:%s%s", LineBreak, out)
 	return out, nil
+}
+
+func Sed(filename string, regex string, newContent string) {
+	log.Tracef("sed %s %s in %s", regex, newContent, filename)
+	bytes, err := ioutil.ReadFile(filename)
+	if err != nil {
+		errx.Fatalf(err, "Could not read: "+filename)
+	}
+	re := regexp.MustCompile(regex)
+	// log.Trace(string(bytes))
+	matched := re.MatchString(string(bytes))
+	if !matched {
+		log.Warnf("regex %s did not match content of %s", regex, filename)
+	}
+	data := re.ReplaceAllString(string(bytes), newContent)
+	// log.Trace(data)
+	err = ioutil.WriteFile(filename, []byte(data), 0644)
+	if err != nil {
+		errx.Fatalf(err, "Could not write to: "+filename)
+	}
 }
