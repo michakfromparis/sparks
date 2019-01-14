@@ -109,13 +109,16 @@ func generateLuaBindings(sourceDirectory string, packageName string) {
 	reflectionFile := filepath.Join(sourceDirectory, packageName+".Reflection.lua")
 	utils.Sed(reflectionFile, "dofile\\(.*\\)", dofileWithCorrectPath)
 	packagePath := filepath.Join(sourceDirectory, packageName)
-	out, err := utils.Execute(
-		toluapp, "-L", packagePath+".Reflection.lua",
+	output, err := utils.ExecuteEx(
+		toluapp,
+		sourceDirectory,
+		true,
+		"-L", packagePath+".Reflection.lua",
 		"-n", packageName,
 		"-o", packagePath+".tolua.cpp",
 		"-H", packagePath+".tolua.h",
 		packagePath+".pkg")
 	if err != nil {
-		errx.Fatalf(err, "tolua++ execution failed: "+out)
+		errx.Fatalf(err, "tolua++ execution failed: "+output)
 	}
 }
