@@ -11,6 +11,7 @@ import (
 
 var SourceDirectory string
 var OutputDirectory string
+var SDKDirectory string
 var ProductName string
 var Debug = false
 var Release = false
@@ -27,6 +28,7 @@ func Init() error {
 	if SourceDirectory, err = utils.Pwd(); err != nil {
 		errx.Fatalf(err, "could not determine current working directory")
 	}
+	SDKDirectory = SourceDirectory
 	OutputDirectory = path.Join(SourceDirectory, "build")
 	Platforms = make(map[string]bool)
 	log.Debug(String())

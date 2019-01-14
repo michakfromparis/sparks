@@ -43,7 +43,7 @@ func GetOs() (Os, error) {
 	}
 }
 
-func Execute(name string, args ...string) string {
+func Execute(name string, args ...string) (string, error) {
 	fullCommand := fmt.Sprintf("%s %s", name, strings.Join(args[:], " "))
 	log.Debugf("executing %s", fullCommand)
 	cmd := exec.Command(name, args...)
@@ -53,5 +53,5 @@ func Execute(name string, args ...string) string {
 	}
 	out := string(bytes)
 	log.Tracef("combined output:%s%s", LineBreak, out)
-	return out
+	return out, nil
 }

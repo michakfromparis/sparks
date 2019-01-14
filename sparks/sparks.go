@@ -49,8 +49,18 @@ func createBuildDirectoryStructure() {
 }
 
 func generateLuaBindings() {
-	
-	utils.Execute("ls", "-la")
+
+	toluapp := filepath.Join(config.SDKDirectory, "dependencies", "toluapp", "bin")
+	os, _ := utils.GetOs()
+	switch os {
+	case utils.Osx:
+		toluapp = filepath.Join(toluapp, "toluapp_osx")
+	case utils.Linux:
+		toluapp = filepath.Join(toluapp, "toluapp_osx")
+	case utils.Windows:
+		toluapp = filepath.Join(toluapp, "tolua++")
+	}
+	utils.Execute(toluapp)
 }
 
 func Build() {
