@@ -40,11 +40,14 @@ func Build(sourceDirectory string, outputDirectory string) {
 	Load()
 	createBuildDirectoryStructure()
 	sparksSourceDirectory := filepath.Join(config.SDKDirectory, "src", config.SDKName)
+	sparksPlayerSourceDirectory := filepath.Join(config.SDKDirectory, "src", config.ProductName)
 	generateLuaBindings(sparksSourceDirectory, config.SDKName)
 	// utils.Sed(filename, regex, newContent)
 	generateLuaBindings(sparksSourceDirectory, "SparksNetworksLua")
-	generateLuaBindings(sparksSourceDirectory, config.ProductName)
+	generateLuaBindings(sparksPlayerSourceDirectory, config.ProductName)
 
+	// iterating through all enabled platforms in all enabled configurations
+	// to call Platform.Build
 	for _, platformName := range PlatformNames {
 		platform := Platforms[platformName]
 		if platform != nil && platform.Enabled() {
