@@ -95,6 +95,12 @@ func (f *Formatter) Format(entry *log.Entry) ([]byte, error) {
 	resetColor := ColorSeq(0)
 	levelColor, messageColor := getColorByLevel(entry.Level)
 
+	// if entry.Level == log.ErrorLevel || entry.Level == log.WarnLevel || entry.Level == log.FatalLevel || entry.Level == log.PanicLevel {
+	// 	log.SetOutput(os.Stderr)
+	// } else {
+	// 	log.SetOutput(os.Stdout)
+	// }
+
 	timestampFormat := f.TimestampFormat
 	if timestampFormat == "" {
 		timestampFormat = time.StampMilli
