@@ -45,7 +45,9 @@ func Build(sourceDirectory string, outputDirectory string) {
 	// utils.Sed(filename, regex, newContent)
 	generateLuaBindings(sparksSourceDirectory, "SparksNetworksLua")
 	generateLuaBindings(sparksPlayerSourceDirectory, config.ProductName)
-
+	generateIcons(filepath.Join(config.SDKDirectory, "Assets", "Icon"))
+	generateIcons(filepath.Join(config.SDKDirectory, "Assets", "SparksPlayerIcon"))
+	generateSplash(filepath.Join(config.SDKDirectory, "Assets", "Splash"))
 	// iterating through all enabled platforms in all enabled configurations
 	// to call Platform.Build
 	for _, platformName := range PlatformNames {
@@ -124,4 +126,12 @@ func generateLuaBindings(sourceDirectory string, packageName string) {
 	if err != nil {
 		errx.Fatalf(err, "tolua++ execution failed: "+output)
 	}
+}
+
+func generateIcons(directory string) {
+
+}
+
+func generateSplash(directory string) {
+
 }
