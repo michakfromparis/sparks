@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/joomcode/errorx"
 	"github.com/michaKFromParis/sparks/errx"
 )
 
@@ -47,29 +48,22 @@ func GetOs() (Os, error) {
 }
 
 func Execute(filename string, args ...string) (string, error) {
-	fullCommand := fmt.Sprintf("%s %s", filename, strings.Join(args[:], " "))
-	log.Debugf("executing %s", fullCommand)
-	cmd := exec.Command(filename, args...)
-	bytes, err := cmd.CombinedOutput()
-	if err != nil {
-		errx.Fatalf(err, "failed to execute "+fullCommand)
-	}
-	out := string(bytes)
-	log.Tracef("combined output:%s%s", NewLine, out)
-	return out, nil
+	return ExecuteEx(filename, "", false, args...)
 }
 
 func ExecuteEx(filename string, directoryName string, environment bool, args ...string) (string, error) {
 	fullCommand := fmt.Sprintf("%s %s", filename, strings.Join(args[:], " "))
 	log.Debugf("executing %s in directory %s with environment: %t", fullCommand, directoryName, environment)
 	cmd := exec.Command(filename, args...)
-	cmd.Dir = directoryName
+	if directoryName != "" {
+		cmd.Dir = directoryName
+	}
 	if environment {
 		cmd.Env = os.Environ()
 	}
 	bytes, err := cmd.CombinedOutput()
 	if err != nil {
-		errx.Fatalf(err, "failed to execute "+fullCommand)
+		return "", errorx.Decorate(err, "failed to execute "+fullCommand)
 	}
 	out := string(bytes)
 	log.Tracef("combined output:%s%s", NewLine, out)

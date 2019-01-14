@@ -26,6 +26,7 @@ func Init() {
 }
 
 func PreRunAllCommands(cmd *cobra.Command, args []string) {
+	// reinitialized here to take the --verbose command line flag into account
 	logger.Init()
 }
 
@@ -40,6 +41,6 @@ func Execute() error {
 func init_root() {
 	log.Trace("root init")
 	rootCmd.Flags().SortFlags = false
-	rootCmd.PersistentFlags().BoolVarP(&config.Verbose, "verbose", "v", false, "set verbose log level to debug")
-	rootCmd.PersistentFlags().BoolVarP(&config.VeryVerbose, "vv", "", false, "set verbose log level to trace")
+	rootCmd.PersistentFlags().BoolVarP(&config.Verbose, "verbose", "v", false, "set log verbose level to debug")
+	rootCmd.PersistentFlags().BoolVarP(&config.VeryVerbose, "v", "", false, "set log verbose level to trace")
 }

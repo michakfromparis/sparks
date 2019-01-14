@@ -10,9 +10,9 @@ type Platform interface {
 	Enabled() bool
 	SetEnabled(bool)
 
-	Deps()
-	Clean()
-	Build(Configuration)
+	Deps() error
+	Clean() error
+	Build(Configuration) error
 }
 
 // Map of all Platforms

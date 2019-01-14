@@ -34,17 +34,19 @@ func (o *Osx) SetEnabled(enabled bool) {
 	o.enabled = enabled
 }
 
-func (o *Osx) Deps() {
+func (o *Osx) Deps() error {
 	log.Info("Installing dependencies for " + o.Title())
+	return nil
 }
-func (o *Osx) Clean() {
-
+func (o *Osx) Clean() error {
+	return nil
 }
-func (o *Osx) Build(configuration sparks.Configuration) {
+func (o *Osx) Build(configuration sparks.Configuration) error {
 	o.prebuild()
 	o.generate()
 	o.compile()
 	o.postbuild()
+	return nil
 }
 
 func (o *Osx) prebuild() {

@@ -33,7 +33,7 @@ func Init() {
 	} else {
 		log.SetLevel(log.InfoLevel)
 	}
-	log.Infof("initialized logger at level %s", log.GetLevel().String())
+	log.Infof("sparks log level %s", strings.Title(log.GetLevel().String()))
 	// log.Trace("Trace Sample")
 	// log.Debug("Debug Sample")
 	// log.Info("Info Sample")

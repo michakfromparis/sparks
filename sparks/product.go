@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/joomcode/errorx"
 	"github.com/michaKFromParis/sparks/config"
 	"github.com/michaKFromParis/sparks/errx"
 	yaml "gopkg.in/yaml.v2"
@@ -48,7 +49,7 @@ type Product struct {
 }
 
 func (p *Product) Load() error {
-	filename := p.findSparksFile()
+	filename, err := p.findSparksFile()
 	log.Debug("loading product from " + filename)
 	bytes, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -62,7 +63,7 @@ func (p *Product) Load() error {
 }
 
 func (p *Product) Save() {
-	filename := p.findSparksFile()
+	filename, err := p.findSparksFile()
 	log.Debug("saving product to " + filename)
 	data, err := yaml.Marshal(p)
 	if err != nil {
@@ -74,21 +75,23 @@ func (p *Product) Save() {
 	}
 }
 
-func (p *Product) findSparksFile() string {
+// look for a .sparks file in config.SourceDirectory) and return it
+func (p *Product) findSparksFile() (string, error) {
 	if p.sparksFilename != "" {
-		return p.sparksFilename
+		return p.sparksFilename, nil
 	}
 	log.Tracef("opening %s", config.SourceDirectory)
 	f, err := os.Open(config.SourceDirectory)
 	if err != nil {
-		errx.Fatalf(err, "Could not open SourceDirectory: "+config.SourceDirectory)
+		return "", errorx.Decorate(err, "Could not open SourceDirectory: "+config.SourceDirectory)
 	}
 	files, err := f.Readdir(-1)
 	if err != nil {
-		errx.Fatalf(err, "Could not read SourceDirectory: "+config.SourceDirectory)
+		_ = f.Close()
+		return "", errorx.Decorate(err, "Could not read SourceDirectory: "+config.SourceDirectory)
 	}
 	if err = f.Close(); err != nil {
-		errx.Fatalf(err, "Could not close SourceDirectory: "+config.SourceDirectory)
+		return "", errorx.Decorate(err, "Could not close SourceDirectory: "+config.SourceDirectory)
 	}
 	log.Trace("files in SourceDirectory:")
 	p.sparksFilename = ""
@@ -103,9 +106,10 @@ func (p *Product) findSparksFile() string {
 	if p.sparksFilename == "" {
 		errx.Fatalf(nil, "could not find a .sparks file at "+config.SourceDirectory)
 	}
-	return p.sparksFilename
+	return p.sparksFilename, nil
 }
 
+// used to generate sample sparks file
 func (p *Product) Sample() {
 	log.Debug("filling product with sample data")
 	p.Name = "Sparks"

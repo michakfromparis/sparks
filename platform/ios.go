@@ -32,17 +32,18 @@ func (i *Ios) SetEnabled(enabled bool) {
 	i.enabled = enabled
 }
 
-func (i *Ios) Deps() {
-
+func (i *Ios) Deps() error {
+	return nil
 }
-func (i *Ios) Clean() {
-
+func (i *Ios) Clean() error {
+	return nil
 }
-func (i *Ios) Build(configuration sparks.Configuration) {
+func (i *Ios) Build(configuration sparks.Configuration) error {
 	i.prebuild()
 	i.generate()
 	i.compile()
 	i.postbuild()
+	return nil
 }
 
 func (i *Ios) prebuild() {

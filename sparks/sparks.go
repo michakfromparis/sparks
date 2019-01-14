@@ -59,7 +59,7 @@ func Build(sourceDirectory string, outputDirectory string) error {
 			for _, configurationName := range ConfigurationNames {
 				configuration := Configurations[configurationName]
 				if configuration != nil && configuration.Enabled() {
-					log.Infof("Building %s for %s-%s", config.ProductName, platform.Title(), configuration.Title())
+					log.Infof("building %s for %s-%s", config.ProductName, platform.Title(), configuration.Title())
 					platform.Build(configuration)
 				}
 			}
@@ -101,7 +101,7 @@ func createBuildDirectoryStructure() {
 
 func generateLuaBindings(sourceDirectory string, packageName string) {
 
-	log.Info("generating lua bindings for " + packageName)
+	log.Info("sparks lua bind " + packageName)
 	toluapp := getToluaPath()
 	toluaHooksPath := filepath.Join(config.SDKDirectory, "src", "Sparks", "tolua.hooks.lua")
 	dofileWithCorrectPath := fmt.Sprintf("dofile(\"%s\")", toluaHooksPath)
@@ -136,9 +136,9 @@ func getToluaPath() string {
 	return toluapp
 }
 func generateIcons(directory string) {
-
+	log.Info("sparks icon generate")
 }
 
 func generateSplash(directory string) {
-
+	log.Info("sparks splash generate")
 }

@@ -28,17 +28,18 @@ func (w *WebGl) SetEnabled(enabled bool) {
 	w.enabled = enabled
 }
 
-func (w *WebGl) Deps() {
-
+func (w *WebGl) Deps() error {
+	return nil
 }
-func (w *WebGl) Clean() {
-
+func (w *WebGl) Clean() error {
+	return nil
 }
-func (w *WebGl) Build(configuration sparks.Configuration) {
+func (w *WebGl) Build(configuration sparks.Configuration) error {
 	w.prebuild()
 	w.generate()
 	w.compile()
 	w.postbuild()
+	return nil
 }
 func (w *WebGl) prebuild() {
 
