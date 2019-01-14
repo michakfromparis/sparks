@@ -45,7 +45,7 @@ func Build(sourceDirectory string, outputDirectory string) error {
 	sparksSourceDirectory := filepath.Join(config.SDKDirectory, "src", config.SDKName)
 	sparksPlayerSourceDirectory := filepath.Join(config.SDKDirectory, "src", config.ProductName)
 	generateLuaBindings(sparksSourceDirectory, config.SDKName)
-	// utils.Sed(filename, regex, newContent)
+	// TODO utils.Sed(filename, regex, newContent) // fix math constants
 	generateLuaBindings(sparksSourceDirectory, "SparksNetworksLua")
 	generateLuaBindings(sparksPlayerSourceDirectory, config.ProductName)
 	generateIcons(filepath.Join(config.SDKDirectory, "Assets", "Icon"))
@@ -55,13 +55,11 @@ func Build(sourceDirectory string, outputDirectory string) error {
 	// to call Platform.Build
 	for _, platformName := range PlatformNames {
 		platform := Platforms[platformName]
-		log.Infof("%#v", platform)
 		if platform != nil && platform.Enabled() {
 			for _, configurationName := range ConfigurationNames {
 				configuration := Configurations[configurationName]
 				if configuration != nil && configuration.Enabled() {
-					Load()
-					log.Infof("Building %s for %s-%s", config.ProductName, platform.Name(), configuration.Name())
+					log.Infof("Building %s for %s-%s", config.ProductName, platform.Title(), configuration.Title())
 					platform.Build(configuration)
 				}
 			}

@@ -4,26 +4,26 @@ type Release struct {
 	enabled bool
 }
 
-func (r Release) Name() string {
+func (r *Release) Name() string {
 	return "release"
 }
 
-func (r Release) Title() string {
+func (r *Release) Title() string {
 	return "Release"
 }
 
-func (r Release) Opt() string {
+func (r *Release) Opt() string {
 	return "r"
 }
 
-func (r Release) String() string {
+func (r *Release) String() string {
 	return r.Title()
 }
 
-func (r Release) Enabled() bool {
-	return true
+func (r *Release) Enabled() bool {
+	return r.enabled
 }
 
-func (r Release) SetEnabled(enabled bool) {
+func (r *Release) SetEnabled(enabled bool) {
 	r.enabled = enabled
 }

@@ -3,8 +3,6 @@ package platform
 import (
 	"github.com/michaKFromParis/sparks/sparks"
 
-	"fmt"
-
 	log "github.com/Sirupsen/logrus"
 )
 
@@ -12,53 +10,52 @@ type Osx struct {
 	enabled bool
 }
 
-func (p Osx) Name() string {
+func (o *Osx) Name() string {
 	return "osx"
 }
 
-func (p Osx) Title() string {
+func (o *Osx) Title() string {
 	return "OSX"
 }
 
-func (p Osx) Opt() string {
+func (o *Osx) Opt() string {
 	return "o"
 }
 
-func (p Osx) String() string {
-	return p.Title()
+func (o *Osx) String() string {
+	return o.Title()
 }
 
-func (p Osx) Enabled() bool {
-	return p.enabled
+func (o *Osx) Enabled() bool {
+	return o.enabled
 }
 
-func (p Osx) SetEnabled(enabled bool) {
-	p.enabled = enabled
+func (o *Osx) SetEnabled(enabled bool) {
+	o.enabled = enabled
 }
 
-func (p Osx) Deps() {
-	log.Info("Installing dependencies for " + p.Title())
+func (o *Osx) Deps() {
+	log.Info("Installing dependencies for " + o.Title())
 }
-func (p Osx) Clean() {
+func (o *Osx) Clean() {
 
 }
-func (p Osx) Build(configuration sparks.Configuration) {
-	log.Info(fmt.Sprintf("Building %s-%s", p.Title(), configuration))
-	p.prebuild()
-	p.generate()
-	p.compile()
-	p.postbuild()
+func (o *Osx) Build(configuration sparks.Configuration) {
+	o.prebuild()
+	o.generate()
+	o.compile()
+	o.postbuild()
 }
 
-func (p Osx) prebuild() {
+func (o *Osx) prebuild() {
 
 }
-func (p Osx) generate() {
+func (o *Osx) generate() {
 
 }
-func (p Osx) compile() {
+func (o *Osx) compile() {
 
 }
-func (p Osx) postbuild() {
+func (o *Osx) postbuild() {
 
 }

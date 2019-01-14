@@ -1,9 +1,6 @@
 package platform
 
 import (
-	"fmt"
-
-	log "github.com/Sirupsen/logrus"
 	"github.com/michaKFromParis/sparks/sparks"
 )
 
@@ -11,48 +8,47 @@ type WebGl struct {
 	enabled bool
 }
 
-func (p WebGl) Name() string {
+func (w *WebGl) Name() string {
 	return "webgl"
 }
 
-func (p WebGl) Title() string {
+func (w *WebGl) Title() string {
 	return "WebGl"
 }
 
-func (p WebGl) Opt() string {
+func (w *WebGl) Opt() string {
 	return "e"
 }
 
-func (p WebGl) Enabled() bool {
-	return p.enabled
+func (w *WebGl) Enabled() bool {
+	return w.enabled
 }
 
-func (p WebGl) SetEnabled(enabled bool) {
-	p.enabled = enabled
+func (w *WebGl) SetEnabled(enabled bool) {
+	w.enabled = enabled
 }
 
-func (p WebGl) Deps() {
+func (w *WebGl) Deps() {
 
 }
-func (p WebGl) Clean() {
+func (w *WebGl) Clean() {
 
 }
-func (p WebGl) Build(configuration sparks.Configuration) {
-	log.Info(fmt.Sprintf("Building %s-%s", p.Title(), configuration))
-	p.prebuild()
-	p.generate()
-	p.compile()
-	p.postbuild()
+func (w *WebGl) Build(configuration sparks.Configuration) {
+	w.prebuild()
+	w.generate()
+	w.compile()
+	w.postbuild()
 }
-func (p WebGl) prebuild() {
+func (w *WebGl) prebuild() {
 
 }
-func (p WebGl) generate() {
+func (w *WebGl) generate() {
 
 }
-func (p WebGl) compile() {
+func (w *WebGl) compile() {
 
 }
-func (p WebGl) postbuild() {
+func (w *WebGl) postbuild() {
 
 }

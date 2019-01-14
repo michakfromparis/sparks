@@ -23,7 +23,7 @@ var Verbose = false
 var VeryVerbose = false // TODO temporary for debugging. need to set a proper verbose level
 
 func Init() error {
-	log.Info("initializing config")
+	log.Info("initializing sparks")
 	SDKName = "Sparks"
 	ProductName = "SparksPlayer"
 
@@ -33,7 +33,6 @@ func Init() error {
 	}
 	SDKDirectory = SourceDirectory
 	OutputDirectory = path.Join(SourceDirectory, "build")
-	Platforms = make(map[string]bool)
 	log.Debug(String())
 	return nil
 }

@@ -6,17 +6,17 @@ import (
 )
 
 func RegisterPlatforms() {
-	sparks.RegisterPlatform(Osx{})
-	sparks.RegisterPlatform(Ios{})
-	sparks.RegisterPlatform(WebGl{})
+	sparks.RegisterPlatform(&Osx{})
+	sparks.RegisterPlatform(&Ios{})
+	sparks.RegisterPlatform(&WebGl{})
 }
 
 func SetEnabledPlatforms(platforms []bool) {
 	i := 0
 	for _, name := range sparks.PlatformNames {
-		if i < len(platforms) && platforms[i] {
+		if i < len(platforms) && platforms[i] == true {
 			sparks.Platforms[name].SetEnabled(true)
-			log.Debug("enabling platform " + sparks.Platforms[name].Title())
+			log.Debugf("enabled platform %s", sparks.Platforms[name].Title())
 		}
 		i++
 	}

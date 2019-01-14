@@ -31,9 +31,9 @@ var enabledPlatforms []bool
 var enabledConfigurations []bool
 
 func build(cmd *cobra.Command, args []string) {
+	sparks.Init()
 	platform.SetEnabledPlatforms(enabledPlatforms)
 	configuration.SetEnabledConfigurations(enabledConfigurations)
-	sparks.Init()
 	sparks.Build(args[0], config.OutputDirectory)
 	sparks.Shutdown()
 }
