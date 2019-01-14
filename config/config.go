@@ -12,6 +12,7 @@ import (
 var SourceDirectory string
 var OutputDirectory string
 var SDKDirectory string
+var SDKName string
 var ProductName string
 var Debug = false
 var Release = false
@@ -22,7 +23,8 @@ var Verbose = false
 
 func Init() error {
 	log.Info("initializing config")
-	ProductName = "Sparks"
+	SDKName = "Sparks"
+	ProductName = "SparksPlayer"
 
 	var err error
 	if SourceDirectory, err = utils.Pwd(); err != nil {

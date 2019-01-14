@@ -34,7 +34,7 @@ func build(cmd *cobra.Command, args []string) {
 	platform.SetEnabledPlatforms(enabledPlatforms)
 	configuration.SetEnabledConfigurations(enabledConfigurations)
 	sparks.Init()
-	sparks.Build(args[0])
+	sparks.Build(args[0], config.OutputDirectory)
 	sparks.Shutdown()
 }
 

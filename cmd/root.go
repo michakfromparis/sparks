@@ -2,13 +2,16 @@ package cmd
 
 import (
 	log "github.com/Sirupsen/logrus"
+	"github.com/michaKFromParis/sparks/config"
+	"github.com/michaKFromParis/sparks/logger"
 	"github.com/spf13/cobra"
 )
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "sparks",
-	Short: "command line interface to the sparks framework",
+	PersistentPreRun: PreRunAllCommands,
+	Use:              "sparks",
+	Short:            "command line interface to the sparks framework",
 	Long: `
 Sparks command line interface`,
 }
@@ -22,6 +25,10 @@ func Init() {
 	init_build()
 }
 
+func PreRunAllCommands(cmd *cobra.Command, args []string) {
+	logger.Init()
+}
+
 func Execute() error {
 	rootCmd.SilenceErrors = true
 	if err := rootCmd.Execute(); err != nil {
@@ -33,5 +40,5 @@ func Execute() error {
 func init_root() {
 	log.Trace("root init")
 	rootCmd.Flags().SortFlags = false
-	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose log level. One of (panic, fatal, error, warning, debug, trace)")
+	rootCmd.PersistentFlags().BoolVarP(&config.Verbose, "verbose", "v", false, "verbose log level. One of (panic, fatal, error, warning, debug, trace)")
 }

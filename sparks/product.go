@@ -50,11 +50,11 @@ type Product struct {
 func (p *Product) Load() error {
 	filename := p.findSparksFile()
 	log.Debug("loading product from " + filename)
-	yamlFile, err := ioutil.ReadFile(filename)
+	bytes, err := ioutil.ReadFile(filename)
 	if err != nil {
 		errx.Fatalf(err, "Could not read: "+filename)
 	}
-	err = yaml.Unmarshal(yamlFile, p)
+	err = yaml.Unmarshal(bytes, p)
 	if err != nil {
 		errx.Fatalf(err, "yaml reader: "+filename)
 	}
@@ -101,7 +101,7 @@ func (p *Product) findSparksFile() string {
 		}
 	}
 	if p.sparksFilename == "" {
-		errx.Error("Could not find a .sparks file at " + config.SourceDirectory)
+		errx.Fatalf(nil, "could not find a .sparks file at "+config.SourceDirectory)
 	}
 	return p.sparksFilename
 }

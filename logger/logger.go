@@ -21,9 +21,15 @@ func Init() {
 		FieldsOrder:     []string{"component", "category"},
 		TimestampFormat: "15:04:05",
 	})
-	log.SetLevel(log.TraceLevel)
 	log.SetOutput(os.Stdout)
 
+	log.SetLevel(log.TraceLevel)
+
+	// if config.Verbose {
+	// 	log.SetLevel(log.TraceLevel)
+	// } else {
+	// 	log.SetLevel(log.InfoLevel)
+	// }
 	log.Infof("initialized logger at level %s", log.GetLevel().String())
 	// log.Trace("Trace Sample")
 	// log.Debug("Debug Sample")

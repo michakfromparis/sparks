@@ -1,6 +1,7 @@
 package sparks
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -32,6 +33,47 @@ func Save() {
 	log.Info("sparks save")
 	CurrentProduct.Save()
 }
+
+func Build(sourceDirectory string, outputDirectory string) {
+	log.Info("sparks build " + sourceDirectory)
+	checkParameters(sourceDirectory, outputDirectory)
+	Load()
+	createBuildDirectoryStructure()
+	sparksSourceDirectory := filepath.Join(config.SDKDirectory, "src", config.SDKName)
+	generateLuaBindings(sparksSourceDirectory, config.SDKName)
+	// utils.Sed(filename, regex, newContent)
+	generateLuaBindings(sparksSourceDirectory, "SparksNetworksLua")
+	generateLuaBindings(sparksSourceDirectory, config.ProductName)
+
+	for _, platformName := range PlatformNames {
+		platform := Platforms[platformName]
+		if platform != nil && platform.Enabled() {
+			for _, configurationName := range ConfigurationNames {
+				configuration := Configurations[configurationName]
+				if configuration != nil && configuration.Enabled() {
+					Load()
+					platform.Build(configuration)
+				}
+			}
+		}
+	}
+}
+
+func checkParameters(sourceDirectory string, outputDirectory string) { // TODO Check output here
+	file, err := os.Stat(sourceDirectory)
+	if err != nil {
+		errx.Fatalf(err, "could not stat source directory: "+sourceDirectory)
+	}
+	if !file.IsDir() {
+		errx.Fatalf(err, "source directory is not a directory: "+sourceDirectory)
+	}
+	config.SourceDirectory = sourceDirectory
+	config.OutputDirectory = outputDirectory
+	config.SDKDirectory = sourceDirectory
+	log.Debugf("SDK Directory: %s", config.SDKDirectory)
+	log.Debugf("Source Directory: %s", config.SourceDirectory)
+}
+
 func createBuildDirectoryStructure() {
 	log.Trace("creating build/bin, build/lib, build/projects")
 	var binPath = filepath.Join(config.OutputDirectory, "bin")
@@ -48,45 +90,32 @@ func createBuildDirectoryStructure() {
 	}
 }
 
-func generateLuaBindings() {
+func generateLuaBindings(sourceDirectory string, packageName string) {
 
+	log.Info("generating lua bindings for " + packageName)
 	toluapp := filepath.Join(config.SDKDirectory, "dependencies", "toluapp", "bin")
+
 	os, _ := utils.GetOs()
 	switch os {
 	case utils.Osx:
 		toluapp = filepath.Join(toluapp, "toluapp_osx")
 	case utils.Linux:
-		toluapp = filepath.Join(toluapp, "toluapp_osx")
-	case utils.Windows:
 		toluapp = filepath.Join(toluapp, "tolua++")
+	case utils.Windows:
+		toluapp = filepath.Join(toluapp, "toluapp_script.exe")
 	}
-	utils.Execute(toluapp)
-}
-
-func Build(sourceDirectory string) {
-	log.Info("sparks build " + sourceDirectory)
-	file, err := os.Stat(sourceDirectory)
+	toluaHooksPath := filepath.Join(config.SDKDirectory, "src", "Sparks", "tolua.hooks.lua")
+	dofileWithCorrectPath := fmt.Sprintf("dofile(\"%s\")%s", toluaHooksPath, utils.LineBreak)
+	reflectionFile := filepath.Join(sourceDirectory, packageName+".Reflection.lua")
+	utils.Sed(reflectionFile, "dofile\\(.*\\)", dofileWithCorrectPath)
+	packagePath := filepath.Join(sourceDirectory, packageName)
+	out, err := utils.Execute(
+		toluapp, "-L", packagePath+".Reflection.lua",
+		"-n", packageName,
+		"-o", packagePath+".tolua.cpp",
+		"-H", packagePath+".tolua.h",
+		packagePath+".pkg")
 	if err != nil {
-		errx.Fatalf(err, "could not stat source directory: "+sourceDirectory)
-	}
-	if !file.IsDir() {
-		errx.Fatalf(err, "source directory is not a directory: "+sourceDirectory)
-	}
-	config.SourceDirectory = sourceDirectory
-	config.SDKDirectory = sourceDirectory
-	Load()
-	createBuildDirectoryStructure()
-	generateLuaBindings()
-	for _, platformName := range PlatformNames {
-		platform := Platforms[platformName]
-		if platform != nil && platform.Enabled() {
-			for _, configurationName := range ConfigurationNames {
-				configuration := Configurations[configurationName]
-				if configuration != nil && configuration.Enabled() {
-					Load()
-					platform.Build(configuration)
-				}
-			}
-		}
+		errx.Fatalf(err, "tolua++ execution failed: "+out)
 	}
 }
