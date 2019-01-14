@@ -4,6 +4,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/michaKFromParis/sparks/config"
 	"github.com/michaKFromParis/sparks/configuration"
+	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/platform"
 	"github.com/michaKFromParis/sparks/sparks"
 	"github.com/spf13/cobra"
@@ -34,7 +35,9 @@ func build(cmd *cobra.Command, args []string) {
 	sparks.Init()
 	platform.SetEnabledPlatforms(enabledPlatforms)
 	configuration.SetEnabledConfigurations(enabledConfigurations)
-	sparks.Build(args[0], config.OutputDirectory)
+	if err := sparks.Build(args[0], config.OutputDirectory); err != nil {
+		errx.Fatal(err)
+	}
 	sparks.Shutdown()
 }
 

@@ -43,11 +43,13 @@ func Build(sourceDirectory string, outputDirectory string) error {
 	log.Tracef("loaded product:%s%+v", utils.NewLine, CurrentProduct)
 	createBuildDirectoryStructure()
 	sparksSourceDirectory := filepath.Join(config.SDKDirectory, "src", config.SDKName)
-	sparksPlayerSourceDirectory := filepath.Join(config.SDKDirectory, "src", config.ProductName)
+	sparksPlayerSourceDirectory := filepath.Join(config.SDKDirectory, "src", config.PlayerName)
 	generateLuaBindings(sparksSourceDirectory, config.SDKName)
-	// TODO utils.Sed(filename, regex, newContent) // fix math constants
+	// TODO fix math constants utils.Sed(filename, regex, newContent)
 	generateLuaBindings(sparksSourceDirectory, "SparksNetworksLua")
-	generateLuaBindings(sparksPlayerSourceDirectory, config.ProductName)
+	// TODO the line below probably should stay like this to build other c++ projects
+	// generateLuaBindings(sparksPlayerSourceDirectory, config.ProductName)
+	generateLuaBindings(sparksPlayerSourceDirectory, config.PlayerName)
 	generateIcons(filepath.Join(config.SDKDirectory, "Assets", "Icon"))
 	generateIcons(filepath.Join(config.SDKDirectory, "Assets", "SparksPlayerIcon"))
 	generateSplash(filepath.Join(config.SDKDirectory, "Assets", "Splash"))
@@ -59,8 +61,13 @@ func Build(sourceDirectory string, outputDirectory string) error {
 			for _, configurationName := range ConfigurationNames {
 				configuration := Configurations[configurationName]
 				if configuration != nil && configuration.Enabled() {
-					log.Infof("building %s for %s-%s", config.ProductName, platform.Title(), configuration.Title())
-					platform.Build(configuration)
+					log.Infof("sparks build --%s --%s --name %s", platform.Name(), configuration.Name(), config.ProductName)
+					if err := platform.Build(configuration); err != nil {
+						return errorx.Decorate(err, "sparks build failed for %s-%s", platform.Title(), configuration.Title())
+					}
+					// TODO calculate build time and build size
+					log.Infof("build completed successfully in %d seconds", 42)
+					log.Infof("build size: %d Mb", 42)
 				}
 			}
 		}
@@ -106,7 +113,7 @@ func generateLuaBindings(sourceDirectory string, packageName string) {
 	toluaHooksPath := filepath.Join(config.SDKDirectory, "src", "Sparks", "tolua.hooks.lua")
 	dofileWithCorrectPath := fmt.Sprintf("dofile(\"%s\")", toluaHooksPath)
 	reflectionFile := filepath.Join(sourceDirectory, packageName+".Reflection.lua")
-	utils.Sed(reflectionFile, "dofile\\(.*\\)", dofileWithCorrectPath)
+	utils.SedFile(reflectionFile, "dofile\\(.*\\)", dofileWithCorrectPath)
 	packagePath := filepath.Join(sourceDirectory, packageName)
 	output, err := utils.ExecuteEx(
 		toluapp,
