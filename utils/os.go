@@ -2,10 +2,13 @@ package utils
 
 import (
 	"errors"
-	"os"
+	"fmt"
+	"os/exec"
 	"runtime"
+	"strings"
 
-	"github.com/Sirupsen/logrus"
+	log "github.com/Sirupsen/logrus"
+	"github.com/michaKFromParis/sparks/errx"
 )
 
 type Os int
@@ -40,20 +43,15 @@ func GetOs() (Os, error) {
 	}
 }
 
-// import (
-// 	"github.com/sirupsen/logrus"
-// 	"os"
-// )
-
-// Term is the terminal logger for the Genesis application.
-var Term *logrus.Logger
-
-func setupTerm() {
-	Term = logrus.New()
-	Term.Out = os.Stdout
-
-}
-
-func init() {
-	setupTerm()
+func Execute(name string, args ...string) string {
+	fullCommand := fmt.Sprintf("%s %s", name, strings.Join(args[:], " "))
+	log.Debugf("executing %s", fullCommand)
+	cmd := exec.Command(name, args...)
+	bytes, err := cmd.CombinedOutput()
+	if err != nil {
+		errx.Fatalf(err, "failed to execute "+fullCommand)
+	}
+	out := string(bytes)
+	log.Tracef("combined output:%s%s", LineBreak, out)
+	return out
 }
