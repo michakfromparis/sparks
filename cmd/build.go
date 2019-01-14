@@ -11,6 +11,7 @@ import (
 
 var buildCmd = &cobra.Command{
 	Run:   build,
+	Args:  cobra.ExactArgs(1),
 	Use:   "build",
 	Short: "Build a sparks product",
 	Long: `
@@ -33,7 +34,7 @@ func build(cmd *cobra.Command, args []string) {
 	platform.SetEnabledPlatforms(enabledPlatforms)
 	configuration.SetEnabledConfigurations(enabledConfigurations)
 	sparks.Init()
-	sparks.Build()
+	sparks.Build(args[0])
 	sparks.Shutdown()
 }
 

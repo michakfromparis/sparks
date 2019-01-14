@@ -25,7 +25,7 @@ func Shutdown() {
 func Load() {
 	log.Info("sparks load")
 	CurrentProduct.Load()
-	log.Trace("%+v", CurrentProduct)
+	log.Tracef("%+v", CurrentProduct)
 }
 
 func Save() {
@@ -63,8 +63,17 @@ func generateLuaBindings() {
 	utils.Execute(toluapp)
 }
 
-func Build() {
-	log.Info("sparks build")
+func Build(sourceDirectory string) {
+	log.Info("sparks build " + sourceDirectory)
+	file, err := os.Stat(sourceDirectory)
+	if err != nil {
+		errx.Fatalf(err, "could not stat source directory: "+sourceDirectory)
+	}
+	if !file.IsDir() {
+		errx.Fatalf(err, "source directory is not a directory: "+sourceDirectory)
+	}
+	config.SourceDirectory = sourceDirectory
+	config.SDKDirectory = sourceDirectory
 	Load()
 	createBuildDirectoryStructure()
 	generateLuaBindings()
