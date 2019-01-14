@@ -100,7 +100,7 @@ func generateLuaBindings(sourceDirectory string, packageName string) {
 	case utils.Osx:
 		toluapp = filepath.Join(toluapp, "toluapp_osx")
 	case utils.Linux:
-		toluapp = filepath.Join(toluapp, "tolua++")
+		toluapp = filepath.Join(config.SDKDirectory, "scripts", "bin", "tolua++")
 	case utils.Windows:
 		toluapp = filepath.Join(toluapp, "toluapp_script.exe")
 	}

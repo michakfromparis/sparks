@@ -8,7 +8,8 @@ OUTPUT_DIRECTORY=$(CURDIR)/build
 OUTPUT_NAME=$(shell basename $(CURDIR))
 # substracting GOPATH from source directory to deduct import path. i.e. github.com/user/project
 IMPORT_PATH=$(subst $(SOURCE_DIRECTORY)/,,$(CURDIR))
-
+# sparks sdk root directory
+SPARKS_SDK_ROOT=$(HOME)/Sources/Sparks
 # GOPATH must be set
 ifndef GOPATH
 $(error GOPATH is not set)
@@ -79,6 +80,7 @@ build-docker: check
 run-docker: check
 	docker run --rm -it                         \
 		-v "$(OUTPUT_DIRECTORY)/linux":/build   \
+		-v "$(SPARKS_SDK_ROOT)":/sparks 		\
 		golang:latest                           \
 		/build/$(OUTPUT_NAME) $(ARGS)
 
@@ -98,3 +100,6 @@ clean: check
 # run built binary
 run: check build
 	"$(OUTPUT_DIRECTORY)/$(HOST_OS)/$(OUTPUT_NAME)" $(ARGS) 2>&1 | panicparse
+
+# build and run in docker
+rd: build-docker run-docker
