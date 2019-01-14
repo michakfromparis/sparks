@@ -1,3 +1,3 @@
 package utils
 
-const LineBreak = "\r\n"
+const NewLine = "\r\n"

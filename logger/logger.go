@@ -10,6 +10,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	log "github.com/Sirupsen/logrus"
+	"github.com/michaKFromParis/sparks/config"
 	"github.com/michaKFromParis/sparks/utils"
 )
 
@@ -25,11 +26,13 @@ func Init() {
 
 	log.SetLevel(log.TraceLevel)
 
-	// if config.Verbose {
-	// 	log.SetLevel(log.TraceLevel)
-	// } else {
-	// 	log.SetLevel(log.InfoLevel)
-	// }
+	if config.Verbose {
+		log.SetLevel(log.DebugLevel)
+	} else if config.VeryVerbose {
+		log.SetLevel(log.TraceLevel)
+	} else {
+		log.SetLevel(log.InfoLevel)
+	}
 	log.Infof("initialized logger at level %s", log.GetLevel().String())
 	// log.Trace("Trace Sample")
 	// log.Debug("Debug Sample")
@@ -139,7 +142,7 @@ func (f *Formatter) Format(entry *log.Entry) ([]byte, error) {
 
 	// write message
 	b.WriteString(fmt.Sprintf("%s%s%s", messageColor, entry.Message, resetColor))
-	b.WriteString(utils.LineBreak)
+	b.WriteString(utils.NewLine)
 	return b.Bytes(), nil
 }
 

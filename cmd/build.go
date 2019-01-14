@@ -47,12 +47,15 @@ func init_build() {
 	enabledConfigurations = make([]bool, len(sparks.Configurations))
 	log.Tracef("registered platforms: %d", len(sparks.Platforms))
 	log.Tracef("registered configurations: %d", len(sparks.Configurations))
-
+	buildCmd.Flags().SortFlags = false
+	buildCmd.Flags().StringVarP(&config.SourceDirectory, "source", "", "", "source directory to build")
+	buildCmd.Flags().StringVarP(&config.OutputDirectory, "output", "", "", "output directory for all selected builds")
+	buildCmd.Flags().StringVarP(&config.ProductName, "name", "", "", "set the product name / filename of the built binaries")
 	i := 0
 	for _, name := range sparks.PlatformNames {
 		p := sparks.Platforms[name]
 		if p != nil && i < len(enabledPlatforms) {
-			buildCmd.Flags().BoolVarP(&enabledPlatforms[i], p.Name(), p.Opt(), false, "Build "+p.Title()+" platform")
+			buildCmd.Flags().BoolVarP(&enabledPlatforms[i], p.Name(), p.Opt(), false, "build for "+p.Title()+"")
 		}
 		i++
 	}
@@ -61,13 +64,8 @@ func init_build() {
 	for _, name := range sparks.ConfigurationNames {
 		c := sparks.Configurations[name]
 		if c != nil && i < len(enabledConfigurations) {
-			buildCmd.Flags().BoolVarP(&enabledConfigurations[i], c.Name(), c.Opt(), false, "Build "+c.Title()+" configuration")
+			buildCmd.Flags().BoolVarP(&enabledConfigurations[i], c.Name(), c.Opt(), false, "build in "+c.Title()+" configuration")
 		}
 		i++
 	}
-
-	buildCmd.Flags().StringVarP(&config.ProductName, "name", "", "", "Product name")
-	buildCmd.Flags().StringVarP(&config.SourceDirectory, "source", "", "", "Source directory")
-	buildCmd.Flags().StringVarP(&config.OutputDirectory, "output", "", "", "Output directory for all selected builds")
-	buildCmd.Flags().SortFlags = false
 }

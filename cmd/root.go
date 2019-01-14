@@ -16,8 +16,8 @@ var rootCmd = &cobra.Command{
 Sparks command line interface`,
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
+// calling all cobra command init functions here to avoid a race condition
+// with the loading of the sparks platforms / configurations first
 func Init() {
 	init_root()
 	init_deps()
@@ -40,5 +40,6 @@ func Execute() error {
 func init_root() {
 	log.Trace("root init")
 	rootCmd.Flags().SortFlags = false
-	rootCmd.PersistentFlags().BoolVarP(&config.Verbose, "verbose", "v", false, "verbose log level. One of (panic, fatal, error, warning, debug, trace)")
+	rootCmd.PersistentFlags().BoolVarP(&config.Verbose, "verbose", "v", false, "set verbose log level to debug")
+	rootCmd.PersistentFlags().BoolVarP(&config.VeryVerbose, "vv", "", false, "set verbose log level to trace")
 }

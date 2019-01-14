@@ -55,7 +55,7 @@ func Execute(filename string, args ...string) (string, error) {
 		errx.Fatalf(err, "failed to execute "+fullCommand)
 	}
 	out := string(bytes)
-	log.Tracef("combined output:%s%s", LineBreak, out)
+	log.Tracef("combined output:%s%s", NewLine, out)
 	return out, nil
 }
 
@@ -72,7 +72,7 @@ func ExecuteEx(filename string, directoryName string, environment bool, args ...
 		errx.Fatalf(err, "failed to execute "+fullCommand)
 	}
 	out := string(bytes)
-	log.Tracef("combined output:%s%s", LineBreak, out)
+	log.Tracef("combined output:%s%s", NewLine, out)
 	return out, nil
 }
 

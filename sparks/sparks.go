@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/joomcode/errorx"
 	"github.com/michaKFromParis/sparks/config"
 	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/utils"
@@ -23,10 +24,9 @@ func Init() {
 func Shutdown() {
 }
 
-func Load() {
+func Load() error {
 	log.Info("sparks load")
-	CurrentProduct.Load()
-	log.Tracef("%+v", CurrentProduct)
+	return CurrentProduct.Load()
 }
 
 func Save() {
@@ -34,10 +34,13 @@ func Save() {
 	CurrentProduct.Save()
 }
 
-func Build(sourceDirectory string, outputDirectory string) {
+func Build(sourceDirectory string, outputDirectory string) error {
 	log.Info("sparks build " + sourceDirectory)
 	checkParameters(sourceDirectory, outputDirectory)
-	Load()
+	if err := Load(); err != nil {
+		return errorx.Decorate(err, "could not load sparks project at %s", sourceDirectory)
+	}
+	log.Tracef("loaded product:%s%+v", utils.NewLine, CurrentProduct)
 	createBuildDirectoryStructure()
 	sparksSourceDirectory := filepath.Join(config.SDKDirectory, "src", config.SDKName)
 	sparksPlayerSourceDirectory := filepath.Join(config.SDKDirectory, "src", config.ProductName)
@@ -52,16 +55,19 @@ func Build(sourceDirectory string, outputDirectory string) {
 	// to call Platform.Build
 	for _, platformName := range PlatformNames {
 		platform := Platforms[platformName]
+		log.Infof("%#v", platform)
 		if platform != nil && platform.Enabled() {
 			for _, configurationName := range ConfigurationNames {
 				configuration := Configurations[configurationName]
 				if configuration != nil && configuration.Enabled() {
 					Load()
+					log.Infof("Building %s for %s-%s", config.ProductName, platform.Name(), configuration.Name())
 					platform.Build(configuration)
 				}
 			}
 		}
 	}
+	return nil
 }
 
 func checkParameters(sourceDirectory string, outputDirectory string) { // TODO Check output here
@@ -98,19 +104,9 @@ func createBuildDirectoryStructure() {
 func generateLuaBindings(sourceDirectory string, packageName string) {
 
 	log.Info("generating lua bindings for " + packageName)
-	toluapp := filepath.Join(config.SDKDirectory, "dependencies", "toluapp", "bin")
-
-	os, _ := utils.GetOs()
-	switch os {
-	case utils.Osx:
-		toluapp = filepath.Join(toluapp, "toluapp_osx")
-	case utils.Linux:
-		toluapp = filepath.Join(config.SDKDirectory, "scripts", "bin", "tolua++")
-	case utils.Windows:
-		toluapp = filepath.Join(toluapp, "toluapp_script.exe")
-	}
+	toluapp := getToluaPath()
 	toluaHooksPath := filepath.Join(config.SDKDirectory, "src", "Sparks", "tolua.hooks.lua")
-	dofileWithCorrectPath := fmt.Sprintf("dofile(\"%s\")%s", toluaHooksPath, utils.LineBreak)
+	dofileWithCorrectPath := fmt.Sprintf("dofile(\"%s\")", toluaHooksPath)
 	reflectionFile := filepath.Join(sourceDirectory, packageName+".Reflection.lua")
 	utils.Sed(reflectionFile, "dofile\\(.*\\)", dofileWithCorrectPath)
 	packagePath := filepath.Join(sourceDirectory, packageName)
@@ -128,6 +124,19 @@ func generateLuaBindings(sourceDirectory string, packageName string) {
 	}
 }
 
+func getToluaPath() string {
+	toluapp := filepath.Join(config.SDKDirectory, "dependencies", "toluapp", "bin")
+	os, _ := utils.GetOs()
+	switch os {
+	case utils.Osx:
+		toluapp = filepath.Join(toluapp, "toluapp_osx")
+	case utils.Linux:
+		toluapp = filepath.Join(config.SDKDirectory, "scripts", "bin", "tolua++")
+	case utils.Windows:
+		toluapp = filepath.Join(toluapp, "toluapp_script.exe")
+	}
+	return toluapp
+}
 func generateIcons(directory string) {
 
 }

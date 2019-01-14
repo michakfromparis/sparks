@@ -20,6 +20,7 @@ var Shipping = false
 
 var Platforms map[string]bool
 var Verbose = false
+var VeryVerbose = false // TODO temporary for debugging. need to set a proper verbose level
 
 func Init() error {
 	log.Info("initializing config")
