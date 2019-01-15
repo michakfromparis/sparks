@@ -30,6 +30,7 @@ func ExecuteEx(filename string, directoryName string, environment bool, args ...
 	}
 	bytes, err := cmd.CombinedOutput()
 	if err != nil {
+		log.Errorf("command execution failed: %s", string(bytes))
 		return "", errorx.Decorate(err, "failed to execute "+fullCommand)
 	}
 	out := string(bytes)

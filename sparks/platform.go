@@ -22,6 +22,9 @@ var Platforms = map[string]Platform{}
 var PlatformNames = []string{
 	"osx",
 	"ios",
+	"android",
+	"windows",
+	"linux",
 	"webgl",
 }
 

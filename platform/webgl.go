@@ -1,6 +1,10 @@
 package platform
 
 import (
+	"fmt"
+	"path/filepath"
+
+	"github.com/michaKFromParis/sparks/config"
 	"github.com/michaKFromParis/sparks/sparks"
 )
 
@@ -36,17 +40,25 @@ func (w *WebGl) Clean() error {
 }
 func (w *WebGl) Build(configuration sparks.Configuration) error {
 	w.prebuild()
-	w.generate()
+	w.generate(configuration)
 	w.compile()
 	w.postbuild()
 	return nil
 }
+
 func (w *WebGl) prebuild() {
 
 }
-func (w *WebGl) generate() {
 
+func (w *WebGl) generate(configuration sparks.Configuration) string {
+	params := generateCmakeCommon(w, configuration)
+	cmakeToolchainFile := filepath.Join(config.SDKDirectory, "scripts", "CMake", "toolchains", "Emscripten.cmake")
+	params += fmt.Sprintf("-DOS_EMSCRIPTEN=1 ")
+	params += fmt.Sprintf("\"-DCMAKE_TOOLCHAIN_FILE%s\" ", cmakeToolchainFile)
+	params += fmt.Sprintf("-DEMSCRIPTEN_ROOT_PATH=${EmscriptenSDKRoot}/emscripten/${EmscriptenVersion} ")
+	return params
 }
+
 func (w *WebGl) compile() {
 
 }
