@@ -2,7 +2,10 @@ package platform
 
 import (
 	"fmt"
+	"path/filepath"
 
+	"github.com/michaKFromParis/sparks/config"
+	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/sparks"
 
 	log "github.com/Sirupsen/logrus"
@@ -57,9 +60,15 @@ func (l *Linux) prebuild() {
 func (l *Linux) generate(configuration sparks.Configuration) {
 	log.Info("sparks project generate --linux")
 
-	params := generateCmakeCommon(l, configuration)
-	params += fmt.Sprintf("-DOS_LINUX=1 ")
+	cmake := sparks.NewCMake(l, configuration)
+	params := fmt.Sprintf("-DOS_LINUX=1 ")
 	params += fmt.Sprintf("\"-GCodeBlocks - Unix Makefiles\" ")
+	projectsPath := filepath.Join(config.OutputDirectory, "projects", l.Title()+"-"+configuration.Title())
+	out, err := cmake.Run(projectsPath)
+	if err != nil {
+		errx.Fatalf(err, "sparks project generate failed: "+out)
+	}
+	log.Trace("cmake output" + out)
 }
 
 func (l *Linux) compile() {

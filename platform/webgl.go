@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"path/filepath"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/michaKFromParis/sparks/config"
+	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/sparks"
 )
 
@@ -50,13 +52,21 @@ func (w *WebGl) prebuild() {
 
 }
 
-func (w *WebGl) generate(configuration sparks.Configuration) string {
-	params := generateCmakeCommon(w, configuration)
+func (w *WebGl) generate(configuration sparks.Configuration) {
+	log.Info("sparks project generate --webgl")
+
 	cmakeToolchainFile := filepath.Join(config.SDKDirectory, "scripts", "CMake", "toolchains", "Emscripten.cmake")
-	params += fmt.Sprintf("-DOS_EMSCRIPTEN=1 ")
+
+	cmake := sparks.NewCMake(w, configuration)
+	params := fmt.Sprintf("-DOS_EMSCRIPTEN=1 ")
 	params += fmt.Sprintf("\"-DCMAKE_TOOLCHAIN_FILE%s\" ", cmakeToolchainFile)
 	params += fmt.Sprintf("-DEMSCRIPTEN_ROOT_PATH=${EmscriptenSDKRoot}/emscripten/${EmscriptenVersion} ")
-	return params
+	projectsPath := filepath.Join(config.OutputDirectory, "projects", w.Title()+"-"+configuration.Title())
+	out, err := cmake.Run(projectsPath)
+	if err != nil {
+		errx.Fatalf(err, "sparks project generate failed: "+out)
+	}
+	log.Trace("cmake output" + out)
 }
 
 func (w *WebGl) compile() {

@@ -67,34 +67,40 @@ func (i *Ios) generate(configuration sparks.Configuration) {
 
 	cmakeToolchainFile := filepath.Join(config.SDKDirectory, "scripts", "CMake", "toolchains", "iOS.cmake")
 	libraryPath := filepath.Join(config.OutputDirectory, "lib", i.Title()+"-"+configuration.Title())
-	params := generateCmakeCommon(i, configuration)
-	params += generateCmakeXcodeCommon()
-	params += fmt.Sprintf("-DOS_IOS=1 ")
+
+	cmake := sparks.NewCMake(i, configuration)
+	params := fmt.Sprintf("-DOS_IOS=1 ")
+	params += fmt.Sprintf("-GXcode -DXCODE_SIGNING_IDENTITY=\"%s\" ", config.XCodeSigningIdentity)
 	params += fmt.Sprintf("\"-DCMAKE_TOOLCHAIN_FILE%s\" ", cmakeToolchainFile)
 	params += fmt.Sprintf("-DXCODE_PROVISIONING_PROFILE_UUID=\"%s\" ", config.ProvisioningProfileUUID)
 	params += fmt.Sprintf("-DPRODUCT_BUNDLE_IDENTIFIER=\"%s\" ", config.BundleIdentifier)
 	params += fmt.Sprintf("-DCMAKE_OSX_SYSROOT=\"%s\" ", iosSysRoot)
 	params += fmt.Sprintf("-DCMAKE_IOS_SYSROOT=\"%s\" ", iosSysRoot)
 
+	// root directory of 2 different projects for iphoneos and iphonesimulator
 	projectsPath := filepath.Join(config.OutputDirectory, "projects", i.Title()+"-"+configuration.Title())
 
 	// calling cmake once for the iphone
 	platform := "iphoneos"
 	iphoneProjectPath := filepath.Join(projectsPath, platform)
 	iphoneLibraryPath := filepath.Join(libraryPath, platform)
-	paramsiPhone := params + fmt.Sprintf("-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=\"%s\" -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=\"%s\" ", iphoneLibraryPath, iphoneLibraryPath)
-	if output, err := runCmake(iphoneProjectPath, paramsiPhone); err != nil {
-		errx.Fatalf(err, fmt.Sprintf("cmake execution failed for %s: %s", platform, output))
+	additionalParameters := fmt.Sprintf("-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=\"%s\" -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=\"%s\" ", iphoneLibraryPath, iphoneLibraryPath)
+	out, err := cmake.RunEx(iphoneProjectPath, additionalParameters)
+	if err != nil {
+		errx.Fatalf(err, "sparks project generate failed: "+out)
 	}
+	log.Trace("cmake output" + out)
 
 	// and once for the simulator
 	platform = "iphonesimulator"
 	iphoneSimulatorProjectPath := filepath.Join(projectsPath, platform)
 	iphoneSimulatorLibraryPath := filepath.Join(libraryPath, platform)
-	paramsiPhoneSimulator := params + fmt.Sprintf("-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=\"%s\" -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=\"%s\" ", iphoneSimulatorLibraryPath, iphoneSimulatorLibraryPath)
-	if output, err := runCmake(iphoneSimulatorProjectPath, paramsiPhoneSimulator); err != nil {
-		errx.Fatalf(err, fmt.Sprintf("cmake execution failed for %s: %s", platform, output))
+	additionalParameters = fmt.Sprintf("-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=\"%s\" -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=\"%s\" ", iphoneSimulatorLibraryPath, iphoneSimulatorLibraryPath)
+	out, err = cmake.RunEx(iphoneSimulatorProjectPath, additionalParameters)
+	if err != nil {
+		errx.Fatalf(err, "sparks project generate failed: "+out)
 	}
+	log.Trace("cmake output" + out)
 }
 
 func (i *Ios) compile() {

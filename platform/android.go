@@ -67,8 +67,8 @@ func (a *Android) generate(configuration sparks.Configuration) {
 	}
 	cmakeToolchainFile := filepath.Join(config.SDKDirectory, "scripts", "CMake", "toolchains", "Android.cmake")
 
-	params := generateCmakeCommon(a, configuration)
-	params += fmt.Sprintf("-DOS_ANDROID=1 ")
+	// params := generateCmakeCommon(a, configuration)
+	params := fmt.Sprintf("-DOS_ANDROID=1 ")
 	params += fmt.Sprintf("\"-DCMAKE_TOOLCHAIN_FILE%s\" ", cmakeToolchainFile)
 	params += fmt.Sprintf("\"-GEclipse CDT4 - Unix Makefiles\" ")
 	params += fmt.Sprintf("-DNDK_CCACHE=\"%s\" ", ccachePath)

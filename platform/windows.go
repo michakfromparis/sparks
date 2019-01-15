@@ -2,8 +2,10 @@ package platform
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/michaKFromParis/sparks/config"
+	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/sparks"
 
 	log "github.com/Sirupsen/logrus"
@@ -57,10 +59,17 @@ func (w *Windows) prebuild() {
 
 func (w *Windows) generate(configuration sparks.Configuration) {
 	log.Info("sparks project generate --windows")
-	params := generateCmakeCommon(w, configuration)
-	params += fmt.Sprintf("-DOS_WINDOWS=1")
+
+	cmake := sparks.NewCMake(w, configuration)
+	params := fmt.Sprintf("-DOS_WINDOWS=1")
 	params += fmt.Sprintf("\"-G%s\" ", config.WindowsCompiler)
 	params += "-DCMAKE_SYSTEM_NAME=Windows"
+	projectsPath := filepath.Join(config.OutputDirectory, "projects", w.Title()+"-"+configuration.Title())
+	out, err := cmake.Run(projectsPath)
+	if err != nil {
+		errx.Fatalf(err, "sparks project generate failed: "+out)
+	}
+	log.Trace("cmake output" + out)
 }
 
 func (w *Windows) compile() {
