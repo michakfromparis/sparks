@@ -1,7 +1,6 @@
 package sparks
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -44,12 +43,12 @@ func Build(sourceDirectory string, outputDirectory string) error {
 	createBuildDirectoryStructure()
 	sparksSourceDirectory := filepath.Join(config.SDKDirectory, "src", config.SDKName)
 	sparksPlayerSourceDirectory := filepath.Join(config.SDKDirectory, "src", config.PlayerName)
-	generateLuaBindings(sparksSourceDirectory, config.SDKName)
+	GenerateLuaBindings(sparksSourceDirectory, config.SDKName)
 	// TODO fix math constants utils.Sed(filename, regex, newContent)
-	generateLuaBindings(sparksSourceDirectory, "SparksNetworksLua")
+	GenerateLuaBindings(sparksSourceDirectory, "SparksNetworksLua")
 	// TODO the line below probably should stay like this to build other c++ projects
-	// generateLuaBindings(sparksPlayerSourceDirectory, config.ProductName)
-	generateLuaBindings(sparksPlayerSourceDirectory, config.PlayerName)
+	// GenerateLuaBindings(sparksPlayerSourceDirectory, config.ProductName)
+	GenerateLuaBindings(sparksPlayerSourceDirectory, config.PlayerName)
 	generateIcons(filepath.Join(config.SDKDirectory, "Assets", "Icon"))
 	generateIcons(filepath.Join(config.SDKDirectory, "Assets", "SparksPlayerIcon"))
 	generateSplash(filepath.Join(config.SDKDirectory, "Assets", "Splash"))
@@ -106,42 +105,6 @@ func createBuildDirectoryStructure() {
 	}
 }
 
-func generateLuaBindings(sourceDirectory string, packageName string) {
-
-	log.Info("sparks lua bind " + packageName)
-	toluapp := getToluaPath()
-	toluaHooksPath := filepath.Join(config.SDKDirectory, "src", "Sparks", "tolua.hooks.lua")
-	dofileWithCorrectPath := fmt.Sprintf("dofile(\"%s\")", toluaHooksPath)
-	reflectionFile := filepath.Join(sourceDirectory, packageName+".Reflection.lua")
-	utils.SedFile(reflectionFile, "dofile\\(.*\\)", dofileWithCorrectPath)
-	packagePath := filepath.Join(sourceDirectory, packageName)
-	output, err := utils.ExecuteEx(
-		toluapp,
-		sourceDirectory,
-		true,
-		"-L", packagePath+".Reflection.lua",
-		"-n", packageName,
-		"-o", packagePath+".tolua.cpp",
-		"-H", packagePath+".tolua.h",
-		packagePath+".pkg")
-	if err != nil {
-		errx.Fatalf(err, "tolua++ execution failed: "+output)
-	}
-}
-
-func getToluaPath() string {
-	toluapp := filepath.Join(config.SDKDirectory, "dependencies", "toluapp", "bin")
-	os, _ := utils.GetOs()
-	switch os {
-	case utils.Osx:
-		toluapp = filepath.Join(toluapp, "toluapp_osx")
-	case utils.Linux:
-		toluapp = filepath.Join(config.SDKDirectory, "scripts", "bin", "tolua++")
-	case utils.Windows:
-		toluapp = filepath.Join(toluapp, "toluapp_script.exe")
-	}
-	return toluapp
-}
 func generateIcons(directory string) {
 	log.Info("sparks icon generate")
 }
