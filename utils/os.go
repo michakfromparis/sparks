@@ -2,7 +2,11 @@ package utils
 
 import (
 	"errors"
+	"os/user"
 	"runtime"
+
+	log "github.com/Sirupsen/logrus"
+	"github.com/joomcode/errorx"
 )
 
 type Os int
@@ -20,19 +24,37 @@ var OsNames = []string{
 	"linux",
 	"windows"}
 
-func (o Os) String() string {
-	return OsNames[o]
-}
+var hostOs Os
 
 func GetOs() (Os, error) {
+	if hostOs != Unknown {
+		return hostOs, nil
+	}
 	switch os := runtime.GOOS; os {
 	case "darwin":
-		return Osx, nil
+		hostOs = Osx
 	case "linux":
-		return Linux, nil
+		hostOs = Linux
 	case "windows":
+		hostOs = Windows
 		return Windows, nil
 	default:
 		return Unknown, errors.New("Unsupported host os: " + os)
 	}
+	return hostOs, nil
+}
+
+var homeDirectory = ""
+
+func GetHome() (string, error) {
+	if homeDirectory != "" {
+		return homeDirectory, nil
+	}
+	usr, err := user.Current()
+	if err != nil {
+		return "", errorx.Decorate(err, "could not access current user environment")
+	}
+	homeDirectory = usr.HomeDir
+	log.Debugf("$HOME Directory: %s", homeDirectory)
+	return homeDirectory, nil
 }

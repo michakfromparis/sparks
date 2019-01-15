@@ -10,6 +10,12 @@ import (
 	"github.com/michaKFromParis/sparks/errx"
 )
 
+func MkDir(path string) error {
+	if err := os.MkdirAll(path, os.ModePerm); err != nil {
+		errx.Fatalf(err, "failed to create directory: "+path)
+	}
+	return nil
+}
 func Pwd() (string, error) {
 	path, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
