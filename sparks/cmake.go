@@ -42,11 +42,11 @@ func (cm *CMake) generateParams() {
 	}
 	params += fmt.Sprintf("-DPRODUCT_ROOT=\"%s\" ", config.SourceDirectory)
 	params += fmt.Sprintf("-DPRODUCT_NAME=\"%s\" ", config.ProductName)
-	if config.VeryVerbose == true {
-		params += fmt.Sprintf("-DCMAKE_VERBOSE_MAKEFILE=ON --debug-output --trace ")
-	} else if config.Verbose {
-		params += fmt.Sprintf("--debug-output --trace ")
-	}
+	// if config.VeryVerbose == true {
+	// 	params += fmt.Sprintf("-DCMAKE_VERBOSE_MAKEFILE=ON --debug-output --trace ")
+	// } else if config.Verbose {
+	// 	params += fmt.Sprintf("--debug-output --trace ")
+	// }
 	params += fmt.Sprintf("-DCMAKE_BUILD_TYPE=%s ", cm.configuration.Title())
 	if cm.configuration.Name() == "shipping" {
 		params += fmt.Sprintf("-DSHIPPING=ON ")
@@ -109,9 +109,8 @@ func (cm *CMake) RunEx(outputDirectory string, params string) (string, error) {
 	log.Debugf("running cmake in %s", outputDirectory)
 	utils.MkDir(outputDirectory)
 	cmakelistsPath := filepath.Join(config.SDKDirectory, "scripts", "CMake", "Sparks")
-	cm.arguments += fmt.Sprintf("\"%s\"", cmakelistsPath)
 	var output string
-	if output, err := utils.ExecuteEx(cm.command, outputDirectory, true, cm.arguments+" "+params); err != nil {
+	if output, err := utils.ExecuteEx(cm.command, outputDirectory, true, fmt.Sprintf("%s %s \"%s\"", cm.arguments, params, cmakelistsPath)); err != nil {
 		return output, errorx.Decorate(err, "cmake execution failed")
 	}
 	return output, nil

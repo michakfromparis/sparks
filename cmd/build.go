@@ -12,7 +12,7 @@ import (
 
 var buildCmd = &cobra.Command{
 	Run:   build,
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.ArbitraryArgs,
 	Use:   "build",
 	Short: "Build a sparks product",
 	Long: `
@@ -31,12 +31,18 @@ will build the product in $HOME/sparks/app for WebGL in Debug configuration`,
 var enabledPlatforms []bool
 var enabledConfigurations []bool
 
+func positionalArgs(cmd *cobra.Command, args []string) {
+
+}
+
 func build(cmd *cobra.Command, args []string) {
 	sparks.Init()
 	platform.SetEnabledPlatforms(enabledPlatforms)
 	configuration.SetEnabledConfigurations(enabledConfigurations)
-	if err := sparks.Build(args[0], config.OutputDirectory); err != nil {
-		errx.Fatal(err)
+	for _, sourceDirectory := range args {
+		if err := sparks.Build(sourceDirectory, config.OutputDirectory); err != nil {
+			errx.Fatal(err)
+		}
 	}
 	sparks.Shutdown()
 }
