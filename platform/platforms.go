@@ -8,6 +8,9 @@ import (
 func RegisterPlatforms() {
 	sparks.RegisterPlatform(&Osx{})
 	sparks.RegisterPlatform(&Ios{})
+	sparks.RegisterPlatform(&Android{})
+	sparks.RegisterPlatform(&Windows{})
+	sparks.RegisterPlatform(&Linux{})
 	sparks.RegisterPlatform(&WebGl{})
 }
 

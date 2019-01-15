@@ -102,4 +102,4 @@ run: check build
 	"$(OUTPUT_DIRECTORY)/$(HOST_OS)/$(OUTPUT_NAME)" $(ARGS) 2>&1 | panicparse
 
 # build and run in docker
-rd: build-docker run-docker
+rund: build-docker run-docker
