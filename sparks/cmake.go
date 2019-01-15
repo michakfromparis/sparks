@@ -111,7 +111,7 @@ func (cm *CMake) RunEx(outputDirectory string, params string) (string, error) {
 	cmakelistsPath := filepath.Join(config.SDKDirectory, "scripts", "CMake", "Sparks")
 	cm.arguments += fmt.Sprintf("\"%s\"", cmakelistsPath)
 	var output string
-	if output, err := utils.ExecuteEx(cm.command, outputDirectory, true, cm.arguments+params); err != nil {
+	if output, err := utils.ExecuteEx(cm.command, outputDirectory, true, cm.arguments+" "+params); err != nil {
 		return output, errorx.Decorate(err, "cmake execution failed")
 	}
 	return output, nil

@@ -25,7 +25,7 @@ var IncludeSparksSource = true
 var SparksOSXSDK = "macosx10.14" // run `xcodebuild -showsdks` to list valid values
 var SparksOSXArchitecture = "x86_64"
 var SparksOSXDeploymentTarget = "10.10"
-var XCodeSigningIdentity = ""
+var XCodeSigningIdentity = "iPhone Developer: Michel Courtine"
 var XCodeRecommendedVersion = "10.1"
 
 // iOS specific
