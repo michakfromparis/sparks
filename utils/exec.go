@@ -16,6 +16,8 @@ import (
 	"github.com/joomcode/errorx"
 )
 
+var ExecuteStreamingToStdout = false
+
 func Execute(filename string, args ...string) (string, error) {
 	return ExecuteEx(filename, "", false, args...)
 }
@@ -82,7 +84,9 @@ func writer(r io.Reader) {
 		n, err := r.Read(buf)
 		if n > 0 {
 			output += string(buf[0:n])
-			fmt.Print(string(buf[0:n]))
+			if ExecuteStreamingToStdout {
+				fmt.Print(string(buf[0:n]))
+			}
 		}
 		if err != nil {
 			break

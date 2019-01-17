@@ -30,6 +30,7 @@ func Init() {
 		log.SetLevel(log.DebugLevel)
 	} else if config.VeryVerbose {
 		log.SetLevel(log.TraceLevel)
+		utils.ExecuteStreamingToStdout = true
 	} else {
 		log.SetLevel(log.InfoLevel)
 	}
