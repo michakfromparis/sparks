@@ -55,49 +55,48 @@ func parseVersion() (int, int, int, int) {
 }
 
 func (cm *CMake) generateParams() {
-	var args []string
-	args = append(args, fmt.Sprintf("-DSPARKS_ROOT=%s", config.SDKDirectory))
-	args = append(args, fmt.Sprintf("-DBUILD_ROOT=%s", config.OutputDirectory))
-	args = append(args, fmt.Sprintf("-DPRODUCT_ROOT=%s", config.SourceDirectory))
-	args = append(args, fmt.Sprintf("-DPRODUCT_NAME=%s", config.ProductName))
-	if config.IncludeSparksSource == true {
-		args = append(args, fmt.Sprintf("-DINCLUDE_SPARKS_SOURCE=ON"))
-	} else {
-		args = append(args, fmt.Sprintf("-DINCLUDE_SPARKS_SOURCE=OFF"))
-	}
+	cm.AddParam(fmt.Sprintf("-DSPARKS_ROOT=%s", config.SDKDirectory))
+	cm.AddParam(fmt.Sprintf("-DBUILD_ROOT=%s", config.OutputDirectory))
+	cm.AddParam(fmt.Sprintf("-DPRODUCT_ROOT=%s", config.SourceDirectory))
+	cm.AddParam(fmt.Sprintf("-DPRODUCT_NAME=%s", config.ProductName))
+
 	// if config.VeryVerbose == true {
-	// 	args = append(args, fmt.Sprintf("-DCMAKE_VERBOSE_MAKEFILE=ON --debug-output --trace"))
+	// 	cm.AddParam(fmt.Sprintf("-DCMAKE_VERBOSE_MAKEFILE=ON --debug-output --trace")))
 	// } else if config.Verbose {
-	// 	args = append(args, fmt.Sprintf("--debug-output --trace"))
+	// 	cm.AddParam(fmt.Sprintf("--debug-output --trace")))
 	// }
-	args = append(args, fmt.Sprintf("-DCMAKE_BUILD_TYPE=%s", cm.configuration.Title()))
+
+	if config.IncludeSparksSource == true {
+		cm.AddParam(fmt.Sprintf("-DINCLUDE_SPARKS_SOURCE=ON"))
+	} else {
+		cm.AddParam(fmt.Sprintf("-DINCLUDE_SPARKS_SOURCE=OFF"))
+	}
+	cm.AddParam(fmt.Sprintf("-DCMAKE_BUILD_TYPE=%s", cm.configuration.Title()))
 	if cm.configuration.Name() == "shipping" {
-		args = append(args, fmt.Sprintf("-DSHIPPING=ON"))
+		cm.AddParam(fmt.Sprintf("-DSHIPPING=ON"))
 	}
 	major, minor, patch, build := parseVersion() // TODO move this out of here
 	widthAndHeight := strings.Split(CurrentProduct.View.Resolution, "x")
 	if len(widthAndHeight) != 2 {
 		errx.Fatalf(nil, "Failed to parse product resolution: "+CurrentProduct.View.Resolution)
 	}
+	if CurrentProduct.View.Fullscreen == "yes" {
+		cm.AddParam(fmt.Sprintf("-DPRODUCT_FULLSCREEN=ON"))
+	} else {
+		cm.AddParam(fmt.Sprintf("-DPRODUCT_FULLSCREEN=OFF"))
+	}
 
 	log.Infof("sparks project version %d.%d.%d.%d", major, minor, patch, build)
-	args = append(args, fmt.Sprintf("-DSPARKS_VERSION_MAJOR=%d", major))
-	args = append(args, fmt.Sprintf("-DSPARKS_VERSION_MINOR=%d", minor))
-	args = append(args, fmt.Sprintf("-DSPARKS_VERSION_PATCH=%d", build))
-	args = append(args, fmt.Sprintf("-DSPARKS_VERSION_BUILD=%d", patch))
+	cm.AddParam(fmt.Sprintf("-DSPARKS_VERSION_MAJOR=%d", major))
+	cm.AddParam(fmt.Sprintf("-DSPARKS_VERSION_MINOR=%d", minor))
+	cm.AddParam(fmt.Sprintf("-DSPARKS_VERSION_PATCH=%d", build))
+	cm.AddParam(fmt.Sprintf("-DSPARKS_VERSION_BUILD=%d", patch))
 	width, height := widthAndHeight[0], widthAndHeight[1]
-	args = append(args, fmt.Sprintf("-DPRODUCT_WIDTH=%s", width))
-	args = append(args, fmt.Sprintf("-DPRODUCT_HEIGHT=%s", height))
-	if CurrentProduct.View.Fullscreen == "yes" {
-		args = append(args, fmt.Sprintf("-DPRODUCT_FULLSCREEN=ON"))
-	} else {
-		args = append(args, fmt.Sprintf("-DPRODUCT_FULLSCREEN=OFF"))
-	}
-	args = append(args, fmt.Sprintf("-DPRODUCT_DEFAULT_ORIENTATION=\"%s\"", CurrentProduct.View.DefaultOrientation))          // TODO Proper listing of orientations
-	args = append(args, fmt.Sprintf("-DPRODUCT_SUPPORTED_ORIENTATIONS=\"%s\"", CurrentProduct.View.SupportedOrientations[0])) // TODO Proper listing of orientations
-	args = append(args, fmt.Sprintf("-DCMAKE_INSTALL_PREFIX=%s", filepath.Join(config.OutputDirectory, "lib", cm.platform.Title()+"-"+cm.configuration.Title())))
-	cm.arguments = args
-	log.Trace(args)
+	cm.AddParam(fmt.Sprintf("-DPRODUCT_WIDTH=%s", width))
+	cm.AddParam(fmt.Sprintf("-DPRODUCT_HEIGHT=%s", height))
+	cm.AddParam(fmt.Sprintf("-DPRODUCT_DEFAULT_ORIENTATION=\"%s\"", CurrentProduct.View.DefaultOrientation))          // TODO Proper listing of orientations
+	cm.AddParam(fmt.Sprintf("-DPRODUCT_SUPPORTED_ORIENTATIONS=\"%s\"", CurrentProduct.View.SupportedOrientations[0])) // TODO Proper listing of orientations
+	cm.AddParam(fmt.Sprintf("-DCMAKE_INSTALL_PREFIX=%s", filepath.Join(config.OutputDirectory, "lib", cm.platform.Title()+"-"+cm.configuration.Title())))
 }
 
 func (cm *CMake) Params() []string {
