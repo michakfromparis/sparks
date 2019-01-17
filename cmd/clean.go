@@ -5,6 +5,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/michaKFromParis/sparks/config"
+	"github.com/michaKFromParis/sparks/errx"
 	"github.com/spf13/cobra"
 )
 
@@ -18,14 +19,15 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	RunE: clean,
+	Run: clean,
 }
 
-func clean(cmd *cobra.Command, args []string) error {
+func clean(cmd *cobra.Command, args []string) {
 
 	log.Info("Cleaning")
-	os.RemoveAll(config.OutputDirectory)
-	return nil
+	if err := os.RemoveAll(config.OutputDirectory); err != nil {
+		errx.Fatalf(err, "failed to clean")
+	}
 }
 
 func init_clean() {
