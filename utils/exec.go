@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -27,15 +28,20 @@ var output string
 func ExecuteEx(filename string, directoryName string, environment bool, args ...string) (string, error) {
 	defer timeTrack(time.Now(), "execution")
 	output = ""
-	fullCommand := fmt.Sprintf("%s %s", filename, strings.Join(args[:], " "))
-	log.Debugf("executing with %d args%s%s%sin directory %s with environment: %t", len(args), NewLine, fullCommand, NewLine, directoryName, environment)
 	cmd := exec.Command(filename, args...)
+	header := fmt.Sprintf("executing %s with %d args", filepath.Base(filename), len(args))
 	if directoryName != "" {
 		cmd.Dir = directoryName
+		header += " in directory " + directoryName
+	} else {
+		header += " in default directory (" + filepath.Dir(os.Args[0]) + ")"
 	}
 	if environment {
 		cmd.Env = os.Environ()
+		header += " and user environment"
 	}
+	fullCommand := fmt.Sprintf("%s %s", filename, strings.Join(args[:], " "))
+	log.Debugf("%s%s%s", header, NewLine, fullCommand)
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
@@ -74,8 +80,7 @@ func ExecuteEx(filename string, directoryName string, environment bool, args ...
 }
 
 func timeTrack(start time.Time, name string) {
-	elapsed := time.Since(start)
-	log.Debugf("%s took %ss", name, elapsed)
+	log.Debugf("%s took %ss", name, time.Since(start))
 }
 
 func writer(r io.Reader) {
