@@ -113,10 +113,6 @@ func (cm *CMake) AddParam(params string) {
 }
 
 func (cm *CMake) Run(outputDirectory string) (string, error) {
-	return cm.RunEx(outputDirectory, "")
-}
-
-func (cm *CMake) RunEx(outputDirectory string, params string) (string, error) {
 	log.Debugf("running cmake in %s", outputDirectory)
 	if err := utils.MkDir(outputDirectory); err != nil {
 		return "could not create " + outputDirectory, err
