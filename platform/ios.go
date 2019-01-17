@@ -74,7 +74,7 @@ func (i *Ios) generate(configuration sparks.Configuration) {
 
 	cmake.AddArg(fmt.Sprintf("-DOS_IOS=1"))
 	cmake.AddArg(fmt.Sprintf("-GXcode"))
-	cmake.AddArg(fmt.Sprintf("-DXCODE_SIGNING_IDENTITY=\"%s\"", config.XCodeSigningIdentity))
+	cmake.AddArg(fmt.Sprintf("-DXCODE_SIGNING_IDENTITY=%s", config.XCodeSigningIdentity))
 	cmake.AddArg(fmt.Sprintf("-DCMAKE_TOOLCHAIN_FILE=%s", cmakeToolchainFile))
 	cmake.AddArg(fmt.Sprintf("-DXCODE_PROVISIONING_PROFILE_UUID=%s", config.ProvisioningProfileUUID))
 	cmake.AddArg(fmt.Sprintf("-DPRODUCT_BUNDLE_IDENTIFIER=%s", config.BundleIdentifier))
@@ -89,8 +89,8 @@ func (i *Ios) generate(configuration sparks.Configuration) {
 	iphoneProjectPath := filepath.Join(projectsPath, platform)
 	iphoneLibraryPath := filepath.Join(libraryPath, platform)
 	var commonArgs = cmake.Args()
-	cmake.AddArg(fmt.Sprintf("-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=\"%s\"", iphoneLibraryPath))
-	cmake.AddArg(fmt.Sprintf("-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=\"%s\"", iphoneLibraryPath))
+	cmake.AddArg(fmt.Sprintf("-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=%s", iphoneLibraryPath))
+	cmake.AddArg(fmt.Sprintf("-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=%s", iphoneLibraryPath))
 	out, err := cmake.Run(iphoneProjectPath)
 	if err != nil {
 		errx.Fatalf(err, "sparks project generate failed")
@@ -102,8 +102,8 @@ func (i *Ios) generate(configuration sparks.Configuration) {
 	iphoneSimulatorProjectPath := filepath.Join(projectsPath, platform)
 	iphoneSimulatorLibraryPath := filepath.Join(libraryPath, platform)
 	cmake.SetArgs(commonArgs)
-	cmake.AddArg(fmt.Sprintf("-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=\"%s\"", iphoneSimulatorLibraryPath))
-	cmake.AddArg(fmt.Sprintf("-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=\"%s\"", iphoneSimulatorLibraryPath))
+	cmake.AddArg(fmt.Sprintf("-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=%s", iphoneSimulatorLibraryPath))
+	cmake.AddArg(fmt.Sprintf("-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=%s", iphoneSimulatorLibraryPath))
 	out, err = cmake.Run(iphoneSimulatorProjectPath)
 	if err != nil {
 		errx.Fatalf(err, "sparks project generate failed")

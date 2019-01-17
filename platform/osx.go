@@ -49,9 +49,10 @@ func (o *Osx) Clean() error {
 	return nil
 }
 func (o *Osx) Build(configuration sparks.Configuration) error {
+	projectDirectory := filepath.Join(config.OutputDirectory, "projects", o.Title()+"-"+configuration.Title())
 	o.prebuild()
-	o.generate(configuration)
-	o.compile()
+	o.generate(configuration, projectDirectory)
+	o.compile(configuration, projectDirectory)
 	o.postbuild()
 	return nil
 }
@@ -64,7 +65,7 @@ func (o *Osx) guessXCodeSigningIdentity() {
 
 }
 
-func (o *Osx) generate(configuration sparks.Configuration) {
+func (o *Osx) generate(configuration sparks.Configuration, projectDirectory string) {
 	log.Info("sparks project generate --osx")
 	log.Trace("determining osx sysroot")
 	osxSysRoot, err := utils.ExecuteEx("xcodebuild", "", true, "-sdk", "macosx", "-version", "Path")
@@ -92,11 +93,10 @@ func (o *Osx) generate(configuration sparks.Configuration) {
 	cmake.AddArg(fmt.Sprintf("-DCMAKE_OSX_SYSROOT=%s", osxSysRoot))
 	cmake.AddArg(fmt.Sprintf("-DCMAKE_C_COMPILER=%s", cc))
 	cmake.AddArg(fmt.Sprintf("-DCMAKE_CXX_COMPILER=%s", cpp))
-	cmake.AddArg(fmt.Sprintf("-DXCODE_SIGNING_IDENTITY=\"%s\"", config.XCodeSigningIdentity))
+	cmake.AddArg(fmt.Sprintf("-DXCODE_SIGNING_IDENTITY='%s'", config.XCodeSigningIdentity))
 	cmake.AddArg(fmt.Sprintf("-DCMAKE_OSX_ARCHITECTURES=%s", config.SparksOSXArchitecture))
 	cmake.AddArg(fmt.Sprintf("-DCMAKE_OSX_DEPLOYMENT_TARGET=%s", config.SparksOSXDeploymentTarget))
 
-	projectDirectory := filepath.Join(config.OutputDirectory, "projects", o.Title()+"-"+configuration.Title())
 	out, err := cmake.Run(projectDirectory)
 	log.Trace("cmake output" + out)
 	if err != nil {
@@ -104,8 +104,10 @@ func (o *Osx) generate(configuration sparks.Configuration) {
 	}
 }
 
-func (o *Osx) compile() {
-
+func (o *Osx) compile(configuration sparks.Configuration, projectDirectory string) {
+	log.Info("sparks project compile --osx")
+	xcode := sparks.NewXCode(o, configuration)
+	xcode.Build(projectDirectory)
 }
 
 func (o *Osx) postbuild() {
