@@ -69,9 +69,14 @@ func Build(sourceDirectory string, outputDirectory string) error {
 					if err := platform.Build(configuration); err != nil {
 						return errorx.Decorate(err, "sparks build failed for %s-%s", platform.Title(), configuration.Title())
 					}
-					// TODO calculate build time and build size
+					buildPath := filepath.Join(outputDirectory, "bin", platform.Title()+"-"+configuration.Title())
+					stat, err := os.Stat(buildPath)
+					if err != nil || !stat.IsDir() {
+						return errorx.Decorate(err, "build directory does not exist: "+buildPath)
+					}
+					buildSize, _ := utils.DirSize(buildPath)
 					log.Infof("build completed successfully in %v", utils.FmtDuration(time.Since(start)))
-					log.Infof("build size: %d Mb", 42)
+					log.Infof("build size: %s", buildSize)
 				}
 			}
 		}
