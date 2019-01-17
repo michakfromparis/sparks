@@ -13,7 +13,8 @@ import (
 )
 
 type Osx struct {
-	enabled bool
+	enabled         bool
+	SigningIdentity string
 }
 
 func (o *Osx) Name() string {
@@ -57,13 +58,11 @@ func (o *Osx) Build(configuration sparks.Configuration) error {
 	return nil
 }
 
-var SigningIdentity string
-
 func (o *Osx) prebuild() {
 	xcode := sparks.XCode{}
 	xcode.DetectSigning()
-	SigningIdentity = xcode.SigningIdentity(sparks.IPhoneDeveloper)
-	if SigningIdentity == "" {
+	o.SigningIdentity = xcode.SigningIdentity(sparks.MacDeveloper)
+	if o.SigningIdentity == "" {
 		errx.Fatalf(nil, "could not detect an xcode signing identity") // TODO explain how to obtain one
 	}
 }
@@ -96,7 +95,7 @@ func (o *Osx) generate(configuration sparks.Configuration, projectDirectory stri
 	cmake.AddArg(fmt.Sprintf("-DCMAKE_OSX_SYSROOT=%s", osxSysRoot))
 	cmake.AddArg(fmt.Sprintf("-DCMAKE_C_COMPILER=%s", cc))
 	cmake.AddArg(fmt.Sprintf("-DCMAKE_CXX_COMPILER=%s", cpp))
-	cmake.AddArg(fmt.Sprintf("-DXCODE_SIGNING_IDENTITY=%s", SigningIdentity))
+	cmake.AddArg(fmt.Sprintf("-DXCODE_SIGNING_IDENTITY=%s", o.SigningIdentity))
 	cmake.AddArg(fmt.Sprintf("-DCMAKE_OSX_ARCHITECTURES=%s", config.SparksOSXArchitecture))
 	cmake.AddArg(fmt.Sprintf("-DCMAKE_OSX_DEPLOYMENT_TARGET=%s", config.SparksOSXDeploymentTarget))
 

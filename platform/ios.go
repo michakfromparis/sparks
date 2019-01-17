@@ -13,7 +13,8 @@ import (
 )
 
 type Ios struct {
-	enabled bool
+	enabled         bool
+	SigningIdentity string
 }
 
 func (i *Ios) Name() string {
@@ -43,21 +44,31 @@ func (i *Ios) SetEnabled(enabled bool) {
 func (i *Ios) Deps() error {
 	return nil
 }
+
 func (i *Ios) Clean() error {
 	return nil
 }
+
 func (i *Ios) Build(configuration sparks.Configuration) error {
+	projectDirectory := filepath.Join(config.OutputDirectory, "projects", i.Title()+"-"+configuration.Title())
 	i.prebuild()
-	i.generate(configuration)
-	i.compile()
+	i.generate(configuration, projectDirectory)
+	i.compile(configuration, projectDirectory)
 	i.postbuild()
+
 	return nil
 }
 
 func (i *Ios) prebuild() {
-
+	xcode := sparks.XCode{}
+	xcode.DetectSigning()
+	i.SigningIdentity = xcode.SigningIdentity(sparks.IPhoneDeveloper)
+	if i.SigningIdentity == "" {
+		errx.Fatalf(nil, "could not detect an xcode signing identity") // TODO explain how to obtain one
+	}
 }
-func (i *Ios) generate(configuration sparks.Configuration) {
+
+func (i *Ios) generate(configuration sparks.Configuration, projectDirectory string) {
 	log.Info("sparks project generate --ios")
 
 	iosSysRoot, err := utils.ExecuteEx("xcodebuild", "", true, "-sdk", config.SparksiOSSDK, "-version", "Path")
@@ -81,12 +92,9 @@ func (i *Ios) generate(configuration sparks.Configuration) {
 	cmake.AddArg(fmt.Sprintf("-DCMAKE_OSX_SYSROOT=%s", iosSysRoot))
 	cmake.AddArg(fmt.Sprintf("-DCMAKE_IOS_SYSROOT=%s", iosSysRoot))
 
-	// root directory of 2 different projects for iphoneos and iphonesimulator
-	projectsPath := filepath.Join(config.OutputDirectory, "projects", i.Title()+"-"+configuration.Title())
-
 	// calling cmake once for the iphone
 	platform := "iphoneos"
-	iphoneProjectPath := filepath.Join(projectsPath, platform)
+	iphoneProjectPath := filepath.Join(projectDirectory, platform)
 	iphoneLibraryPath := filepath.Join(libraryPath, platform)
 	var commonArgs = cmake.Args()
 	cmake.AddArg(fmt.Sprintf("-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=%s", iphoneLibraryPath))
@@ -99,7 +107,7 @@ func (i *Ios) generate(configuration sparks.Configuration) {
 
 	// and once for the simulator
 	platform = "iphonesimulator"
-	iphoneSimulatorProjectPath := filepath.Join(projectsPath, platform)
+	iphoneSimulatorProjectPath := filepath.Join(projectDirectory, platform)
 	iphoneSimulatorLibraryPath := filepath.Join(libraryPath, platform)
 	cmake.SetArgs(commonArgs)
 	cmake.AddArg(fmt.Sprintf("-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=%s", iphoneSimulatorLibraryPath))
@@ -111,9 +119,13 @@ func (i *Ios) generate(configuration sparks.Configuration) {
 	log.Trace("cmake output" + out)
 }
 
-func (i *Ios) compile() {
-
+func (i *Ios) compile(configuration sparks.Configuration, projectDirectory string) {
+	log.Info("sparks project compile --ios")
+	xcode := sparks.NewXCode(i, configuration)
+	xcode.Build(filepath.Join(projectDirectory, "iphoneos"))
+	xcode.Build(filepath.Join(projectDirectory, "iphonesimulator"))
 }
+
 func (i *Ios) postbuild() {
 
 }
