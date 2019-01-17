@@ -30,6 +30,7 @@ func (st SigningType) String() string {
 }
 
 var SigningIdentities = map[SigningType]string{}
+var SigningIdentity string
 
 type XCode struct {
 	command       string
@@ -85,4 +86,8 @@ func (t *XCode) DetectSigning() {
 			}
 		}
 	}
+}
+
+func (t *XCode) SigningIdentity(signingType SigningType) string {
+	return SigningIdentities[signingType]
 }
