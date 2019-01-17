@@ -9,18 +9,25 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/joomcode/errorx"
 )
+
+func timeTrack(start time.Time, name string) {
+	elapsed := time.Since(start)
+	log.Debugf("%s took %ss", name, elapsed)
+}
 
 func Execute(filename string, args ...string) (string, error) {
 	return ExecuteEx(filename, "", false, args...)
 }
 
 func ExecuteEx(filename string, directoryName string, environment bool, args ...string) (string, error) {
+	defer timeTrack(time.Now(), "execution")
 	fullCommand := fmt.Sprintf("%s %s", filename, strings.Join(args[:], " "))
-	log.Debugf("executing %s in directory %s with environment: %t", fullCommand, directoryName, environment)
+	log.Debugf("executing with %d args%s%s%sin directory %s with environment: %t", len(args), NewLine, fullCommand, NewLine, directoryName, environment)
 	cmd := exec.Command(filename, args...)
 	if directoryName != "" {
 		cmd.Dir = directoryName

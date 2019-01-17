@@ -42,6 +42,7 @@ func (o *Osx) SetEnabled(enabled bool) {
 
 func (o *Osx) Deps() error {
 	log.Info("Installing dependencies for " + o.Title())
+
 	return nil
 }
 func (o *Osx) Clean() error {
@@ -71,15 +72,29 @@ func (o *Osx) generate(configuration sparks.Configuration) {
 		errx.Fatalf(err, "could not determine osx sysroot")
 	}
 	osxSysRoot = strings.TrimSpace(osxSysRoot)
+	cc, err := utils.ExecuteEx("xcrun", "", true, "-find", "cc")
+	if err != nil {
+		errx.Fatalf(err, "could not determine C compiler")
+	}
+	cc = strings.TrimSpace(cc)
+	cpp, err := utils.ExecuteEx("xcrun", "", true, "-find", "c++")
+	if err != nil {
+		errx.Fatalf(err, "could not determine C++ compiler")
+	}
+	cpp = strings.TrimSpace(cpp)
 	log.Tracef("osx sysroot: %s", osxSysRoot)
+	log.Tracef("C compiler: %s", cc)
+	log.Tracef("C++ compiler: %s", cpp)
 
 	cmake := sparks.NewCMake(o, configuration)
-	params := fmt.Sprintf("-DOS_OSX=1 ")
-	params += fmt.Sprintf("-GXcode -DXCODE_SIGNING_IDENTITY=\"%s\" ", config.XCodeSigningIdentity)
-	params += fmt.Sprintf("-DCMAKE_OSX_ARCHITECTURES=\"%s\" ", config.SparksOSXArchitecture)
-	params += fmt.Sprintf("-DCMAKE_OSX_DEPLOYMENT_TARGET=\"%s\" ", config.SparksOSXDeploymentTarget)
-	params += fmt.Sprintf("-DCMAKE_OSX_SYSROOT=\"%s\" ", osxSysRoot)
-	cmake.AddParams(params)
+	cmake.AddParam(fmt.Sprintf("-DOS_OSX=1"))
+	cmake.AddParam(fmt.Sprintf("-GXcode"))
+	cmake.AddParam(fmt.Sprintf("-DCMAKE_OSX_SYSROOT=%s", osxSysRoot))
+	cmake.AddParam(fmt.Sprintf("-DCMAKE_C_COMPILER=%s", cc))
+	cmake.AddParam(fmt.Sprintf("-DCMAKE_CXX_COMPILER=%s", cpp))
+	cmake.AddParam(fmt.Sprintf("-DXCODE_SIGNING_IDENTITY=\"%s\"", config.XCodeSigningIdentity))
+	cmake.AddParam(fmt.Sprintf("-DCMAKE_OSX_ARCHITECTURES=%s", config.SparksOSXArchitecture))
+	cmake.AddParam(fmt.Sprintf("-DCMAKE_OSX_DEPLOYMENT_TARGET=%s", config.SparksOSXDeploymentTarget))
 
 	projectDirectory := filepath.Join(config.OutputDirectory, "projects", o.Title()+"-"+configuration.Title())
 	out, err := cmake.Run(projectDirectory)

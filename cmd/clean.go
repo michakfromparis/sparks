@@ -1,7 +1,10 @@
 package cmd
 
 import (
+	"os"
+
 	log "github.com/Sirupsen/logrus"
+	"github.com/michaKFromParis/sparks/config"
 	"github.com/spf13/cobra"
 )
 
@@ -21,6 +24,7 @@ to quickly create a Cobra application.`,
 func clean(cmd *cobra.Command, args []string) error {
 
 	log.Info("Cleaning")
+	os.RemoveAll(config.OutputDirectory)
 	return nil
 }
 
