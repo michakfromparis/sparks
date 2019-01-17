@@ -47,7 +47,7 @@ func NewXCode(platform Platform, configuration Configuration) *XCode {
 	return xc
 }
 
-func (xc *XCode) Build(directory string) {
+func (xc *XCode) Build(directory string, arg ...string) {
 
 	var args []string
 
@@ -58,15 +58,15 @@ func (xc *XCode) Build(directory string) {
 	args = append(args, "-target", config.ProductName)
 	args = append(args, "-sdk", config.SparksOSXSDK)
 	args = append(args, "-configuration", xc.configuration.Title())
-
+	args = append(args, arg...)
 	utils.ExecuteEx(xc.command, directory, true, args...)
 }
 
-func (t *XCode) Clean() {
+func (xc *XCode) Clean() {
 
 }
 
-func (t *XCode) DetectSigning() {
+func (xc *XCode) DetectSigning() {
 	log.Debug("detecting xcode signing identity")
 	s, err := utils.Execute("security", "find-identity", "-v", "-p", "codesigning")
 	if err != nil {
@@ -88,6 +88,6 @@ func (t *XCode) DetectSigning() {
 	}
 }
 
-func (t *XCode) SigningIdentity(signingType SigningType) string {
+func (xc *XCode) SigningIdentity(signingType SigningType) string {
 	return SigningIdentities[signingType]
 }
