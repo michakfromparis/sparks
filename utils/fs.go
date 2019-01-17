@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/michaKFromParis/sparks/errx"
@@ -16,6 +17,19 @@ func MkDir(path string) error {
 	}
 	return nil
 }
+
+func DirSize(path string) (string, error) {
+	du, err := Execute("du", "-hs", path)
+	if err != nil {
+		return "", err
+	}
+	fields := strings.Fields(du)
+	if len(fields) > 0 {
+		return fields[0], nil
+	}
+	return "", nil
+}
+
 func Pwd() (string, error) {
 	path, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
