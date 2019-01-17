@@ -60,6 +60,7 @@ func init_build() {
 	buildCmd.Flags().StringVarP(&config.SourceDirectory, "source", "", "", "source directory to build")
 	buildCmd.Flags().StringVarP(&config.OutputDirectory, "output", "", "", "output directory for all selected builds")
 	buildCmd.Flags().StringVarP(&config.ProductName, "name", "", "", "set the product name / filename of the built binaries")
+	buildCmd.Flags().BoolVarP(&config.GenerateLua, "lua", "L", false, "generate lua bindings")
 	i := 0
 	for _, name := range sparks.PlatformNames {
 		p := sparks.Platforms[name]

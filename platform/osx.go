@@ -64,7 +64,7 @@ func (o *Osx) prebuild() {
 	xcode.DetectSigning()
 	SigningIdentity = xcode.SigningIdentity(sparks.IPhoneDeveloper)
 	if SigningIdentity == "" {
-		errx.Fatalf(nil, "could not detect an xcode signing identity")
+		errx.Fatalf(nil, "could not detect an xcode signing identity") // TODO explain how to obtain one
 	}
 }
 

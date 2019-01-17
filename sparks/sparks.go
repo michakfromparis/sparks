@@ -3,6 +3,7 @@ package sparks
 import (
 	"os"
 	"path/filepath"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/joomcode/errorx"
@@ -43,12 +44,14 @@ func Build(sourceDirectory string, outputDirectory string) error {
 	createBuildDirectoryStructure()
 	sparksSourceDirectory := filepath.Join(config.SDKDirectory, "src", config.SDKName)
 	sparksPlayerSourceDirectory := filepath.Join(config.SDKDirectory, "src", config.PlayerName)
-	GenerateLuaBindings(sparksSourceDirectory, config.SDKName)
-	// TODO fix math constants utils.Sed(filename, regex, newContent)
-	GenerateLuaBindings(sparksSourceDirectory, "SparksNetworksLua")
-	// TODO the line below probably should stay like this to build other c++ projects
-	// GenerateLuaBindings(sparksPlayerSourceDirectory, config.ProductName)
-	GenerateLuaBindings(sparksPlayerSourceDirectory, config.PlayerName)
+	if config.GenerateLua {
+		GenerateLuaBindings(sparksSourceDirectory, config.SDKName)
+		// TODO fix math constants utils.Sed(filename, regex, newContent)
+		GenerateLuaBindings(sparksSourceDirectory, "SparksNetworksLua")
+		// TODO the line below probably should stay like this to build other c++ projects
+		// GenerateLuaBindings(sparksPlayerSourceDirectory, config.ProductName)
+		GenerateLuaBindings(sparksPlayerSourceDirectory, config.PlayerName)
+	}
 	generateIcons(filepath.Join(config.SDKDirectory, "Assets", "Icon"))
 	generateIcons(filepath.Join(config.SDKDirectory, "Assets", "SparksPlayerIcon"))
 	generateSplash(filepath.Join(config.SDKDirectory, "Assets", "Splash"))
@@ -60,12 +63,14 @@ func Build(sourceDirectory string, outputDirectory string) error {
 			for _, configurationName := range ConfigurationNames {
 				configuration := Configurations[configurationName]
 				if configuration != nil && configuration.Enabled() {
+					start := time.Now()
 					log.Infof("sparks build --%s --%s --name %s", platform.Name(), configuration.Name(), config.ProductName)
+
 					if err := platform.Build(configuration); err != nil {
 						return errorx.Decorate(err, "sparks build failed for %s-%s", platform.Title(), configuration.Title())
 					}
 					// TODO calculate build time and build size
-					log.Infof("build completed successfully in %d seconds", 42)
+					log.Infof("build completed successfully in %v", utils.FmtDuration(time.Since(start)))
 					log.Infof("build size: %d Mb", 42)
 				}
 			}

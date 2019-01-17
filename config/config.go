@@ -20,6 +20,7 @@ var Verbose = false
 var VeryVerbose = false // TODO temporary for debugging. need to set a proper verbose level
 
 var IncludeSparksSource = true
+var GenerateLua = false
 
 // OSX specific
 var SparksOSXSDK = "macosx10.14" // run `xcodebuild -showsdks` to list valid values
