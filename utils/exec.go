@@ -45,6 +45,45 @@ func ExecuteEx(filename string, directoryName string, environment bool, args ...
 	return out, nil
 }
 
+func execute(cmd *exec.Cmd, timeout <-chan time.Time) (string, error) {
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = mergeWriter(cmd.Stdout, &stdout)
+	cmd.Stderr = mergeWriter(cmd.Stderr, &stderr)
+
+	log.Infof("Execute '%s %s'", cmd.Path, strings.Join(cmd.Args[1:], " ")) // skip arg[0] as it is printed separately
+	if err := cmd.Start(); err != nil {
+		return "", fmt.Errorf("error starting %v:\nCommand stdout:\n%v\nstderr:\n%v\nerror:\n%v", cmd, stdout.String(), stderr.String(), err)
+	}
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- cmd.Wait()
+	}()
+	log.Debugf("Entering select")
+	select {
+	case err := <-errCh:
+		log.Debugf("Received on errCh: %v", err)
+		if err != nil {
+			return stderr.String(), err
+		}
+	case <-timeout:
+		if err := cmd.Process.Kill(); err != nil {
+			return "", err
+		}
+		return "", fmt.Errorf(
+			"timed out waiting for command %v:\nCommand stdout:\n%v\nstderr:\n%v",
+			cmd.Args, stdout.String(), stderr.String())
+	}
+	log.Debugf("stderr: %s", stderr.String())
+	return stdout.String(), nil
+}
+
+func mergeWriter(other io.Writer, buf io.Writer) io.Writer {
+	if other != nil {
+		return io.MultiWriter(other, buf)
+	}
+	return buf
+}
+
 // Convert a shell command with a series of pipes into
 // correspondingly piped list of *exec.Cmd
 // If an arg has spaces, this will fail

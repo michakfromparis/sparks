@@ -72,14 +72,14 @@ func (i *Ios) generate(configuration sparks.Configuration) {
 
 	cmake := sparks.NewCMake(i, configuration)
 
-	cmake.AddParam(fmt.Sprintf("-DOS_IOS=1"))
-	cmake.AddParam(fmt.Sprintf("-GXcode"))
-	cmake.AddParam(fmt.Sprintf("-DXCODE_SIGNING_IDENTITY=\"%s\"", config.XCodeSigningIdentity))
-	cmake.AddParam(fmt.Sprintf("-DCMAKE_TOOLCHAIN_FILE=%s", cmakeToolchainFile))
-	cmake.AddParam(fmt.Sprintf("-DXCODE_PROVISIONING_PROFILE_UUID=%s", config.ProvisioningProfileUUID))
-	cmake.AddParam(fmt.Sprintf("-DPRODUCT_BUNDLE_IDENTIFIER=%s", config.BundleIdentifier))
-	cmake.AddParam(fmt.Sprintf("-DCMAKE_OSX_SYSROOT=%s", iosSysRoot))
-	cmake.AddParam(fmt.Sprintf("-DCMAKE_IOS_SYSROOT=%s", iosSysRoot))
+	cmake.AddArg(fmt.Sprintf("-DOS_IOS=1"))
+	cmake.AddArg(fmt.Sprintf("-GXcode"))
+	cmake.AddArg(fmt.Sprintf("-DXCODE_SIGNING_IDENTITY=\"%s\"", config.XCodeSigningIdentity))
+	cmake.AddArg(fmt.Sprintf("-DCMAKE_TOOLCHAIN_FILE=%s", cmakeToolchainFile))
+	cmake.AddArg(fmt.Sprintf("-DXCODE_PROVISIONING_PROFILE_UUID=%s", config.ProvisioningProfileUUID))
+	cmake.AddArg(fmt.Sprintf("-DPRODUCT_BUNDLE_IDENTIFIER=%s", config.BundleIdentifier))
+	cmake.AddArg(fmt.Sprintf("-DCMAKE_OSX_SYSROOT=%s", iosSysRoot))
+	cmake.AddArg(fmt.Sprintf("-DCMAKE_IOS_SYSROOT=%s", iosSysRoot))
 
 	// root directory of 2 different projects for iphoneos and iphonesimulator
 	projectsPath := filepath.Join(config.OutputDirectory, "projects", i.Title()+"-"+configuration.Title())
@@ -88,9 +88,9 @@ func (i *Ios) generate(configuration sparks.Configuration) {
 	platform := "iphoneos"
 	iphoneProjectPath := filepath.Join(projectsPath, platform)
 	iphoneLibraryPath := filepath.Join(libraryPath, platform)
-	var commonArgs = cmake.Params()
-	cmake.AddParam(fmt.Sprintf("-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=\"%s\"", iphoneLibraryPath))
-	cmake.AddParam(fmt.Sprintf("-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=\"%s\"", iphoneLibraryPath))
+	var commonArgs = cmake.Args()
+	cmake.AddArg(fmt.Sprintf("-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=\"%s\"", iphoneLibraryPath))
+	cmake.AddArg(fmt.Sprintf("-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=\"%s\"", iphoneLibraryPath))
 	out, err := cmake.Run(iphoneProjectPath)
 	if err != nil {
 		errx.Fatalf(err, "sparks project generate failed")
@@ -101,9 +101,9 @@ func (i *Ios) generate(configuration sparks.Configuration) {
 	platform = "iphonesimulator"
 	iphoneSimulatorProjectPath := filepath.Join(projectsPath, platform)
 	iphoneSimulatorLibraryPath := filepath.Join(libraryPath, platform)
-	cmake.SetParams(commonArgs)
-	cmake.AddParam(fmt.Sprintf("-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=\"%s\"", iphoneSimulatorLibraryPath))
-	cmake.AddParam(fmt.Sprintf("-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=\"%s\"", iphoneSimulatorLibraryPath))
+	cmake.SetArgs(commonArgs)
+	cmake.AddArg(fmt.Sprintf("-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=\"%s\"", iphoneSimulatorLibraryPath))
+	cmake.AddArg(fmt.Sprintf("-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=\"%s\"", iphoneSimulatorLibraryPath))
 	out, err = cmake.Run(iphoneSimulatorProjectPath)
 	if err != nil {
 		errx.Fatalf(err, "sparks project generate failed")
