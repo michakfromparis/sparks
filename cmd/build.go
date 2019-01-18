@@ -47,20 +47,7 @@ func build(cmd *cobra.Command, args []string) {
 	sparks.Shutdown()
 }
 
-func init_build() {
-
-	log.Trace("build init")
-	rootCmd.AddCommand(buildCmd)
-
-	enabledPlatforms = make([]bool, len(sparks.Platforms))
-	enabledConfigurations = make([]bool, len(sparks.Configurations))
-	log.Tracef("registered platforms: %d", len(sparks.Platforms))
-	log.Tracef("registered configurations: %d", len(sparks.Configurations))
-	buildCmd.Flags().SortFlags = false
-	buildCmd.Flags().StringVarP(&config.SourceDirectory, "source", "", "", "source directory to build")
-	buildCmd.Flags().StringVarP(&config.OutputDirectory, "output", "", "", "output directory for all selected builds")
-	buildCmd.Flags().StringVarP(&config.ProductName, "name", "", "", "set the product name / filename of the built binaries")
-	buildCmd.Flags().BoolVarP(&config.GenerateLua, "lua", "L", false, "generate lua bindings")
+func AppendPlatformFlags(cmd *cobra.Command) {
 	i := 0
 	for _, name := range sparks.PlatformNames {
 		p := sparks.Platforms[name]
@@ -78,4 +65,21 @@ func init_build() {
 		}
 		i++
 	}
+
+}
+func init_build() {
+
+	log.Trace("build init")
+	rootCmd.AddCommand(buildCmd)
+
+	enabledPlatforms = make([]bool, len(sparks.Platforms))
+	enabledConfigurations = make([]bool, len(sparks.Configurations))
+	log.Tracef("registered platforms: %d", len(sparks.Platforms))
+	log.Tracef("registered configurations: %d", len(sparks.Configurations))
+	buildCmd.Flags().SortFlags = false
+	buildCmd.Flags().StringVarP(&config.SourceDirectory, "source", "", "", "source directory to build")
+	buildCmd.Flags().StringVarP(&config.OutputDirectory, "output", "", "", "output directory for all selected builds")
+	buildCmd.Flags().StringVarP(&config.ProductName, "name", "", "", "set the product name / filename of the built binaries")
+	buildCmd.Flags().BoolVarP(&config.GenerateLua, "lua", "L", false, "generate lua bindings")
+	AppendPlatformFlags(buildCmd)
 }
