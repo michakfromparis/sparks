@@ -70,13 +70,15 @@ func Build(sourceDirectory string, outputDirectory string) error {
 						return errorx.Decorate(err, "sparks build failed for %s-%s", platform.Title(), configuration.Title())
 					}
 					buildPath := filepath.Join(outputDirectory, "bin", platform.Title()+"-"+configuration.Title())
+					libPath := filepath.Join(outputDirectory, "lib", platform.Title()+"-"+configuration.Title())
 					stat, err := os.Stat(buildPath)
 					if err != nil || !stat.IsDir() {
 						return errorx.Decorate(err, "build directory does not exist: "+buildPath)
 					}
 					buildSize, _ := utils.DirSize(buildPath)
+					libSize, _ := utils.DirSize(libPath)
 					log.Infof("build completed successfully in %v", utils.FmtDuration(time.Since(start)))
-					log.Infof("build size: %s", buildSize)
+					log.Infof("build size: %s (libraries: %s)", buildSize, libSize)
 				}
 			}
 		}
