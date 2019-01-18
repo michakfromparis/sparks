@@ -101,7 +101,7 @@ func (i *Ios) generate(configuration sparks.Configuration, projectDirectory stri
 	cmake.AddArg(fmt.Sprintf("-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=%s", iphoneLibraryPath))
 	out, err := cmake.Run(iphoneProjectPath)
 	if err != nil {
-		errx.Fatalf(err, "sparks project generate failed")
+		errx.Fatalf(nil, "sparks project generate failed")
 	}
 	log.Trace("cmake output" + out)
 
@@ -114,7 +114,7 @@ func (i *Ios) generate(configuration sparks.Configuration, projectDirectory stri
 	cmake.AddArg(fmt.Sprintf("-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=%s", iphoneSimulatorLibraryPath))
 	out, err = cmake.Run(iphoneSimulatorProjectPath)
 	if err != nil {
-		errx.Fatalf(err, "sparks project generate failed")
+		errx.Fatalf(nil, "sparks project generate failed")
 	}
 	log.Trace("cmake output" + out)
 }
@@ -122,8 +122,21 @@ func (i *Ios) generate(configuration sparks.Configuration, projectDirectory stri
 func (i *Ios) compile(configuration sparks.Configuration, projectDirectory string) {
 	log.Info("sparks project compile --ios")
 	xcode := sparks.NewXCode(i, configuration)
-	xcode.Build(filepath.Join(projectDirectory, "iphoneos"))
-	xcode.Build(filepath.Join(projectDirectory, "iphonesimulator"))
+	// if [ $buildConfiguration = $debugConfiguration ]; then
+	//   LogWarning "Only building armv7 arch in $debugConfiguration configuration"
+	//   arch='-arch armv7'
+	// else
+	//   arch="-arch armv7 -arch armv7s -arch arm64"
+	// fi
+
+	archsIos := []string{"-arch", "armv7", "-arch", "armv7s", "-arch", "arm64"}
+	archsSimulator := []string{ /* "-arch", "i386", */ "-arch", "x86_64"}
+	archsDebug := []string{"-arch", "armv7"}
+	if configuration.Name() == "debug" {
+		archsIos = archsDebug
+	}
+	xcode.Build(filepath.Join(projectDirectory, "iphoneos"), archsIos...)
+	xcode.Build(filepath.Join(projectDirectory, "iphonesimulator"), archsSimulator...)
 }
 
 func (i *Ios) postbuild() {
