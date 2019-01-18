@@ -21,14 +21,14 @@ func TestAssemblePipes(t *testing.T) {
 	buf := bytes.NewBuffer([]byte{})
 	cmds := []*exec.Cmd{cmd1, cmd2, cmd3}
 	AssemblePipes(cmds, os.Stdin, os.Stdout)
-	if err := RunCmds(cmds); err != nil {
+	if err := runCmds(cmds); err != nil {
 		t.Fatal(err)
 	}
 	fmt.Println(string(buf.Bytes()))
 }
 
 func TestString(t *testing.T) {
-	s, err := RunString("ps aux | grep usr")
+	s, err := ExecutePipe("ps aux | grep usr")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -37,7 +37,7 @@ func TestString(t *testing.T) {
 
 func TestStrings(t *testing.T) {
 	tokens := []string{"ps", "aux", "|", "grep", "usr", "|", "awk", "{print $2}"}
-	s, err := RunStrings(tokens...)
+	s, err := ExecutePipes(tokens...)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -46,7 +46,7 @@ func TestStrings(t *testing.T) {
 
 func TestLittle(t *testing.T) {
 	tokens := []string{"ps", "aux"}
-	s, err := RunStrings(tokens...)
+	s, err := ExecutePipes(tokens...)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -55,7 +55,7 @@ func TestLittle(t *testing.T) {
 
 func TestError(t *testing.T) {
 	tokens := []string{"cd", "booogieman"}
-	s, err := RunStrings(tokens...)
+	s, err := ExecutePipes(tokens...)
 	if err == nil {
 		t.Fatal("Should have raised an error!")
 	}

@@ -113,7 +113,7 @@ func ExecutePipe(s string) (string, error) {
 		cmds[i] = cmd
 	}
 
-	cmds = assemblePipes(cmds, nil, buf)
+	cmds = AssemblePipes(cmds, nil, buf)
 	if err := runCmds(cmds); err != nil {
 		return "", err
 	}
@@ -150,7 +150,7 @@ func ExecutePipes(tokens ...string) (string, error) {
 		}
 	}
 	cmds = append(cmds, cmdFromString(args))
-	cmds = assemblePipes(cmds, nil, buf)
+	cmds = AssemblePipes(cmds, nil, buf)
 	if err := runCmds(cmds); err != nil {
 		return "", fmt.Errorf("%s; %s", err.Error(), string(buf.Bytes()))
 	}
@@ -160,7 +160,7 @@ func ExecutePipes(tokens ...string) (string, error) {
 }
 
 // Pipe stdout of each command into stdin of next
-func assemblePipes(cmds []*exec.Cmd, stdin io.Reader, stdout io.Writer) []*exec.Cmd {
+func AssemblePipes(cmds []*exec.Cmd, stdin io.Reader, stdout io.Writer) []*exec.Cmd {
 	cmds[0].Stdin = stdin
 	cmds[0].Stderr = stdout
 	// assemble pipes
