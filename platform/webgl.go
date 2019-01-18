@@ -34,7 +34,7 @@ func (w *WebGl) SetEnabled(enabled bool) {
 	w.enabled = enabled
 }
 
-func (w *WebGl) Deps() error {
+func (w *WebGl) Get() error {
 	return nil
 }
 func (w *WebGl) Clean() error {

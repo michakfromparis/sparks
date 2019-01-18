@@ -20,7 +20,7 @@ Sparks command line interface`,
 // with the loading of the sparks platforms / configurations first
 func Init() {
 	init_root()
-	init_deps()
+	init_get()
 	init_clean()
 	init_build()
 }

@@ -41,7 +41,7 @@ func (o *Osx) SetEnabled(enabled bool) {
 	o.enabled = enabled
 }
 
-func (o *Osx) Deps() error {
+func (o *Osx) Get() error {
 	log.Info("Installing dependencies for " + o.Title())
 
 	return nil
@@ -109,7 +109,11 @@ func (o *Osx) generate(configuration sparks.Configuration, projectDirectory stri
 func (o *Osx) compile(configuration sparks.Configuration, projectDirectory string) {
 	log.Info("sparks project compile --osx")
 	xcode := sparks.NewXCode(o, configuration)
-	xcode.Build(projectDirectory)
+	err := xcode.Build(projectDirectory)
+	if err != nil {
+		errx.Fatalf(err, "sparks project compile failed")
+	}
+
 }
 
 func (o *Osx) postbuild() {

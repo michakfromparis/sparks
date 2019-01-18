@@ -39,7 +39,7 @@ func (w *Windows) SetEnabled(enabled bool) {
 	w.enabled = enabled
 }
 
-func (w *Windows) Deps() error {
+func (w *Windows) Get() error {
 	log.Info("Installing dependencies for " + w.Title())
 	return nil
 }

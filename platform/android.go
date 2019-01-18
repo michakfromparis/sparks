@@ -40,7 +40,7 @@ func (a *Android) SetEnabled(enabled bool) {
 	a.enabled = enabled
 }
 
-func (a *Android) Deps() error {
+func (a *Android) Get() error {
 	log.Info("Installing dependencies for " + a.Title())
 	return nil
 }

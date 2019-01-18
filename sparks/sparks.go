@@ -34,6 +34,17 @@ func Save() {
 	CurrentProduct.Save()
 }
 
+func Get() error {
+
+	for _, platformName := range PlatformNames {
+		platform := Platforms[platformName]
+		if platform != nil && platform.Enabled() {
+			return platform.Get()
+		}
+	}
+	return nil
+}
+
 func Build(sourceDirectory string, outputDirectory string) error {
 	log.Info("sparks build " + sourceDirectory)
 	checkParameters(sourceDirectory, outputDirectory)

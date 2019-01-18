@@ -41,7 +41,7 @@ func (i *Ios) SetEnabled(enabled bool) {
 	i.enabled = enabled
 }
 
-func (i *Ios) Deps() error {
+func (i *Ios) Get() error {
 	return nil
 }
 
@@ -132,11 +132,19 @@ func (i *Ios) compile(configuration sparks.Configuration, projectDirectory strin
 	archsIos := []string{"-arch", "armv7", "-arch", "armv7s", "-arch", "arm64"}
 	archsSimulator := []string{ /* "-arch", "i386", */ "-arch", "x86_64"}
 	archsDebug := []string{"-arch", "armv7"}
-	if configuration.Name() == "debug" {
+	if configuration.Name() == "debug" { // build only one arch to speed local dev builds
 		archsIos = archsDebug
 	}
-	xcode.Build(filepath.Join(projectDirectory, "iphoneos"), archsIos...)
-	xcode.Build(filepath.Join(projectDirectory, "iphonesimulator"), archsSimulator...)
+	iphoneOs := "iphoneos"
+	simulator := "iphonesimulator"
+	err := xcode.Build(filepath.Join(projectDirectory, iphoneOs), archsIos...)
+	if err != nil {
+		errx.Fatalf(err, "sparks project compile failed for "+iphoneOs)
+	}
+	err = xcode.Build(filepath.Join(projectDirectory, simulator), archsSimulator...)
+	if err != nil {
+		errx.Fatalf(err, "sparks project compile failed for "+simulator)
+	}
 }
 
 func (i *Ios) postbuild() {

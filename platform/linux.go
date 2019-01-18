@@ -39,7 +39,7 @@ func (l *Linux) SetEnabled(enabled bool) {
 	l.enabled = enabled
 }
 
-func (l *Linux) Deps() error {
+func (l *Linux) Get() error {
 	log.Info("Installing dependencies for " + l.Title())
 	return nil
 }

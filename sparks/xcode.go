@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/joomcode/errorx"
 	"github.com/michaKFromParis/sparks/config"
 	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/utils"
@@ -47,7 +48,7 @@ func NewXCode(platform Platform, configuration Configuration) *XCode {
 	return xc
 }
 
-func (xc *XCode) Build(directory string, arg ...string) {
+func (xc *XCode) Build(directory string, arg ...string) error {
 
 	var args []string
 
@@ -59,7 +60,11 @@ func (xc *XCode) Build(directory string, arg ...string) {
 	args = append(args, "-sdk", config.SparksOSXSDK)
 	args = append(args, "-configuration", xc.configuration.Title())
 	args = append(args, arg...)
-	utils.ExecuteEx(xc.command, directory, true, args...)
+	output, err := utils.ExecuteEx(xc.command, directory, true, args...)
+	if err != nil {
+		return errorx.Decorate(err, "xcode build failed: "+output)
+	}
+	return nil
 }
 
 func (xc *XCode) Clean() {

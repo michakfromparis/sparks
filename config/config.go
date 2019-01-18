@@ -10,6 +10,9 @@ import (
 	"github.com/michaKFromParis/sparks/utils"
 )
 
+// Get specific
+var GetDependencies bool
+
 var SourceDirectory string
 var OutputDirectory string
 var SDKDirectory string

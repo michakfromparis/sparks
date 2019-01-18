@@ -10,7 +10,7 @@ type Platform interface {
 	Enabled() bool
 	SetEnabled(bool)
 
-	Deps() error
+	Get() error
 	Clean() error
 	Build(Configuration) error
 }
