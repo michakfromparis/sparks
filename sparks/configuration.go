@@ -1,6 +1,8 @@
 package sparks
 
-import log "github.com/Sirupsen/logrus"
+import (
+	log "github.com/Sirupsen/logrus"
+)
 
 // Configuration Interfaxce
 type Configuration interface {
@@ -24,4 +26,15 @@ var ConfigurationNames = []string{
 func RegisterConfiguration(configuration Configuration) {
 	log.Debug("registering configuration: " + configuration.Title())
 	Configurations[configuration.Name()] = configuration
+}
+
+func SetEnabledConfigurations(configurations []bool) {
+	i := 0
+	for _, name := range ConfigurationNames {
+		if i < len(configurations) && configurations[i] == true {
+			Configurations[name].SetEnabled(true)
+			log.Debug("enabled configuration " + Configurations[name].Title())
+		}
+		i++
+	}
 }

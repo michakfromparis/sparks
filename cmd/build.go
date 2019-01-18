@@ -3,9 +3,7 @@ package cmd
 import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/michaKFromParis/sparks/config"
-	"github.com/michaKFromParis/sparks/configuration"
 	"github.com/michaKFromParis/sparks/errx"
-	"github.com/michaKFromParis/sparks/platform"
 	"github.com/michaKFromParis/sparks/sparks"
 	"github.com/spf13/cobra"
 )
@@ -30,8 +28,8 @@ will build the product in $HOME/sparks/app for WebGL in Debug configuration`,
 
 func build(cmd *cobra.Command, args []string) {
 	sparks.Init()
-	platform.SetEnabledPlatforms(enabledPlatforms)
-	configuration.SetEnabledConfigurations(enabledConfigurations)
+	sparks.SetEnabledPlatforms(enabledPlatforms)
+	sparks.SetEnabledConfigurations(enabledConfigurations)
 	for _, sourceDirectory := range args {
 		if err := sparks.Build(sourceDirectory, config.OutputDirectory); err != nil {
 			errx.Fatal(err)

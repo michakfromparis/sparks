@@ -1,6 +1,8 @@
 package sparks
 
-import log "github.com/Sirupsen/logrus"
+import (
+	log "github.com/Sirupsen/logrus"
+)
 
 // Platform Interfaxce
 type Platform interface {
@@ -31,4 +33,15 @@ var PlatformNames = []string{
 func RegisterPlatform(platform Platform) {
 	log.Debug("registering platform: " + platform.Title())
 	Platforms[platform.Name()] = platform
+}
+
+func SetEnabledPlatforms(platforms []bool) {
+	i := 0
+	for _, name := range PlatformNames {
+		if i < len(platforms) && platforms[i] == true {
+			Platforms[name].SetEnabled(true)
+			log.Debugf("enabled platform %s", Platforms[name].Title())
+		}
+		i++
+	}
 }
