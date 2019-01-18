@@ -9,7 +9,7 @@ import (
 	"github.com/joomcode/errorx"
 	"github.com/michaKFromParis/sparks/config"
 	"github.com/michaKFromParis/sparks/errx"
-	"github.com/michaKFromParis/sparks/utils"
+	"github.com/michaKFromParis/sparks/sys"
 )
 
 var CurrentProduct = Product{}
@@ -51,13 +51,13 @@ func Build(sourceDirectory string, outputDirectory string) error {
 	if err := Load(); err != nil {
 		return errorx.Decorate(err, "could not load sparks project at %s", sourceDirectory)
 	}
-	log.Tracef("loaded product:%s%+v", utils.NewLine, CurrentProduct)
+	log.Tracef("loaded product:%s%+v", sys.NewLine, CurrentProduct)
 	createBuildDirectoryStructure()
 	sparksSourceDirectory := filepath.Join(config.SDKDirectory, "src", config.SDKName)
 	sparksPlayerSourceDirectory := filepath.Join(config.SDKDirectory, "src", config.PlayerName)
 	if config.GenerateLua {
 		GenerateLuaBindings(sparksSourceDirectory, config.SDKName)
-		// TODO fix math constants utils.Sed(filename, regex, newContent)
+		// TODO fix math constants sys.Sed(filename, regex, newContent)
 		GenerateLuaBindings(sparksSourceDirectory, "SparksNetworksLua")
 		// TODO the line below probably should stay like this to build other c++ projects
 		// GenerateLuaBindings(sparksPlayerSourceDirectory, config.ProductName)
@@ -86,9 +86,9 @@ func Build(sourceDirectory string, outputDirectory string) error {
 					if err != nil || !stat.IsDir() {
 						return errorx.Decorate(err, "build directory does not exist: "+buildPath)
 					}
-					buildSize, _ := utils.DirSize(buildPath)
-					libSize, _ := utils.DirSize(libPath)
-					log.Infof("build completed successfully in %v", utils.FmtDuration(time.Since(start)))
+					buildSize, _ := sys.DirSize(buildPath)
+					libSize, _ := sys.DirSize(libPath)
+					log.Infof("build completed successfully in %v", sys.FmtDuration(time.Since(start)))
 					log.Infof("build size: %s (libraries: %s)", buildSize, libSize)
 				}
 			}

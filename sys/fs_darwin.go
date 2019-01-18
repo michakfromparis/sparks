@@ -1,3 +1,3 @@
-package utils
+package sys
 
 const NewLine = "\n"

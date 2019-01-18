@@ -7,7 +7,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/michaKFromParis/sparks/errx"
-	"github.com/michaKFromParis/sparks/utils"
+	"github.com/michaKFromParis/sparks/sys"
 )
 
 // Get specific
@@ -68,7 +68,7 @@ func Init() error {
 		ProductName = PlayerName
 	}
 	var err error
-	if SourceDirectory, err = utils.Pwd(); err != nil {
+	if SourceDirectory, err = sys.Pwd(); err != nil {
 		errx.Fatalf(err, "could not determine current working directory")
 	}
 	SDKDirectory = SourceDirectory

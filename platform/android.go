@@ -7,7 +7,7 @@ import (
 	"github.com/michaKFromParis/sparks/config"
 	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/sparks"
-	"github.com/michaKFromParis/sparks/utils"
+	"github.com/michaKFromParis/sparks/sys"
 
 	log "github.com/Sirupsen/logrus"
 )
@@ -61,7 +61,7 @@ func (a *Android) prebuild() {
 func (a *Android) generate(configuration sparks.Configuration) {
 	log.Info("sparks project generate --android")
 	ccachePath := ""
-	ccachePath, err := utils.Execute("which", "ccache")
+	ccachePath, err := sys.Execute("which", "ccache")
 	if err != nil {
 		errx.Fatal(err)
 	}

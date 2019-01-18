@@ -7,18 +7,18 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/michaKFromParis/sparks/config"
 	"github.com/michaKFromParis/sparks/errx"
-	"github.com/michaKFromParis/sparks/utils"
+	"github.com/michaKFromParis/sparks/sys"
 )
 
 func getToluaPath() string {
 	toluapp := filepath.Join(config.SDKDirectory, "dependencies", "toluapp", "bin")
-	os, _ := utils.GetOs()
+	os, _ := sys.GetOs()
 	switch os {
-	case utils.Osx:
+	case sys.Osx:
 		toluapp = filepath.Join(toluapp, "toluapp_osx")
-	case utils.Linux:
+	case sys.Linux:
 		toluapp = filepath.Join(config.SDKDirectory, "scripts", "bin", "tolua++")
-	case utils.Windows:
+	case sys.Windows:
 		toluapp = filepath.Join(toluapp, "toluapp_script.exe")
 	}
 	return toluapp
@@ -31,9 +31,9 @@ func GenerateLuaBindings(sourceDirectory string, packageName string) {
 	toluaHooksPath := filepath.Join(config.SDKDirectory, "src", "Sparks", "tolua.hooks.lua")
 	dofileWithCorrectPath := fmt.Sprintf("dofile(\"%s\")", toluaHooksPath)
 	reflectionFile := filepath.Join(sourceDirectory, packageName+".Reflection.lua")
-	utils.SedFile(reflectionFile, "dofile\\(.*\\)", dofileWithCorrectPath)
+	sys.SedFile(reflectionFile, "dofile\\(.*\\)", dofileWithCorrectPath)
 	packagePath := filepath.Join(sourceDirectory, packageName)
-	output, err := utils.ExecuteEx(
+	output, err := sys.ExecuteEx(
 		toluapp,
 		sourceDirectory,
 		true,

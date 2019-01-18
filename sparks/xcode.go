@@ -7,7 +7,7 @@ import (
 	"github.com/joomcode/errorx"
 	"github.com/michaKFromParis/sparks/config"
 	"github.com/michaKFromParis/sparks/errx"
-	"github.com/michaKFromParis/sparks/utils"
+	"github.com/michaKFromParis/sparks/sys"
 )
 
 type SigningType int
@@ -60,7 +60,7 @@ func (xc *XCode) Build(directory string, arg ...string) error {
 	args = append(args, "-sdk", config.SparksOSXSDK)
 	args = append(args, "-configuration", xc.configuration.Title())
 	args = append(args, arg...)
-	output, err := utils.ExecuteEx(xc.command, directory, true, args...)
+	output, err := sys.ExecuteEx(xc.command, directory, true, args...)
 	if err != nil {
 		return errorx.Decorate(err, "xcode build failed: "+output)
 	}
@@ -73,12 +73,12 @@ func (xc *XCode) Clean() {
 
 func (xc *XCode) DetectSigning() {
 	log.Debug("detecting xcode signing identity")
-	s, err := utils.Execute("security", "find-identity", "-v", "-p", "codesigning")
+	s, err := sys.Execute("security", "find-identity", "-v", "-p", "codesigning")
 	if err != nil {
 		errx.Fatalf(err, "security find-identity failed")
 		return
 	}
-	lines := strings.Split(s, utils.NewLine)
+	lines := strings.Split(s, sys.NewLine)
 	for _, line := range lines {
 		parts := strings.Split(line, "\"")
 		if len(parts) == 3 {

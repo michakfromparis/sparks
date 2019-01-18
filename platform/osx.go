@@ -9,7 +9,7 @@ import (
 	"github.com/michaKFromParis/sparks/config"
 	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/sparks"
-	"github.com/michaKFromParis/sparks/utils"
+	"github.com/michaKFromParis/sparks/sys"
 )
 
 type Osx struct {
@@ -70,17 +70,17 @@ func (o *Osx) prebuild() {
 func (o *Osx) generate(configuration sparks.Configuration, projectDirectory string) {
 	log.Info("sparks project generate --osx")
 	log.Trace("determining osx sysroot")
-	osxSysRoot, err := utils.ExecuteEx("xcodebuild", "", true, "-sdk", "macosx", "-version", "Path")
+	osxSysRoot, err := sys.ExecuteEx("xcodebuild", "", true, "-sdk", "macosx", "-version", "Path")
 	if err != nil {
 		errx.Fatalf(err, "could not determine osx sysroot")
 	}
 	osxSysRoot = strings.TrimSpace(osxSysRoot)
-	cc, err := utils.ExecuteEx("xcrun", "", true, "-find", "cc")
+	cc, err := sys.ExecuteEx("xcrun", "", true, "-find", "cc")
 	if err != nil {
 		errx.Fatalf(err, "could not determine C compiler")
 	}
 	cc = strings.TrimSpace(cc)
-	cpp, err := utils.ExecuteEx("xcrun", "", true, "-find", "c++")
+	cpp, err := sys.ExecuteEx("xcrun", "", true, "-find", "c++")
 	if err != nil {
 		errx.Fatalf(err, "could not determine C++ compiler")
 	}

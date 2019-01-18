@@ -9,7 +9,7 @@ import (
 	"github.com/michaKFromParis/sparks/config"
 	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/sparks"
-	"github.com/michaKFromParis/sparks/utils"
+	"github.com/michaKFromParis/sparks/sys"
 )
 
 type Ios struct {
@@ -71,7 +71,7 @@ func (i *Ios) prebuild() {
 func (i *Ios) generate(configuration sparks.Configuration, projectDirectory string) {
 	log.Info("sparks project generate --ios")
 
-	iosSysRoot, err := utils.ExecuteEx("xcodebuild", "", true, "-sdk", config.SparksiOSSDK, "-version", "Path")
+	iosSysRoot, err := sys.ExecuteEx("xcodebuild", "", true, "-sdk", config.SparksiOSSDK, "-version", "Path")
 	if err != nil {
 		errx.Fatalf(err, "could not determine ios sysroot")
 	}

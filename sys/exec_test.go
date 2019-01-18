@@ -1,6 +1,6 @@
 // FROM https://github.com/ebuchman/go-shell-pipes
 
-package utils
+package sys
 
 import (
 	"bytes"

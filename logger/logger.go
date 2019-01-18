@@ -11,7 +11,7 @@ import (
 	"github.com/Sirupsen/logrus"
 	log "github.com/Sirupsen/logrus"
 	"github.com/michaKFromParis/sparks/config"
-	"github.com/michaKFromParis/sparks/utils"
+	"github.com/michaKFromParis/sparks/sys"
 )
 
 func Init() {
@@ -30,7 +30,7 @@ func Init() {
 		log.SetLevel(log.DebugLevel)
 	} else if config.VeryVerbose {
 		log.SetLevel(log.TraceLevel)
-		utils.ExecuteStreamingToStdout = true
+		sys.ExecuteStreamingToStdout = true
 	} else {
 		log.SetLevel(log.InfoLevel)
 	}
@@ -143,7 +143,7 @@ func (f *Formatter) Format(entry *log.Entry) ([]byte, error) {
 
 	// write message
 	b.WriteString(fmt.Sprintf("%s%s%s", messageColor, entry.Message, resetColor))
-	b.WriteString(utils.NewLine)
+	b.WriteString(sys.NewLine)
 	return b.Bytes(), nil
 }
 

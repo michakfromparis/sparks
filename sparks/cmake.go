@@ -10,7 +10,7 @@ import (
 	"github.com/joomcode/errorx"
 	"github.com/michaKFromParis/sparks/config"
 	"github.com/michaKFromParis/sparks/errx"
-	"github.com/michaKFromParis/sparks/utils"
+	"github.com/michaKFromParis/sparks/sys"
 )
 
 type CMake struct {
@@ -113,13 +113,13 @@ func (cm *CMake) AddArg(params string) {
 
 func (cm *CMake) Run(outputDirectory string, args ...[]string) (string, error) {
 	log.Debugf("running cmake in %s", outputDirectory)
-	if err := utils.MkDir(outputDirectory); err != nil {
+	if err := sys.MkDir(outputDirectory); err != nil {
 		return "could not create " + outputDirectory, err
 	}
 	cmakelistsPath := filepath.Join(config.SDKDirectory, "scripts", "CMake", "Sparks")
 	cm.AddArg(cmakelistsPath)
 	var output string
-	if output, err := utils.ExecuteEx(cm.command, outputDirectory, true, cm.arguments[0:]...); err != nil {
+	if output, err := sys.ExecuteEx(cm.command, outputDirectory, true, cm.arguments[0:]...); err != nil {
 		return output, errorx.Decorate(err, "cmake execution failed")
 	}
 	return output, nil
