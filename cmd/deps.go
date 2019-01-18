@@ -18,7 +18,7 @@ to quickly create a Cobra application.`,
 }
 
 func deps(cmd *cobra.Command, args []string) {
-	log.Info("Installing dependencies")
+	log.Info("installing dependencies")
 }
 
 func init_deps() {

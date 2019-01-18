@@ -111,7 +111,7 @@ func (cm *CMake) AddArg(params string) {
 	cm.arguments = append(cm.arguments, params)
 }
 
-func (cm *CMake) Run(outputDirectory string) (string, error) {
+func (cm *CMake) Run(outputDirectory string, args ...[]string) (string, error) {
 	log.Debugf("running cmake in %s", outputDirectory)
 	if err := utils.MkDir(outputDirectory); err != nil {
 		return "could not create " + outputDirectory, err
@@ -119,8 +119,6 @@ func (cm *CMake) Run(outputDirectory string) (string, error) {
 	cmakelistsPath := filepath.Join(config.SDKDirectory, "scripts", "CMake", "Sparks")
 	cm.AddArg(cmakelistsPath)
 	var output string
-	// parameters := fmt.Sprintf("%s %s %s", cm.arguments, params, cmakelistsPath)
-	// parts := strings.Split(parameters, " ")
 	if output, err := utils.ExecuteEx(cm.command, outputDirectory, true, cm.arguments[0:]...); err != nil {
 		return output, errorx.Decorate(err, "cmake execution failed")
 	}

@@ -58,8 +58,8 @@ func (w *WebGl) generate(configuration sparks.Configuration) {
 	cmakeToolchainFile := filepath.Join(config.SDKDirectory, "scripts", "CMake", "toolchains", "Emscripten.cmake")
 
 	cmake := sparks.NewCMake(w, configuration)
-	params := fmt.Sprintf("-DOS_EMSCRIPTEN=1 ")
-	params += fmt.Sprintf("\"-DCMAKE_TOOLCHAIN_FILE%s\" ", cmakeToolchainFile)
+	params := fmt.Sprintf("-DOS_EMSCRIPTEN=1")
+	params += fmt.Sprintf("-DCMAKE_TOOLCHAIN_FILE=%s", cmakeToolchainFile)
 	params += fmt.Sprintf("-DEMSCRIPTEN_ROOT_PATH=${EmscriptenSDKRoot}/emscripten/${EmscriptenVersion} ")
 	projectsPath := filepath.Join(config.OutputDirectory, "projects", w.Title()+"-"+configuration.Title())
 	out, err := cmake.Run(projectsPath)

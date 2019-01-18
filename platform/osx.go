@@ -102,7 +102,7 @@ func (o *Osx) generate(configuration sparks.Configuration, projectDirectory stri
 	out, err := cmake.Run(projectDirectory)
 	log.Trace("cmake output" + out)
 	if err != nil {
-		errx.Fatalf(err, "sparks project generate failed")
+		errx.Fatalf(nil, "sparks project generate failed")
 	}
 }
 
