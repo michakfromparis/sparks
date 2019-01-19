@@ -42,6 +42,7 @@ deps: check
 	go get golang.org/x/tools/cmd/goimports
 	go get github.com/kisielk/errcheck
 	go get github.com/maruel/panicparse
+	go get golang.org/x/lint/golint
 
 # install development build dependencies
 deps-dev: check deps
@@ -52,12 +53,16 @@ deps-dev: check deps
 format: check
 	-goimports -l -w .
 
+# run golint on all source tree
+lint: check
+	golint ./...
+
 # check for untested errors in code
 errcheck: check
 	-errcheck ./...
 
 # build
-build: check format errcheck
+build: check format lint errcheck
 	go build -v -o "$(OUTPUT_DIRECTORY)/$(HOST_OS)/$(OUTPUT_NAME)"
 	@du -h "$(OUTPUT_DIRECTORY)/$(HOST_OS)/$(OUTPUT_NAME)"
 
