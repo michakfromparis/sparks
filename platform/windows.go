@@ -11,18 +11,22 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
+// Windows represents the Windows platform
 type Windows struct {
 	enabled bool
 }
 
+// Name is the lowercase name of the platform
 func (w *Windows) Name() string {
 	return "windows"
 }
 
+// Title is name of the platform
 func (w *Windows) Title() string {
 	return "Windows"
 }
 
+// Opt is the short command line option of the platform
 func (w *Windows) Opt() string {
 	return "w"
 }
@@ -31,20 +35,28 @@ func (w *Windows) String() string {
 	return w.Title()
 }
 
+// Enabled returns true if the platform is enabled
 func (w *Windows) Enabled() bool {
 	return w.enabled
 }
 
+// SetEnabled allows to enable / disable the platform
 func (w *Windows) SetEnabled(enabled bool) {
 	w.enabled = enabled
 }
 
+// Get installs the platform dependencies
 func (w *Windows) Get() error {
+	log.Info("Installing dependencies for " + w.Title())
 	return nil
 }
+
+// Clean cleans the platform build
 func (w *Windows) Clean() error {
 	return nil
 }
+
+// Build builds the platform
 func (w *Windows) Build(configuration sparks.Configuration) error {
 	w.prebuild()
 	w.generate(configuration)

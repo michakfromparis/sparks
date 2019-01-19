@@ -24,7 +24,7 @@ func get(cmd *cobra.Command, args []string) {
 	sparks.Shutdown()
 }
 
-func init_get() {
+func initGet() {
 	enabledPlatforms = make([]bool, len(sparks.Platforms))
 	log.Tracef("registered platforms: %d", len(sparks.Platforms))
 	getCmd.Flags().SortFlags = false

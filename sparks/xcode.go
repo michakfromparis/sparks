@@ -10,15 +10,21 @@ import (
 	"github.com/michaKFromParis/sparks/sys"
 )
 
+// SigningType represents the type of signing used to sign an OSX or iOS application
 type SigningType int
 
 const (
+	// IPhoneDeveloper signing type
 	IPhoneDeveloper = 0
+	// IphoneDistribution signing type
 	IphoneDistribution
+	// MacDeveloper signing type
 	MacDeveloper
+	// MacDistribution signing type
 	MacDistribution
 )
 
+// SigningTypeNames is used to String a SigningType into a string
 var SigningTypeNames = []string{
 	"iPhone Developer",
 	"iPhone Distribution",
@@ -30,9 +36,13 @@ func (st SigningType) String() string {
 	return SigningTypeNames[st]
 }
 
+// SigningIdentities holds the list of detected signing type identities
 var SigningIdentities = map[SigningType]string{}
+
+// SigningIdentity holds the name of the signing identity that will be used
 var SigningIdentity string
 
+// XCode is a wrapper class around the xcodebuild command
 type XCode struct {
 	command       string
 	arguments     []string
@@ -40,6 +50,7 @@ type XCode struct {
 	configuration Configuration
 }
 
+// NewXCode returns a new instance of XCode
 func NewXCode(platform Platform, configuration Configuration) *XCode {
 	xc := new(XCode)
 	xc.command = "xcodebuild"
@@ -48,29 +59,29 @@ func NewXCode(platform Platform, configuration Configuration) *XCode {
 	return xc
 }
 
+// Build starts to build the project
 func (xc *XCode) Build(directory string, arg ...string) error {
-
-	var args []string
-
-	args = append(args, "-parallelizeTargets")
-	args = append(args, "-verbose")
-	args = append(args, "build")
-	args = append(args, "-project", config.ProductName+".xcodeproj")
-	args = append(args, "-target", config.ProductName)
-	args = append(args, "-sdk", config.SparksOSXSDK)
-	args = append(args, "-configuration", xc.configuration.Title())
-	args = append(args, arg...)
-	output, err := sys.ExecuteEx(xc.command, directory, true, args...)
+	xc.arguments = append(xc.arguments, "-parallelizeTargets")
+	xc.arguments = append(xc.arguments, "-verbose")
+	xc.arguments = append(xc.arguments, "build")
+	xc.arguments = append(xc.arguments, "-project", config.ProductName+".xcodeproj")
+	xc.arguments = append(xc.arguments, "-target", config.ProductName)
+	xc.arguments = append(xc.arguments, "-sdk", config.SparksOSXSDK)
+	xc.arguments = append(xc.arguments, "-configuration", xc.configuration.Title())
+	xc.arguments = append(xc.arguments, arg...)
+	output, err := sys.ExecuteEx(xc.command, directory, true, xc.arguments...)
 	if err != nil {
 		return errorx.Decorate(err, "xcode build failed: "+output)
 	}
 	return nil
 }
 
+// Clean cleans a built project
 func (xc *XCode) Clean() {
 
 }
 
+// DetectSigning detects the currently imported Signing identities and fills SigningIdentities with them
 func (xc *XCode) DetectSigning() {
 	log.Debug("detecting xcode signing identity")
 	s, err := sys.Execute("security", "find-identity", "-v", "-p", "codesigning")
@@ -93,6 +104,7 @@ func (xc *XCode) DetectSigning() {
 	}
 }
 
+// SigningIdentity returns the configured signing identity provided a signing type
 func (xc *XCode) SigningIdentity(signingType SigningType) string {
 	return SigningIdentities[signingType]
 }

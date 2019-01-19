@@ -7,34 +7,16 @@ import (
 	"github.com/joomcode/errorx"
 )
 
-func Warning(err error, message string) {
-	if err != nil {
-		log.Warnf("%s, cause: %s", message, err.Error())
-	} else {
-		log.Warn(message)
-	}
-}
-
-func Error(message string) {
-	log.Error(message)
-}
-
-func Errorf(err error, message string) {
-	if err != nil {
-		log.Errorf("%+v", errorx.Decorate(err, message))
-	} else {
-		Error(message)
-	}
-}
-
+// Fatal is used terminate the program with an error
 func Fatal(err error) {
 	log.Fatalf("%v", err)
 }
 
+// Fatalf is used terminate the program with an error and decorate the last error with a message
 func Fatalf(err error, message string) {
 	if err != nil {
 		Fatal(errorx.Decorate(err, message))
 	} else {
-		log.Fatal(message)
+		log.Fatalf(message)
 	}
 }

@@ -12,18 +12,22 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
+// Android represents the Android platform
 type Android struct {
 	enabled bool
 }
 
+// Name is the lowercase name of the platform
 func (a *Android) Name() string {
 	return "android"
 }
 
+// Title is name of the platform
 func (a *Android) Title() string {
 	return "Android"
 }
 
+// Opt is the short command line option of the platform
 func (a *Android) Opt() string {
 	return "a"
 }
@@ -32,21 +36,28 @@ func (a *Android) String() string {
 	return a.Title()
 }
 
+// Enabled returns true if the platform is enabled
 func (a *Android) Enabled() bool {
 	return a.enabled
 }
 
+// SetEnabled allows to enable / disable the platform
 func (a *Android) SetEnabled(enabled bool) {
 	a.enabled = enabled
 }
 
+// Get installs the platform dependencies
 func (a *Android) Get() error {
-	// log.Info("Installing dependencies for " + a.Title())
+	log.Info("Installing dependencies for " + a.Title())
 	return nil
 }
+
+// Clean cleans the platform build
 func (a *Android) Clean() error {
 	return nil
 }
+
+// Build builds the platform
 func (a *Android) Build(configuration sparks.Configuration) error {
 	a.prebuild()
 	a.generate(configuration)
@@ -73,7 +84,7 @@ func (a *Android) generate(configuration sparks.Configuration) {
 	params += fmt.Sprintf("-GEclipse CDT4 - Unix Makefiles")
 	params += fmt.Sprintf("-DNDK_CCACHE=%s", ccachePath)
 	params += fmt.Sprintf("-DANDROID_NDK_RELEASE=%s", config.SpakrsAndroidNDKVersion)
-	params += fmt.Sprintf("-DANDROID_NATIVE_API_LEVEL=android-%d", config.SpakrsAndroidApiLevel)
+	params += fmt.Sprintf("-DANDROID_NATIVE_API_LEVEL=android-%d", config.SparksAndroidAPILevel)
 	// "-DLIBRARY_OUTPUT_PATH_ROOT=${buildRoot}/lib/${platformName}-${buildConfiguration}"
 }
 

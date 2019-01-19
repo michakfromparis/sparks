@@ -48,8 +48,12 @@ type Product struct {
 	sparksFilename string
 }
 
+// Load loads a .sparks file
 func (p *Product) Load() error {
 	filename, err := p.findSparksFile()
+	if err != nil {
+		errx.Fatalf(err, "Could not find a sparks file at "+config.SourceDirectory)
+	}
 	log.Debug("loading product from " + filename)
 	bytes, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -62,8 +66,12 @@ func (p *Product) Load() error {
 	return nil
 }
 
+// Save saves a .sparks file
 func (p *Product) Save() {
 	filename, err := p.findSparksFile()
+	if err != nil {
+		errx.Fatalf(err, "Could not find a sparks file at "+config.SourceDirectory)
+	}
 	log.Debug("saving product to " + filename)
 	data, err := yaml.Marshal(p)
 	if err != nil {
@@ -87,7 +95,9 @@ func (p *Product) findSparksFile() (string, error) {
 	}
 	files, err := f.Readdir(-1)
 	if err != nil {
-		_ = f.Close()
+		if err = f.Close(); err != nil {
+			return "", errorx.Decorate(err, "Could not close SourceDirectory: "+config.SourceDirectory)
+		}
 		return "", errorx.Decorate(err, "Could not read SourceDirectory: "+config.SourceDirectory)
 	}
 	if err = f.Close(); err != nil {
@@ -104,12 +114,12 @@ func (p *Product) findSparksFile() (string, error) {
 		}
 	}
 	if p.sparksFilename == "" {
-		errx.Fatalf(nil, "could not find a .sparks file at "+config.SourceDirectory)
+		return "", errorx.Decorate(nil, "could not find a .sparks file at "+config.SourceDirectory)
 	}
 	return p.sparksFilename, nil
 }
 
-// used to generate sample sparks file
+// Sample is used to generate sample sparks file
 func (p *Product) Sample() {
 	log.Debug("filling product with sample data")
 	p.Name = "Sparks"

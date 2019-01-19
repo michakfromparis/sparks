@@ -8,7 +8,7 @@ import (
 
 // FmtDuration formats a time.Duration into a human readable form
 func FmtDuration(duration time.Duration) string {
-	duration.Round(time.Millisecond)
+	duration = duration.Round(time.Millisecond)
 	days := int64(duration.Hours() / 24)
 	hours := int64(math.Mod(duration.Hours(), 24))
 	minutes := int64(math.Mod(duration.Minutes(), 60))

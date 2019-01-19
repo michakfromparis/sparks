@@ -16,20 +16,23 @@ var rootCmd = &cobra.Command{
 Sparks command line interface`,
 }
 
-// calling all cobra command init functions here to avoid a race condition
+// Init is calling all cobra command functions here to avoid a race condition
 // with the loading of the sparks platforms / configurations first
 func Init() {
-	init_root()
-	init_get()
-	init_clean()
-	init_build()
+	initRoot()
+	initGet()
+	initClean()
+	initBuild()
 }
 
+// PreRunAllCommands is called by cobra for every commands just before executing a command
 func PreRunAllCommands(cmd *cobra.Command, args []string) {
 	// reinitialized here to take the --verbose command line flag into account
 	logger.Init()
 }
 
+// Execute is the main blocking entry point, usually called from main
+// it chains all the commands into a tree and execcutes all sub commands
 func Execute() error {
 	rootCmd.SilenceErrors = true
 	if err := rootCmd.Execute(); err != nil {
@@ -38,7 +41,7 @@ func Execute() error {
 	return nil
 }
 
-func init_root() {
+func initRoot() {
 	log.Trace("root init")
 	rootCmd.Flags().SortFlags = false
 	rootCmd.PersistentFlags().BoolVarP(&config.Verbose, "verbose", "v", false, "set log verbose level to debug")

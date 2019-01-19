@@ -13,6 +13,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/michaKFromParis/sparks/errx"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/joomcode/errorx"
 )
@@ -158,7 +160,7 @@ func ExecutePipes(tokens ...string) (string, error) {
 	cmds = append(cmds, cmdFromString(args))
 	cmds = AssemblePipes(cmds, nil, buf)
 	if err := runCmds(cmds); err != nil {
-		return "", fmt.Errorf("%s; %s", err.Error(), string(buf.Bytes()))
+		return "", fmt.Errorf("%s; %s", err.Error(), buf.String())
 	}
 
 	b := buf.Bytes()
@@ -172,7 +174,11 @@ func AssemblePipes(cmds []*exec.Cmd, stdin io.Reader, stdout io.Writer) []*exec.
 	// assemble pipes
 	for i, c := range cmds {
 		if i < len(cmds)-1 {
-			cmds[i+1].Stdin, _ = c.StdoutPipe()
+			var err error
+			cmds[i+1].Stdin, err = c.StdoutPipe()
+			if err != nil {
+				errx.Fatalf(err, "Failed to assemble pipes while executing piped command")
+			}
 			cmds[i+1].Stderr = stdout
 		} else {
 			c.Stdout = stdout

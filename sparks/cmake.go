@@ -13,6 +13,7 @@ import (
 	"github.com/michaKFromParis/sparks/sys"
 )
 
+// CMake is a wrapper class around cmake
 type CMake struct {
 	command         string
 	arguments       []string
@@ -22,6 +23,7 @@ type CMake struct {
 	configuration   Configuration
 }
 
+// NewCMake returns an instance of a new CMake class
 func NewCMake(platform Platform, configuration Configuration) *CMake {
 	cm := new(CMake)
 	cm.command = "cmake"
@@ -43,7 +45,7 @@ func (cm *CMake) generateArgs() {
 	// 	cm.AddArg(fmt.Sprintf("--debug-output --trace")))
 	// }
 
-	if config.IncludeSparksSource == true {
+	if config.IncludeSparksSource {
 		cm.AddArg(fmt.Sprintf("-DINCLUDE_SPARKS_SOURCE=ON"))
 	} else {
 		cm.AddArg(fmt.Sprintf("-DINCLUDE_SPARKS_SOURCE=OFF"))
@@ -99,27 +101,34 @@ func parseVersion() (int, int, int, int) {
 	return major, minor, patch, build
 }
 
+// Args returns the array of strings passed as parameters to cmake
 func (cm *CMake) Args() []string {
 	return cm.arguments
 }
 
+// SetArgs sets the array of strings passed as parameters to cmake
 func (cm *CMake) SetArgs(params []string) {
 	cm.arguments = params
 }
 
+// AddArg adds a string to the array of strings passed as parameters to cmake
 func (cm *CMake) AddArg(params string) {
 	cm.arguments = append(cm.arguments, params)
 }
 
+// Run needs to be called once the parameters list is built.
+// Run will output project files in outputDirectory
 func (cm *CMake) Run(outputDirectory string, args ...[]string) (string, error) {
 	log.Debugf("running cmake in %s", outputDirectory)
-	if err := sys.MkDir(outputDirectory); err != nil {
+	cm.outputDirectory = outputDirectory
+	var err error
+	if err = sys.MkDir(outputDirectory); err != nil {
 		return "could not create " + outputDirectory, err
 	}
-	cmakelistsPath := filepath.Join(config.SDKDirectory, "scripts", "CMake", "Sparks")
-	cm.AddArg(cmakelistsPath)
+	cm.cmakelistsPath = filepath.Join(config.SDKDirectory, "scripts", "CMake", "Sparks")
+	cm.AddArg(cm.cmakelistsPath)
 	var output string
-	if output, err := sys.ExecuteEx(cm.command, outputDirectory, true, cm.arguments[0:]...); err != nil {
+	if output, err = sys.ExecuteEx(cm.command, cm.outputDirectory, true, cm.arguments[0:]...); err != nil {
 		return output, errorx.Decorate(err, "cmake execution failed")
 	}
 	return output, nil

@@ -12,19 +12,23 @@ import (
 	"github.com/michaKFromParis/sparks/sys"
 )
 
+// Osx represents the OSX platform
 type Osx struct {
 	enabled         bool
 	SigningIdentity string
 }
 
+// Name is the lowercase name of the platform
 func (o *Osx) Name() string {
 	return "osx"
 }
 
+// Title is name of the platform
 func (o *Osx) Title() string {
 	return "OSX"
 }
 
+// Opt is the short command line option of the platform
 func (o *Osx) Opt() string {
 	return "o"
 }
@@ -33,21 +37,27 @@ func (o *Osx) String() string {
 	return o.Title()
 }
 
+// Enabled returns true if the platform is enabled
 func (o *Osx) Enabled() bool {
 	return o.enabled
 }
 
+// SetEnabled allows to enable / disable the platform
 func (o *Osx) SetEnabled(enabled bool) {
 	o.enabled = enabled
 }
 
+// Get installs the platform dependencies
 func (o *Osx) Get() error {
 	return nil
 }
 
+// Clean cleans the platform build
 func (o *Osx) Clean() error {
 	return nil
 }
+
+// Build builds the platform
 func (o *Osx) Build(configuration sparks.Configuration) error {
 	projectDirectory := filepath.Join(config.OutputDirectory, "projects", o.Title()+"-"+configuration.Title())
 	o.prebuild()
@@ -116,5 +126,4 @@ func (o *Osx) compile(configuration sparks.Configuration, projectDirectory strin
 }
 
 func (o *Osx) postbuild() {
-
 }

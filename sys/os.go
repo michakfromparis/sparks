@@ -23,12 +23,6 @@ const (
 	Windows
 )
 
-var osNames = []string{
-	"unknown",
-	"osx",
-	"linux",
-	"windows"}
-
 var hostOs Os
 
 // GetOs returns the Os enum representing the currently running operating system
@@ -51,6 +45,7 @@ func GetOs() (Os, error) {
 }
 
 var homeDirectory = ""
+
 // GetHome returns the fullpasth to the user's home directory
 func GetHome() (string, error) {
 	if homeDirectory != "" {

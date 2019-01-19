@@ -12,7 +12,10 @@ import (
 
 func getToluaPath() string {
 	toluapp := filepath.Join(config.SDKDirectory, "dependencies", "toluapp", "bin")
-	os, _ := sys.GetOs()
+	os, err := sys.GetOs()
+	if err != nil {
+		errx.Fatal(err)
+	}
 	switch os {
 	case sys.Osx:
 		toluapp = filepath.Join(toluapp, "toluapp_osx")
@@ -24,6 +27,9 @@ func getToluaPath() string {
 	return toluapp
 }
 
+// GenerateLuaBindings generates C/C++ code from the definition of a package
+// defined with packageName. It invokes tolua++ and has complex toluahooks
+// that also generates C++ class reflection
 func GenerateLuaBindings(sourceDirectory string, packageName string) {
 
 	log.Info("sparks lua bind " + packageName)

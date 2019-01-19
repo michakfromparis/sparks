@@ -30,7 +30,7 @@ func clean(cmd *cobra.Command, args []string) {
 	}
 }
 
-func init_clean() {
+func initClean() {
 	log.Trace("clean init")
 	rootCmd.AddCommand(cleanCmd)
 

@@ -12,19 +12,23 @@ import (
 	"github.com/michaKFromParis/sparks/sys"
 )
 
+// Ios represents the iOS platform
 type Ios struct {
 	enabled         bool
 	SigningIdentity string
 }
 
+// Name is the lowercase name of the platform
 func (i *Ios) Name() string {
 	return "ios"
 }
 
+// Title is name of the platform
 func (i *Ios) Title() string {
 	return "iOS"
 }
 
+// Opt is the short command line option of the platform
 func (i *Ios) Opt() string {
 	return "i"
 }
@@ -33,22 +37,28 @@ func (i *Ios) String() string {
 	return i.Title()
 }
 
+// Enabled returns true if the platform is enabled
 func (i *Ios) Enabled() bool {
 	return i.enabled
 }
 
+// SetEnabled allows to enable / disable the platform
 func (i *Ios) SetEnabled(enabled bool) {
 	i.enabled = enabled
 }
 
+// Get installs the platform dependencies
 func (i *Ios) Get() error {
+	log.Info("Installing dependencies for " + i.Title())
 	return nil
 }
 
+// Clean cleans the platform build
 func (i *Ios) Clean() error {
 	return nil
 }
 
+// Build builds the platform
 func (i *Ios) Build(configuration sparks.Configuration) error {
 	projectDirectory := filepath.Join(config.OutputDirectory, "projects", i.Title()+"-"+configuration.Title())
 	i.prebuild()
@@ -148,5 +158,4 @@ func (i *Ios) compile(configuration sparks.Configuration, projectDirectory strin
 }
 
 func (i *Ios) postbuild() {
-
 }

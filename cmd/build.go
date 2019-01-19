@@ -38,7 +38,7 @@ func build(cmd *cobra.Command, args []string) {
 	sparks.Shutdown()
 }
 
-func init_build() {
+func initBuild() {
 
 	log.Trace("build init")
 	rootCmd.AddCommand(buildCmd)

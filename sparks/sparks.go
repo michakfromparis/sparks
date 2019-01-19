@@ -12,8 +12,10 @@ import (
 	"github.com/michaKFromParis/sparks/sys"
 )
 
+// CurrentProduct holds a reference to the currently loaded Sparks product from a .sparks file
 var CurrentProduct = Product{}
 
+// Init needs to be called once at the beggining of the program to Initialize Sparks
 func Init() {
 	log.Info("sparks init")
 	if err := config.Init(); err != nil {
@@ -21,24 +23,28 @@ func Init() {
 	}
 }
 
+// Shutdown needs to be called once at the end of the program to Shutdown Sparks
 func Shutdown() {
 }
 
+// Load loads a sparks product
 func Load() error {
 	log.Info("sparks load")
 	return CurrentProduct.Load()
 }
 
+// Save saves a sparks product
 func Save() {
 	log.Info("sparks save")
 	CurrentProduct.Save()
 }
 
+// Get is used to get packages and build dependencies
 func Get() error {
 	for _, platformName := range PlatformNames {
 		platform := Platforms[platformName]
 		// if platform != nil && platform.Enabled() {
-		if config.GetDependencies == true {
+		if config.GetDependencies {
 			log.Info("sparks get --dependencies --" + platform.Title())
 			err := platform.Get()
 			if err != nil {
@@ -50,6 +56,7 @@ func Get() error {
 	return nil
 }
 
+// Build builds a product in its defined && enabled platforms / configurations
 func Build(sourceDirectory string, outputDirectory string) error {
 	log.Info("sparks build " + sourceDirectory)
 	checkParameters(sourceDirectory, outputDirectory)
@@ -91,8 +98,14 @@ func Build(sourceDirectory string, outputDirectory string) error {
 					if err != nil || !stat.IsDir() {
 						return errorx.Decorate(err, "build directory does not exist: "+buildPath)
 					}
-					buildSize, _ := sys.DirSize(buildPath)
-					libSize, _ := sys.DirSize(libPath)
+					buildSize, err := sys.DirSize(buildPath)
+					if err != nil {
+						log.Error("Could not determine build size: " + err.Error())
+					}
+					libSize, err := sys.DirSize(libPath)
+					if err != nil {
+						log.Error("Could not determine libraries size: " + err.Error())
+					}
 					log.Infof("build completed successfully in %v", sys.FmtDuration(time.Since(start)))
 					log.Infof("build size: %s (libraries: %s)", buildSize, libSize)
 				}
@@ -123,13 +136,13 @@ func createBuildDirectoryStructure() {
 	var libPath = filepath.Join(config.OutputDirectory, "lib")
 	var projectsPath = filepath.Join(config.OutputDirectory, "projects")
 	if err := os.MkdirAll(binPath, os.ModePerm); err != nil {
-		errx.Error("failed to create build bin directory: " + binPath)
+		log.Warn("failed to create build bin directory: " + binPath)
 	}
 	if err := os.MkdirAll(libPath, os.ModePerm); err != nil {
-		errx.Error("failed to create build lib directory: " + libPath)
+		log.Warn("failed to create build lib directory: " + libPath)
 	}
 	if err := os.MkdirAll(projectsPath, os.ModePerm); err != nil {
-		errx.Error("failed to create build projects directory: " + projectsPath)
+		log.Warn("failed to create build projects directory: " + projectsPath)
 	}
 }
 

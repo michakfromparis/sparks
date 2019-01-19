@@ -24,7 +24,7 @@ func TestAssemblePipes(t *testing.T) {
 	if err := runCmds(cmds); err != nil {
 		t.Fatal(err)
 	}
-	fmt.Println(string(buf.Bytes()))
+	fmt.Println(buf.String())
 }
 
 func TestString(t *testing.T) {

@@ -3,17 +3,19 @@ package logger
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"os"
 	"sort"
 	"strings"
 	"time"
 
-	"github.com/Sirupsen/logrus"
 	log "github.com/Sirupsen/logrus"
 	"github.com/michaKFromParis/sparks/config"
 	"github.com/michaKFromParis/sparks/sys"
 )
 
+// Init is called at the start of the program to intialize logrus
+// with a custom formatter
 func Init() {
 
 	log.SetFormatter(&Formatter{
@@ -68,14 +70,17 @@ const (
 	White
 )
 
+// ColorSeq returns the escape sequence string corresponding to setting a terminal color
 func ColorSeq(color int) string {
 	return fmt.Sprintf("\033[%dm", color)
 }
 
+// ColorSeqFaint does the same as ColorSeq but returns the fainted version of that color
 func ColorSeqFaint(color int) string {
 	return fmt.Sprintf("\033[2m\033[%dm", color)
 }
 
+// ColorSeqBold does the same as ColorSeq but returns the bold version of that color
 func ColorSeqBold(color int) string {
 	return fmt.Sprintf("\033[%d;1m", color)
 }
@@ -119,8 +124,10 @@ func (f *Formatter) Format(entry *log.Entry) ([]byte, error) {
 	// output buffer
 	b := &bytes.Buffer{}
 
-	b.WriteString(fmt.Sprintf("[%s%s%s]", timeColor, entry.Time.Format(timestampFormat), resetColor))
-
+	_, err := b.WriteString(fmt.Sprintf("[%s%s%s]", timeColor, entry.Time.Format(timestampFormat), resetColor))
+	if err != nil {
+		fmt.Printf("Logger failed to write to buffer")
+	}
 	// write level
 	level := strings.Title(entry.Level.String())
 	if f.ShowFullLevel {
@@ -129,7 +136,10 @@ func (f *Formatter) Format(entry *log.Entry) ([]byte, error) {
 		level = level[:4]
 	}
 
-	b.WriteString(fmt.Sprintf("[%s%s%s] ", levelColor, level, resetColor))
+	_, err = b.WriteString(fmt.Sprintf("[%s%s%s] ", levelColor, level, resetColor))
+	if err != nil {
+		fmt.Printf("Logger failed to write to buffer")
+	}
 
 	// write fields
 	if f.FieldsOrder == nil {
@@ -138,16 +148,21 @@ func (f *Formatter) Format(entry *log.Entry) ([]byte, error) {
 		f.writeOrderedFields(b, entry)
 	}
 	if !f.NoColors && !f.NoFieldsColors {
-		b.WriteString(ColorSeq(0))
+		_, err = b.WriteString(ColorSeq(0))
+		if err != nil {
+			fmt.Printf("Logger failed to write to buffer")
+		}
 	}
 
 	// write message
-	b.WriteString(fmt.Sprintf("%s%s%s", messageColor, entry.Message, resetColor))
-	b.WriteString(sys.NewLine)
+	_, err = b.WriteString(fmt.Sprintf("%s%s%s%s", messageColor, entry.Message, resetColor, sys.NewLine))
+	if err != nil {
+		fmt.Printf("Logger failed to write to buffer")
+	}
 	return b.Bytes(), nil
 }
 
-func (f *Formatter) writeFields(b *bytes.Buffer, entry *log.Entry) {
+func (f *Formatter) writeFields(b io.Writer, entry *log.Entry) {
 	if len(entry.Data) != 0 {
 		fields := make([]string, 0, len(entry.Data))
 		for field := range entry.Data {
@@ -160,7 +175,7 @@ func (f *Formatter) writeFields(b *bytes.Buffer, entry *log.Entry) {
 	}
 }
 
-func (f *Formatter) writeOrderedFields(b *bytes.Buffer, entry *log.Entry) {
+func (f *Formatter) writeOrderedFields(b io.Writer, entry *log.Entry) {
 	length := len(entry.Data)
 	foundFieldsMap := map[string]bool{}
 	for _, field := range f.FieldsOrder {
@@ -174,7 +189,7 @@ func (f *Formatter) writeOrderedFields(b *bytes.Buffer, entry *log.Entry) {
 	if length > 0 {
 		notFoundFields := make([]string, 0, length)
 		for field := range entry.Data {
-			if foundFieldsMap[field] == false {
+			if !foundFieldsMap[field] {
 				notFoundFields = append(notFoundFields, field)
 			}
 		}
@@ -187,23 +202,14 @@ func (f *Formatter) writeOrderedFields(b *bytes.Buffer, entry *log.Entry) {
 	}
 }
 
-func (f *Formatter) writeField(b *bytes.Buffer, entry *log.Entry, field string) {
+func (f *Formatter) writeField(b io.Writer, entry *log.Entry, field string) {
 	if f.HideKeys {
-		fmt.Fprintf(b, "[%v] ", entry.Data[field])
+		if _, err := fmt.Fprintf(b, "[%v] ", entry.Data[field]); err != nil {
+			fmt.Printf("Logger writeFields failed to write")
+		}
 	} else {
-		fmt.Fprintf(b, "[%s:%v] ", field, entry.Data[field])
+		if _, err := fmt.Fprintf(b, "[%s:%v] ", field, entry.Data[field]); err != nil {
+			fmt.Printf("Logger writeFields failed to write")
+		}
 	}
-}
-
-type stderrHook struct {
-	logger *logrus.Logger
-}
-
-func (h *stderrHook) Levels() []logrus.Level {
-	return []logrus.Level{logrus.PanicLevel, logrus.FatalLevel, logrus.ErrorLevel, logrus.WarnLevel}
-}
-
-func (h *stderrHook) Fire(entry *logrus.Entry) error {
-	entry.Logger = h.logger
-	return nil
 }

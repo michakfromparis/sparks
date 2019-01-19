@@ -10,58 +10,125 @@ import (
 	"github.com/michaKFromParis/sparks/sys"
 )
 
-// Get specific
+// GetDependencies stores the command line flag of go get --dependencies
 var GetDependencies bool
 
+// SourceDirectory points to the directory containing the sources to be built
 var SourceDirectory string
-var OutputDirectory string
-var SDKDirectory string
-var SDKName = "Sparks"
-var PlayerName = "SparksPlayer"
-var ProductName string
-var Verbose = false
-var VeryVerbose = false // TODO temporary for debugging. need to set a proper verbose level
 
+// OutputDirectory points to the directory where the product will be built
+var OutputDirectory string
+
+// SDKDirectory points to the directory containing the sparks sdk
+var SDKDirectory string
+
+// SDKName is the name of the sparks sdk
+var SDKName = "Sparks"
+
+// PlayerName is the name of the sparks player
+var PlayerName = "SparksPlayer"
+
+// ProductName is the name of the built product
+var ProductName string
+
+// Verbose flag to show verbose log output
+var Verbose = false
+
+// VeryVerbose flag to show very verbose log output // TODO temporary for debugging. need to set a proper verbose level
+var VeryVerbose = false
+
+// IncludeSparksSource determines wether the sparks source should be included when generating projects
 var IncludeSparksSource = true
+
+// GenerateLua determines wether the sparks lua bindings should be generated
 var GenerateLua = false
 
 // OSX specific
-var SparksOSXSDK = "macosx10.14" // run `xcodebuild -showsdks` to list valid values
+
+// SparksOSXSDK determines the OSX SDK sparks will be built with. run `xcodebuild -showsdks` to list valid values
+var SparksOSXSDK = "macosx10.14"
+
+// SparksOSXArchitecture determines the OSX built architectures
 var SparksOSXArchitecture = "x86_64"
+
+// SparksOSXDeploymentTarget determines the minimum deployment target for a Sparks OSX application
 var SparksOSXDeploymentTarget = "10.10"
-var XCodeSigningIdentity = "iPhone Developer: Michel Courtine"
-var XCodeRecommendedVersion = "10.1"
+
+// XCodeSigningIdentity is usually set at runtime using XCode.DetectSigning
+var XCodeSigningIdentity = ""
 
 // iOS specific
-var SparksiOSSDK = "iphoneos12.1"                 // run `xcodebuild -showsdks` to list valid values
-var sparksiOSSimulatorSDK = "iphonesimulator12.1" // run `xcodebuild -showsdks` to list valid values
+
+// SparksiOSSDK determines the iOS SDK sparks will be built with. run `xcodebuild -showsdks` to list valid values
+var SparksiOSSDK = "iphoneos12.1"
+
+// sparksiOSSimulatorSDK determines the iPhone Simulator SDK sparks will be built with. run `xcodebuild -showsdks` to list valid values
+var sparksiOSSimulatorSDK = "iphonesimulator12.1"
+
+// DevelopmentSigningType is the type signing type used when building Debug or Release builds
 var DevelopmentSigningType = "iPhone Developer"
+
+// DistributionSigningType is the type signing type used when building Shipping builds
 var DistributionSigningType = "iPhone Distribution"
+
+// BundleIdentifier is the bundle identifier of the iOS ipa
 var BundleIdentifier = "me.ivoltage.sparksplayer"
+
+// ProvisioningProfileUUID is the identifier of the provisionning profile
 var ProvisioningProfileUUID = ""
 
 // Android specific
+
+// AndroidSDKRoot points to the location where the Android sdk is installed
 var AndroidSDKRoot = filepath.Join("Android", "sdk")
+
+// AndroidNDKRoot points to the location where the Android ndk is installed
 var AndroidNDKRoot = filepath.Join("Android", "ndk")
+
+// AndroidSDKToolsVersion defines the android sdk tools version to use
 var AndroidSDKToolsVersion = "25.2.3"
+
+// SparksAndroidBuildToolsVersion defines the android sdk build tools version to use
 var SparksAndroidBuildToolsVersion = "25.2.3"
-var SpakrsAndroidApiLevel = 19
+
+// SparksAndroidAPILevel defines the minimum android os requirement to run a sparks application
+var SparksAndroidAPILevel = 19
+
+// SpakrsAndroidNDKVersion defines the minimum android NDK version required to build a sparks application
 var SpakrsAndroidNDKVersion = "r10d"
-var SndroidPackagePrefix = "me.ivoltage"
+
+// SparkzsAndroidPackagePrefix defines the package prefix used for the android bundle identifier
+var SparkzsAndroidPackagePrefix = "me.ivoltage"
+
+// SparksAndroidNDKUrlOSX specifies the url to download the android NDK for OSX
 var SparksAndroidNDKUrlOSX = "http://dl.google.com/android/ndk/android-ndk-${spakrsAndroidNDKVersion}-darwin-x86_64.bin"
+
+// SparksAndroidNDKUrlLinux specifies the url to download the android NDK for Linux
 var SparksAndroidNDKUrlLinux = "http://dl.google.com/android/ndk/android-ndk-${spakrsAndroidNDKVersion}-linux-x86_64.bin"
-var FacebookAndroidApiLevel = 9
-var VolleyAndroidApiLevel = 19
+
+// FacebookAndroidAPILevel specifies android api level for the Facebook SDK
+var FacebookAndroidAPILevel = 9
+
+// VolleyAndroidAPILevel specifies android api level for the Volley SDK
+var VolleyAndroidAPILevel = 19
 
 // Emscripten specific
+
+// EmscriptenSDKRoot points to the location where the Emscripten sdk is installed
 var EmscriptenSDKRoot = "Emscripten"
-var EmscriptenVersion = "incoming" // possible values '1.27.0', '1.29.0' 'latest', 'master' or 'incoming' for the latest version
-var EmscriptenBrowser = "firefox"  // possible values: 'chrome' 'firefox' 'safari'
+
+// EmscriptenVersion defines the version of the Emscripten SDK to use. Possible values: '1.27.0', '1.29.0' 'latest', 'master' or 'incoming' for the latest version
+var EmscriptenVersion = "incoming"
+
+// EmscriptenBrowser defines the browser started when using emrun to start an Emscripten application. Possible values: 'chrome' 'firefox' 'safari'
+var EmscriptenBrowser = "firefox"
 
 // Windows specific
-// var WindowsCompiler="MSBuild"
+
+// WindowsCompiler specifies the Windows compiler to use to build. Possible values are "VisualStudio" or "MSBuild"
 var WindowsCompiler = "VisualStudio"
 
+// Init initializes config
 func Init() error {
 	log.Info("sparks config init")
 	if ProductName == "" {
@@ -77,13 +144,8 @@ func Init() error {
 	return nil
 }
 
+// String returns a string representation of the config
 func String() string {
-	// platforms := ""
-	// for _, name := range platform.PlatformNames {
-	// 	if Platforms[name] {
-	// 		platforms += name + " "
-	// 	}
-	// }
 	return fmt.Sprintf(`Loaded Configuration:
 ProductName: %s
 SourceDirectory: %s
