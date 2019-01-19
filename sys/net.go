@@ -8,6 +8,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
+// DownloadFile downloads the file at url and saves it to filepath
 func DownloadFile(filepath string, url string) error {
 
 	log.Debugf("sparks download %s %s", url, filepath)

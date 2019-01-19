@@ -17,14 +17,14 @@ import (
 	"github.com/joomcode/errorx"
 )
 
-var ExecuteStreamingToStdout = false
-
+// Execute runs a command naked
 func Execute(filename string, args ...string) (string, error) {
 	return ExecuteEx(filename, "", false, args...)
 }
 
 var output string
 
+// ExecuteEx runs a command and allows to set its working directory or pass the user environment to the command
 func ExecuteEx(filename string, directoryName string, environment bool, args ...string) (string, error) {
 	defer timeTrack(time.Now(), "execution")
 	output = ""
@@ -61,12 +61,12 @@ func ExecuteEx(filename string, directoryName string, environment bool, args ...
 	wg.Add(2)
 	go func() {
 		defer wg.Done()
-		writer(stdout)
+		ExecuteOutputWriter(stdout)
 	}()
 
 	go func() {
 		defer wg.Done()
-		writer(stderr)
+		ExecuteOutputWriter(stderr)
 	}()
 
 	wg.Wait()
@@ -83,7 +83,13 @@ func timeTrack(start time.Time, name string) {
 	log.Debugf("%s took %ss", name, time.Since(start))
 }
 
-func writer(r io.Reader) {
+// ExecuteStreamingToStdout is used to silence command output
+// in the ExecuteOutputWriter below
+var ExecuteStreamingToStdout = false
+
+// ExecuteOutputWriter is called the go routines above to stream to stdout
+// TODO: parameterize output channel, etc
+func ExecuteOutputWriter(r io.Reader) {
 	buf := make([]byte, 256)
 	for {
 		n, err := r.Read(buf)
@@ -99,9 +105,9 @@ func writer(r io.Reader) {
 	}
 }
 
-// Convert a shell command with a series of pipes into
-// correspondingly piped list of *exec.Cmd
-// If an arg has spaces, this will fail
+// ExecutePipe converts a shell command with a series of pipes into
+// a correspondingly piped list of *exec.Cmd
+// TODO replace this -> If an arg has spaces, this will fail
 func ExecutePipe(s string) (string, error) {
 	buf := bytes.NewBuffer([]byte{})
 	sp := strings.Split(s, "|")
@@ -131,7 +137,7 @@ func cmdFromString(cs []string) *exec.Cmd {
 	return exec.Command(cs[0], cs[1:]...)
 }
 
-// Convert sequence of tokens into commands,
+// ExecutePipes converts a sequence of tokens into commands,
 // using "|" as a delimiter
 func ExecutePipes(tokens ...string) (string, error) {
 	if len(tokens) == 0 {
@@ -159,7 +165,7 @@ func ExecutePipes(tokens ...string) (string, error) {
 	return string(b), nil
 }
 
-// Pipe stdout of each command into stdin of next
+// AssemblePipes pipes stdout of each command into stdin of the next
 func AssemblePipes(cmds []*exec.Cmd, stdin io.Reader, stdout io.Writer) []*exec.Cmd {
 	cmds[0].Stdin = stdin
 	cmds[0].Stderr = stdout

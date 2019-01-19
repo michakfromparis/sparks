@@ -9,16 +9,21 @@ import (
 	"github.com/joomcode/errorx"
 )
 
+// Os represents the operating system the code in running on
 type Os int
 
 const (
+	// Unknown OS was not detected
 	Unknown = iota
+	// Osx Os
 	Osx
+	// Linux Os
 	Linux
+	// Windows Os
 	Windows
 )
 
-var OsNames = []string{
+var osNames = []string{
 	"unknown",
 	"osx",
 	"linux",
@@ -26,6 +31,7 @@ var OsNames = []string{
 
 var hostOs Os
 
+// GetOs returns the Os enum representing the currently running operating system
 func GetOs() (Os, error) {
 	if hostOs != Unknown {
 		return hostOs, nil
@@ -45,7 +51,7 @@ func GetOs() (Os, error) {
 }
 
 var homeDirectory = ""
-
+// GetHome returns the fullpasth to the user's home directory
 func GetHome() (string, error) {
 	if homeDirectory != "" {
 		return homeDirectory, nil

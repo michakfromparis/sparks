@@ -11,6 +11,7 @@ import (
 	"github.com/michaKFromParis/sparks/errx"
 )
 
+// MkDir creates the directory at path and all subdirectories
 func MkDir(path string) error {
 	if err := os.MkdirAll(path, os.ModePerm); err != nil {
 		errx.Fatalf(err, "failed to create directory: "+path)
@@ -18,6 +19,7 @@ func MkDir(path string) error {
 	return nil
 }
 
+// DirSize returns a human readable form of the size of the directory at path
 func DirSize(path string) (string, error) {
 	du, err := Execute("du", "-hs", path)
 	if err != nil {
@@ -30,6 +32,7 @@ func DirSize(path string) (string, error) {
 	return "", nil
 }
 
+// Pwd returns the current directory's full path
 func Pwd() (string, error) {
 	path, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
@@ -39,6 +42,7 @@ func Pwd() (string, error) {
 	return path, err
 }
 
+// SedFile searches regex inside filename and replaces it by newContent
 func SedFile(filename string, regex string, newContent string) {
 	log.Tracef("sed %s %s in %s", regex, newContent, filename)
 	bytes, err := ioutil.ReadFile(filename)
