@@ -41,7 +41,7 @@ func (a *Android) SetEnabled(enabled bool) {
 }
 
 func (a *Android) Get() error {
-	log.Info("Installing dependencies for " + a.Title())
+	// log.Info("Installing dependencies for " + a.Title())
 	return nil
 }
 func (a *Android) Clean() error {

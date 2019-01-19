@@ -35,12 +35,17 @@ func Save() {
 }
 
 func Get() error {
-
 	for _, platformName := range PlatformNames {
 		platform := Platforms[platformName]
-		if platform != nil && platform.Enabled() {
-			return platform.Get()
+		// if platform != nil && platform.Enabled() {
+		if config.GetDependencies == true {
+			log.Info("sparks get --dependencies --" + platform.Title())
+			err := platform.Get()
+			if err != nil {
+				return errorx.Decorate(err, "sparks get failed")
+			}
 		}
+		// }
 	}
 	return nil
 }

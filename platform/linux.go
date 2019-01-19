@@ -40,9 +40,9 @@ func (l *Linux) SetEnabled(enabled bool) {
 }
 
 func (l *Linux) Get() error {
-	log.Info("Installing dependencies for " + l.Title())
 	return nil
 }
+
 func (l *Linux) Clean() error {
 	return nil
 }

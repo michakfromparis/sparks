@@ -42,10 +42,9 @@ func (o *Osx) SetEnabled(enabled bool) {
 }
 
 func (o *Osx) Get() error {
-	log.Info("Installing dependencies for " + o.Title())
-
 	return nil
 }
+
 func (o *Osx) Clean() error {
 	return nil
 }

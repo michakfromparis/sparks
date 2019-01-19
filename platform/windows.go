@@ -40,7 +40,6 @@ func (w *Windows) SetEnabled(enabled bool) {
 }
 
 func (w *Windows) Get() error {
-	log.Info("Installing dependencies for " + w.Title())
 	return nil
 }
 func (w *Windows) Clean() error {
