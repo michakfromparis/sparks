@@ -1,7 +1,9 @@
 package platform
 
 import (
+	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
@@ -15,6 +17,8 @@ import (
 type Ios struct {
 	enabled         bool
 	SigningIdentity string
+	configuration   sparks.Configuration
+	udid            string
 }
 
 // Name is the lowercase name of the platform
@@ -59,10 +63,11 @@ func (i *Ios) Clean() error {
 
 // Build builds the platform
 func (i *Ios) Build(configuration sparks.Configuration) error {
+	i.configuration = configuration
 	projectDirectory := filepath.Join(config.OutputDirectory, "projects", i.Title()+"-"+configuration.Title())
 	i.prebuild()
-	i.generate(configuration, projectDirectory)
-	i.compile(configuration, projectDirectory)
+	i.generate(projectDirectory)
+	i.compile(projectDirectory)
 	i.postbuild()
 
 	return nil
@@ -80,9 +85,36 @@ func (i *Ios) prebuild() {
 	}
 	i.SigningIdentity = identity
 	log.Debugf("signing identity: %s", identity)
+	i.importProvisioningProfile()
 }
 
-func (i *Ios) generate(configuration sparks.Configuration, projectDirectory string) {
+func (i *Ios) importProvisioningProfile() {
+	log.Debug("looking for provioning profile")
+	keysDirectory := filepath.Join(config.SourceDirectory, "conf", "keys", "ios", "development")
+	if i.configuration.Name() == "shipping" {
+		keysDirectory = filepath.Join(config.SourceDirectory, "conf", "keys", "ios", "distribution")
+	}
+	provisioningFilename, err := sys.Execute("find", keysDirectory, "-name", "*.mobileprovision")
+	provisioningFilename = strings.TrimSpace(provisioningFilename)
+	stat, err2 := os.Stat(provisioningFilename)
+	if err != nil || err2 != nil || stat.IsDir() {
+		log.Warnf("could not find a provisioning profile inside the project at %s", keysDirectory)
+		return
+	}
+	log.Debugf("provisioning profile found: %s", provisioningFilename)
+	output, err := sys.Execute("grep", "UUID", "-A1", "-a", provisioningFilename)
+	if err != nil {
+		log.Error("Could not parse provisioning profile at " + provisioningFilename)
+	}
+	re := regexp.MustCompile("string>(.*)</string")
+	matched := re.MatchString(output)
+	if !matched {
+		log.Warnf("Could not parse provisioning profile at " + provisioningFilename)
+	}
+	i.udid = re.FindStringSubmatch(output)[1]
+}
+
+func (i *Ios) generate(projectDirectory string) {
 	log.Info("sparks project generate --ios")
 
 	iosSysRoot, err := sys.ExecuteEx("xcodebuild", "", true, "-sdk", config.SparksiOSSDK, "-version", "Path")
@@ -93,15 +125,16 @@ func (i *Ios) generate(configuration sparks.Configuration, projectDirectory stri
 	log.Tracef("ios sysroot: %s", iosSysRoot)
 
 	cmakeToolchainFile := filepath.Join(config.SDKDirectory, "scripts", "CMake", "toolchains", "iOS.cmake")
-	libraryPath := filepath.Join(config.OutputDirectory, "lib", i.Title()+"-"+configuration.Title())
+	libraryPath := filepath.Join(config.OutputDirectory, "lib", i.Title()+"-"+i.configuration.Title())
 
-	cmake := sparks.NewCMake(i, configuration)
+	cmake := sparks.NewCMake(i, i.configuration)
 
 	cmake.AddArg("-GXcode")
 	cmake.AddDefine("OS_IOS", "1")
+	cmake.AddDefine("IOS_PLATFORM", "OS")
 	cmake.AddDefine("XCODE_SIGNING_IDENTITY", i.SigningIdentity)
 	cmake.AddDefine("CMAKE_TOOLCHAIN_FILE", cmakeToolchainFile)
-	cmake.AddDefine("XCODE_PROVISIONING_PROFILE_UUID", config.ProvisioningProfileUUID)
+	cmake.AddDefine("XCODE_PROVISIONING_PROFILE_UUID", i.udid)
 	cmake.AddDefine("PRODUCT_BUNDLE_IDENTIFIER", config.BundleIdentifier)
 	cmake.AddDefine("CMAKE_OSX_SYSROOT", iosSysRoot)
 	cmake.AddDefine("CMAKE_IOS_SYSROOT", iosSysRoot)
@@ -117,7 +150,7 @@ func (i *Ios) generate(configuration sparks.Configuration, projectDirectory stri
 	if err != nil {
 		errx.Fatalf(nil, "sparks project generate failed")
 	}
-	log.Trace("cmake output" + out)
+	log.Trace("cmake output: " + out)
 
 	// and once for the simulator
 	platform = "iphonesimulator"
@@ -130,12 +163,12 @@ func (i *Ios) generate(configuration sparks.Configuration, projectDirectory stri
 	if err != nil {
 		errx.Fatalf(nil, "sparks project generate failed")
 	}
-	log.Trace("cmake output" + out)
+	log.Trace("cmake output: " + out)
 }
 
-func (i *Ios) compile(configuration sparks.Configuration, projectDirectory string) {
+func (i *Ios) compile(projectDirectory string) {
 	log.Info("sparks project compile --ios")
-	xcode := sparks.NewXCode(i, configuration)
+	xcode := sparks.NewXCode(i, i.configuration)
 	// if [ $buildConfiguration = $debugConfiguration ]; then
 	//   LogWarning "Only building armv7 arch in $debugConfiguration configuration"
 	//   arch='-arch armv7'
@@ -143,19 +176,19 @@ func (i *Ios) compile(configuration sparks.Configuration, projectDirectory strin
 	//   arch="-arch armv7 -arch armv7s -arch arm64"
 	// fi
 
-	archsIos := []string{"-arch", "armv7", "-arch", "armv7s", "-arch", "arm64"}
+	// archsIos := []string{"-arch", "armv7", "-arch", "armv7s", "-arch", "arm64"}
 	archsSimulator := []string{ /* "-arch", "i386", */ "-arch", "x86_64"}
-	archsDebug := []string{"-arch", "armv7"}
-	if configuration.Name() == "debug" { // build only one arch to speed local dev builds
-		archsIos = archsDebug
+	// archsDebug := []string{"-arch", "armv7"}
+	if i.configuration.Name() == "debug" { // build only one arch to speed local dev builds
+		// archsIos = archsDebug
 	}
-	iphoneOs := "iphoneos"
+	// iphoneOs := "iphoneos"
 	simulator := "iphonesimulator"
-	err := xcode.Build(filepath.Join(projectDirectory, iphoneOs), archsIos...)
-	if err != nil {
-		errx.Fatalf(err, "sparks project compile failed for "+iphoneOs)
-	}
-	err = xcode.Build(filepath.Join(projectDirectory, simulator), archsSimulator...)
+	// err := xcode.Build(filepath.Join(projectDirectory, iphoneOs), archsIos...)
+	// if err != nil {
+	// 	errx.Fatalf(err, "sparks project compile failed for "+iphoneOs)
+	// }
+	err := xcode.Build(filepath.Join(projectDirectory, simulator), archsSimulator...)
 	if err != nil {
 		errx.Fatalf(err, "sparks project compile failed for "+simulator)
 	}

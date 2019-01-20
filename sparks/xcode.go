@@ -112,6 +112,6 @@ func (xc *XCode) SelectSigning(signingType SigningType) (string, error) {
 		return "", fmt.Errorf("Could not select a %+v signing identity", signingType)
 	}
 	SigningIdentity = SigningIdentities[signingType]
-	// log.Debugf("xcode signing identity: %s", SigningIdentity)
+	// log.Tracef("xcode signing identity: %s", SigningIdentity)
 	return SigningIdentity, nil
 }

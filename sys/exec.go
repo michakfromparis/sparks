@@ -111,6 +111,7 @@ func ExecuteOutputWriter(r io.Reader) {
 // a correspondingly piped list of *exec.Cmd
 // TODO replace this -> If an arg has spaces, this will fail
 func ExecutePipe(s string) (string, error) {
+	log.Trace("Executing piped command: " + s)
 	buf := bytes.NewBuffer([]byte{})
 	sp := strings.Split(s, "|")
 	cmds := make([]*exec.Cmd, len(sp))
