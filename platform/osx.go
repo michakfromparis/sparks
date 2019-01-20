@@ -1,7 +1,6 @@
 package platform
 
 import (
-	"fmt"
 	"path/filepath"
 	"strings"
 
@@ -78,6 +77,7 @@ func (o *Osx) prebuild() {
 		log.Warnf("could not select a %s signing identity. The build will fail to sign", signing)
 	}
 	o.SigningIdentity = identity
+	log.Debugf("signing identity: %s", signing)
 }
 
 func (o *Osx) generate(configuration sparks.Configuration, projectDirectory string) {
@@ -103,14 +103,14 @@ func (o *Osx) generate(configuration sparks.Configuration, projectDirectory stri
 	log.Tracef("C++ compiler: %s", cpp)
 
 	cmake := sparks.NewCMake(o, configuration)
-	cmake.AddArg(fmt.Sprintf("-DOS_OSX=1"))
-	cmake.AddArg(fmt.Sprintf("-GXcode"))
-	cmake.AddArg(fmt.Sprintf("-DCMAKE_OSX_SYSROOT=%s", osxSysRoot))
-	cmake.AddArg(fmt.Sprintf("-DCMAKE_C_COMPILER=%s", cc))
-	cmake.AddArg(fmt.Sprintf("-DCMAKE_CXX_COMPILER=%s", cpp))
-	cmake.AddArg(fmt.Sprintf("-DXCODE_SIGNING_IDENTITY=%s", o.SigningIdentity))
-	cmake.AddArg(fmt.Sprintf("-DCMAKE_OSX_ARCHITECTURES=%s", config.SparksOSXArchitecture))
-	cmake.AddArg(fmt.Sprintf("-DCMAKE_OSX_DEPLOYMENT_TARGET=%s", config.SparksOSXDeploymentTarget))
+	cmake.AddArg("-GXcode")
+	cmake.AddDefine("OS_OSX", "1")
+	cmake.AddDefine("CMAKE_OSX_SYSROOT", osxSysRoot)
+	cmake.AddDefine("CMAKE_C_COMPILER", cc)
+	cmake.AddDefine("CMAKE_CXX_COMPILER", cpp)
+	cmake.AddDefine("XCODE_SIGNING_IDENTITY", o.SigningIdentity)
+	cmake.AddDefine("CMAKE_OSX_ARCHITECTURES", config.SparksOSXArchitecture)
+	cmake.AddDefine("CMAKE_OSX_DEPLOYMENT_TARGET", config.SparksOSXDeploymentTarget)
 
 	out, err := cmake.Run(projectDirectory)
 	log.Trace("cmake output" + out)

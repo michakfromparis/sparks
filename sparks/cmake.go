@@ -33,26 +33,67 @@ func NewCMake(platform Platform, configuration Configuration) *CMake {
 	return cm
 }
 
+// Args returns the array of strings passed as parameters to cmake
+func (cm *CMake) Args() []string {
+	return cm.arguments
+}
+
+// SetArgs sets the array of strings passed as parameters to cmake
+func (cm *CMake) SetArgs(params []string) {
+	cm.arguments = params
+}
+
+// AddArg adds a string to the array of strings passed as parameters to cmake
+func (cm *CMake) AddArg(arg string) {
+	cm.arguments = append(cm.arguments, arg)
+}
+
+// AddDefine adds a string to the array of strings passed as parameters to cmake
+func (cm *CMake) AddDefine(key string, value string) {
+	if value == "" {
+		log.Warnf("cmake define %s is passed an empty value", key)
+	}
+	cm.arguments = append(cm.arguments, fmt.Sprintf("-D%s=%s", key, value))
+}
+
+// Run needs to be called once the parameters list is built.
+// Run will output project files in outputDirectory
+func (cm *CMake) Run(outputDirectory string, args ...[]string) (string, error) {
+	log.Debugf("running cmake in %s", outputDirectory)
+	cm.outputDirectory = outputDirectory
+	var err error
+	if err = sys.MkDir(outputDirectory); err != nil {
+		return "could not create " + outputDirectory, err
+	}
+	cm.cmakelistsPath = filepath.Join(config.SDKDirectory, "scripts", "CMake", "Sparks")
+	cm.AddArg(cm.cmakelistsPath)
+	var output string
+	if output, err = sys.ExecuteEx(cm.command, cm.outputDirectory, true, cm.arguments[0:]...); err != nil {
+		return output, errorx.Decorate(err, "cmake execution failed")
+	}
+	return output, nil
+}
+
 func (cm *CMake) generateArgs() {
-	cm.AddArg(fmt.Sprintf("-DSPARKS_ROOT=%s", config.SDKDirectory))
-	cm.AddArg(fmt.Sprintf("-DBUILD_ROOT=%s", config.OutputDirectory))
-	cm.AddArg(fmt.Sprintf("-DPRODUCT_ROOT=%s", config.SourceDirectory))
-	cm.AddArg(fmt.Sprintf("-DPRODUCT_NAME=%s", config.ProductName))
+	cm.AddDefine("SPARKS_ROOT", config.SDKDirectory)
+	cm.AddDefine("BUILD_ROOT", config.OutputDirectory)
+	cm.AddDefine("PRODUCT_ROOT", config.SourceDirectory)
+	cm.AddDefine("PRODUCT_NAME", config.ProductName)
 
 	// if config.VeryVerbose == true {
-	// 	cm.AddArg(fmt.Sprintf("-DCMAKE_VERBOSE_MAKEFILE=ON --debug-output --trace")))
+	// 	cm.AddArg("CMAKE_VERBOSE_MAKEFILE=ON --debug-output --trace")))
 	// } else if config.Verbose {
 	// 	cm.AddArg(fmt.Sprintf("--debug-output --trace")))
 	// }
 
 	if config.IncludeSparksSource {
-		cm.AddArg(fmt.Sprintf("-DINCLUDE_SPARKS_SOURCE=ON"))
+		cm.AddDefine("INCLUDE_SPARKS_SOURCE", "`ON")
 	} else {
-		cm.AddArg(fmt.Sprintf("-DINCLUDE_SPARKS_SOURCE=OFF"))
+		cm.AddDefine("INCLUDE_SPARKS_SOURCE", "`OFF")
 	}
-	cm.AddArg(fmt.Sprintf("-DCMAKE_BUILD_TYPE=%s", cm.configuration.Title()))
+	cm.AddDefine("CMAKE_BUILD_TYPE", cm.configuration.Title())
 	if cm.configuration.Name() == "shipping" {
-		cm.AddArg(fmt.Sprintf("-DSHIPPING=ON"))
+		cm.AddDefine("SHIPPING", "ON")
 	}
 	major, minor, patch, build := parseVersion() // TODO move this out of here
 	widthAndHeight := strings.Split(CurrentProduct.View.Resolution, "x")
@@ -60,22 +101,22 @@ func (cm *CMake) generateArgs() {
 		errx.Fatalf(nil, "Failed to parse product resolution: "+CurrentProduct.View.Resolution)
 	}
 	if CurrentProduct.View.Fullscreen == "yes" {
-		cm.AddArg(fmt.Sprintf("-DPRODUCT_FULLSCREEN=ON"))
+		cm.AddDefine("PRODUCT_FULLSCREEN", "ON")
 	} else {
-		cm.AddArg(fmt.Sprintf("-DPRODUCT_FULLSCREEN=OFF"))
+		cm.AddDefine("PRODUCT_FULLSCREEN", "OFF")
 	}
 
 	log.Infof("sparks project version %d.%d.%d.%d", major, minor, patch, build)
-	cm.AddArg(fmt.Sprintf("-DSPARKS_VERSION_MAJOR=%d", major))
-	cm.AddArg(fmt.Sprintf("-DSPARKS_VERSION_MINOR=%d", minor))
-	cm.AddArg(fmt.Sprintf("-DSPARKS_VERSION_PATCH=%d", build))
-	cm.AddArg(fmt.Sprintf("-DSPARKS_VERSION_BUILD=%d", patch))
+	cm.AddDefine("SPARKS_VERSION_MAJOR", string(major))
+	cm.AddDefine("SPARKS_VERSION_MINOR", string(minor))
+	cm.AddDefine("SPARKS_VERSION_PATCH", string(build))
+	cm.AddDefine("SPARKS_VERSION_BUILD", string(patch))
 	width, height := widthAndHeight[0], widthAndHeight[1]
-	cm.AddArg(fmt.Sprintf("-DPRODUCT_WIDTH=%s", width))
-	cm.AddArg(fmt.Sprintf("-DPRODUCT_HEIGHT=%s", height))
-	cm.AddArg(fmt.Sprintf("-DPRODUCT_DEFAULT_ORIENTATION=\"%s\"", CurrentProduct.View.DefaultOrientation))          // TODO Proper listing of orientations
-	cm.AddArg(fmt.Sprintf("-DPRODUCT_SUPPORTED_ORIENTATIONS=\"%s\"", CurrentProduct.View.SupportedOrientations[0])) // TODO Proper listing of orientations
-	cm.AddArg(fmt.Sprintf("-DCMAKE_INSTALL_PREFIX=%s", filepath.Join(config.OutputDirectory, "lib", cm.platform.Title()+"-"+cm.configuration.Title())))
+	cm.AddDefine("PRODUCT_WIDTH", width)
+	cm.AddDefine("PRODUCT_HEIGHT", height)
+	cm.AddDefine("PRODUCT_DEFAULT_ORIENTATION=\"%s\"", CurrentProduct.View.DefaultOrientation)          // TODO Proper listing of orientations
+	cm.AddDefine("PRODUCT_SUPPORTED_ORIENTATIONS=\"%s\"", CurrentProduct.View.SupportedOrientations[0]) // TODO Proper listing of orientations
+	cm.AddDefine("CMAKE_INSTALL_PREFIX", filepath.Join(config.OutputDirectory, "lib", cm.platform.Title()+"-"+cm.configuration.Title()))
 }
 
 func parseVersion() (int, int, int, int) {
@@ -99,37 +140,4 @@ func parseVersion() (int, int, int, int) {
 		build = segments[3]
 	}
 	return major, minor, patch, build
-}
-
-// Args returns the array of strings passed as parameters to cmake
-func (cm *CMake) Args() []string {
-	return cm.arguments
-}
-
-// SetArgs sets the array of strings passed as parameters to cmake
-func (cm *CMake) SetArgs(params []string) {
-	cm.arguments = params
-}
-
-// AddArg adds a string to the array of strings passed as parameters to cmake
-func (cm *CMake) AddArg(params string) {
-	cm.arguments = append(cm.arguments, params)
-}
-
-// Run needs to be called once the parameters list is built.
-// Run will output project files in outputDirectory
-func (cm *CMake) Run(outputDirectory string, args ...[]string) (string, error) {
-	log.Debugf("running cmake in %s", outputDirectory)
-	cm.outputDirectory = outputDirectory
-	var err error
-	if err = sys.MkDir(outputDirectory); err != nil {
-		return "could not create " + outputDirectory, err
-	}
-	cm.cmakelistsPath = filepath.Join(config.SDKDirectory, "scripts", "CMake", "Sparks")
-	cm.AddArg(cm.cmakelistsPath)
-	var output string
-	if output, err = sys.ExecuteEx(cm.command, cm.outputDirectory, true, cm.arguments[0:]...); err != nil {
-		return output, errorx.Decorate(err, "cmake execution failed")
-	}
-	return output, nil
 }

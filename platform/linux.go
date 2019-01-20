@@ -1,7 +1,6 @@
 package platform
 
 import (
-	"fmt"
 	"path/filepath"
 
 	"github.com/michaKFromParis/sparks/config"
@@ -72,8 +71,8 @@ func (l *Linux) generate(configuration sparks.Configuration) {
 	log.Info("sparks project generate --linux")
 
 	cmake := sparks.NewCMake(l, configuration)
-	params := fmt.Sprintf("-DOS_LINUX=1 ")
-	params += fmt.Sprintf("\"-GCodeBlocks - Unix Makefiles\" ")
+	cmake.AddArg("-GCodeBlocks - Unix Makefiles")
+	cmake.AddDefine("OS_LINUX", "1")
 	projectsPath := filepath.Join(config.OutputDirectory, "projects", l.Title()+"-"+configuration.Title())
 	out, err := cmake.Run(projectsPath)
 	if err != nil {
