@@ -1,6 +1,7 @@
 package sparks
 
 import (
+	"fmt"
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
@@ -15,7 +16,7 @@ type SigningType int
 
 const (
 	// IPhoneDeveloper signing type
-	IPhoneDeveloper = 0
+	IPhoneDeveloper = iota
 	// IphoneDistribution signing type
 	IphoneDistribution
 	// MacDeveloper signing type
@@ -81,7 +82,8 @@ func (xc *XCode) Clean() {
 
 }
 
-// DetectSigning detects the currently imported Signing identities and fills SigningIdentities with them
+// DetectSigning detects the currently imported Signing identities into OSX / XCode
+// and fills the sparks.SigningIdentities array with them
 func (xc *XCode) DetectSigning() {
 	log.Debug("detecting xcode signing identity")
 	s, err := sys.Execute("security", "find-identity", "-v", "-p", "codesigning")
@@ -104,7 +106,11 @@ func (xc *XCode) DetectSigning() {
 	}
 }
 
-// SigningIdentity returns the configured signing identity provided a signing type
-func (xc *XCode) SigningIdentity(signingType SigningType) string {
-	return SigningIdentities[signingType]
+// SelectSigning returns the configured signing identity provided a signing type
+func (xc *XCode) SelectSigning(signingType SigningType) (string, error) {
+	if SigningIdentities[signingType] == "" {
+		return "", fmt.Errorf("Could not select a %+v signing identity", signingType)
+	}
+	SigningIdentity = SigningIdentities[signingType]
+	return SigningIdentity, nil
 }

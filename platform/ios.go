@@ -71,11 +71,15 @@ func (i *Ios) Build(configuration sparks.Configuration) error {
 
 func (i *Ios) prebuild() {
 	xcode := sparks.XCode{}
+	var signing sparks.SigningType
+	signing = sparks.IPhoneDeveloper
+	log.Debugf("selecting an %s profile for signing", signing.String())
 	xcode.DetectSigning()
-	i.SigningIdentity = xcode.SigningIdentity(sparks.IPhoneDeveloper)
-	if i.SigningIdentity == "" {
-		errx.Fatalf(nil, "could not detect an xcode signing identity") // TODO explain how to obtain one
+	identity, err := xcode.SelectSigning(sparks.IPhoneDeveloper)
+	if err != nil {
+		log.Warnf("could not select a %s signing identity.", signing)
 	}
+	i.SigningIdentity = identity
 }
 
 func (i *Ios) generate(configuration sparks.Configuration, projectDirectory string) {
