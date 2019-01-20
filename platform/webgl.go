@@ -77,7 +77,7 @@ func (w *WebGl) generate(configuration sparks.Configuration) {
 	if err != nil {
 		errx.Fatalf(err, "sparks project generate failed: "+out)
 	}
-	log.Trace("cmake output" + out)
+	//log.Trace("cmake output" + out)
 }
 
 func (w *WebGl) compile() {

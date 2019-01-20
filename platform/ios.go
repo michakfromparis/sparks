@@ -132,7 +132,7 @@ func (i *Ios) generate(projectDirectory string) {
 	cmake.AddArg("-GXcode")
 	cmake.AddDefine("OS_IOS", "1")
 	cmake.AddDefine("IOS_PLATFORM", "OS")
-	cmake.AddDefine("XCODE_SIGNING_IDENTITY", i.SigningIdentity)
+	cmake.AddDefine("XCODE_SIGNING_IDENTITY", "\""+i.SigningIdentity+"\"")
 	cmake.AddDefine("CMAKE_TOOLCHAIN_FILE", cmakeToolchainFile)
 	cmake.AddDefine("XCODE_PROVISIONING_PROFILE_UUID", i.udid)
 	cmake.AddDefine("PRODUCT_BUNDLE_IDENTIFIER", config.BundleIdentifier)
@@ -150,7 +150,7 @@ func (i *Ios) generate(projectDirectory string) {
 	if err != nil {
 		errx.Fatalf(nil, "sparks project generate failed")
 	}
-	log.Trace("cmake output: " + out)
+	//log.Trace("cmake output: " + out)
 
 	// and once for the simulator
 	platform = "iphonesimulator"
@@ -161,9 +161,9 @@ func (i *Ios) generate(projectDirectory string) {
 	cmake.AddDefine("CMAKE_LIBRARY_OUTPUT_DIRECTORY", iphoneSimulatorLibraryPath)
 	out, err = cmake.Run(iphoneSimulatorProjectPath)
 	if err != nil {
-		errx.Fatalf(nil, "sparks project generate failed")
+		errx.Fatalf(nil, "sparks project generate failed: "+out)
 	}
-	log.Trace("cmake output: " + out)
+	//log.Trace("cmake output: " + out)
 }
 
 func (i *Ios) compile(projectDirectory string) {
@@ -176,19 +176,21 @@ func (i *Ios) compile(projectDirectory string) {
 	//   arch="-arch armv7 -arch armv7s -arch arm64"
 	// fi
 
-	// archsIos := []string{"-arch", "armv7", "-arch", "armv7s", "-arch", "arm64"}
+	archsIos := []string{"-arch", "armv7", "-arch", "armv7s", "-arch", "arm64"}
 	archsSimulator := []string{ /* "-arch", "i386", */ "-arch", "x86_64"}
 	// archsDebug := []string{"-arch", "armv7"}
 	if i.configuration.Name() == "debug" { // build only one arch to speed local dev builds
 		// archsIos = archsDebug
 	}
-	// iphoneOs := "iphoneos"
+	iphoneOs := "iphoneos"
 	simulator := "iphonesimulator"
-	// err := xcode.Build(filepath.Join(projectDirectory, iphoneOs), archsIos...)
-	// if err != nil {
-	// 	errx.Fatalf(err, "sparks project compile failed for "+iphoneOs)
-	// }
-	err := xcode.Build(filepath.Join(projectDirectory, simulator), archsSimulator...)
+	log.Infof("sparks project compile --ios %v", archsIos)
+	err := xcode.Build(filepath.Join(projectDirectory, iphoneOs), archsIos...)
+	if err != nil {
+		errx.Fatalf(err, "sparks project compile failed for "+iphoneOs)
+	}
+	log.Infof("sparks project compile --ios %v", archsSimulator[:])
+	err = xcode.Build(filepath.Join(projectDirectory, simulator), archsSimulator...)
 	if err != nil {
 		errx.Fatalf(err, "sparks project compile failed for "+simulator)
 	}

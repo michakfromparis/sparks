@@ -8,7 +8,6 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	version "github.com/hashicorp/go-version"
-	"github.com/joomcode/errorx"
 	"github.com/michaKFromParis/sparks/config"
 	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/sys"
@@ -68,11 +67,7 @@ func (cm *CMake) Run(outputDirectory string, args ...[]string) (string, error) {
 	}
 	cm.cmakelistsPath = filepath.Join(config.SDKDirectory, "scripts", "CMake", "Sparks")
 	cm.AddArg(cm.cmakelistsPath)
-	var output string
-	if output, err = sys.ExecuteEx(cm.command, cm.outputDirectory, true, cm.arguments[0:]...); err != nil {
-		return output, errorx.Decorate(err, "cmake execution failed")
-	}
-	return output, nil
+	return sys.ExecuteEx(cm.command, cm.outputDirectory, true, cm.arguments[0:]...)
 }
 
 func (cm *CMake) generateArgs() {

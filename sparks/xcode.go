@@ -67,7 +67,9 @@ func (xc *XCode) Build(directory string, arg ...string) error {
 	xc.arguments = append(xc.arguments, "build")
 	xc.arguments = append(xc.arguments, "-project", config.ProductName+".xcodeproj")
 	xc.arguments = append(xc.arguments, "-target", config.ProductName)
-	xc.arguments = append(xc.arguments, "-sdk", config.SparksOSXSDK)
+	if xc.platform.Name() != "ios" {
+		xc.arguments = append(xc.arguments, "-sdk", config.SparksOSXSDK)
+	}
 	xc.arguments = append(xc.arguments, "-configuration", xc.configuration.Title())
 	xc.arguments = append(xc.arguments, arg...)
 	output, err := sys.ExecuteEx(xc.command, directory, true, xc.arguments...)

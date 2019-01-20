@@ -113,9 +113,9 @@ func (o *Osx) generate(configuration sparks.Configuration, projectDirectory stri
 	cmake.AddDefine("CMAKE_OSX_DEPLOYMENT_TARGET", config.SparksOSXDeploymentTarget)
 
 	out, err := cmake.Run(projectDirectory)
-	log.Trace("cmake output" + out)
+	//log.Trace("cmake output" + out)
 	if err != nil {
-		errx.Fatalf(nil, "sparks project generate failed")
+		errx.Fatalf(nil, "sparks project generate failed: "+out)
 	}
 }
 

@@ -77,7 +77,7 @@ func ExecuteEx(filename string, directoryName string, environment bool, args ...
 		log.Errorf("command execution failed: %s", output)
 		return output, errorx.Decorate(err, "failed to execute "+fullCommand)
 	}
-	log.Tracef("combined output:%s%s", NewLine, output)
+	// log.Tracef("combined output:%s%s", NewLine, output)
 	return output, nil
 }
 
