@@ -79,7 +79,7 @@ func (i *Ios) prebuild() {
 		log.Warnf("could not select a %s signing identity.", signing)
 	}
 	i.SigningIdentity = identity
-	log.Debugf("signing identity: %s", signing)
+	log.Debugf("signing identity: %s", identity)
 }
 
 func (i *Ios) generate(configuration sparks.Configuration, projectDirectory string) {
@@ -99,7 +99,7 @@ func (i *Ios) generate(configuration sparks.Configuration, projectDirectory stri
 
 	cmake.AddArg("-GXcode")
 	cmake.AddDefine("OS_IOS", "1")
-	cmake.AddDefine("XCODE_SIGNING_IDENTITY", config.XCodeSigningIdentity)
+	cmake.AddDefine("XCODE_SIGNING_IDENTITY", i.SigningIdentity)
 	cmake.AddDefine("CMAKE_TOOLCHAIN_FILE", cmakeToolchainFile)
 	cmake.AddDefine("XCODE_PROVISIONING_PROFILE_UUID", config.ProvisioningProfileUUID)
 	cmake.AddDefine("PRODUCT_BUNDLE_IDENTIFIER", config.BundleIdentifier)

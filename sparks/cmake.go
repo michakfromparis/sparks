@@ -3,6 +3,7 @@ package sparks
 import (
 	"fmt"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
@@ -87,7 +88,7 @@ func (cm *CMake) generateArgs() {
 	// }
 
 	if config.IncludeSparksSource {
-		cm.AddDefine("INCLUDE_SPARKS_SOURCE", "`ON")
+		cm.AddDefine("INCLUDE_SPARKS_SOURCE", "ON")
 	} else {
 		cm.AddDefine("INCLUDE_SPARKS_SOURCE", "`OFF")
 	}
@@ -95,27 +96,27 @@ func (cm *CMake) generateArgs() {
 	if cm.configuration.Name() == "shipping" {
 		cm.AddDefine("SHIPPING", "ON")
 	}
-	major, minor, patch, build := parseVersion() // TODO move this out of here
-	widthAndHeight := strings.Split(CurrentProduct.View.Resolution, "x")
-	if len(widthAndHeight) != 2 {
-		errx.Fatalf(nil, "Failed to parse product resolution: "+CurrentProduct.View.Resolution)
-	}
 	if CurrentProduct.View.Fullscreen == "yes" {
 		cm.AddDefine("PRODUCT_FULLSCREEN", "ON")
 	} else {
 		cm.AddDefine("PRODUCT_FULLSCREEN", "OFF")
 	}
+	widthAndHeight := strings.Split(CurrentProduct.View.Resolution, "x")
+	if len(widthAndHeight) != 2 {
+		errx.Fatalf(nil, "Failed to parse product resolution: "+CurrentProduct.View.Resolution)
+	}
+	width, height := widthAndHeight[0], widthAndHeight[1]
+	major, minor, patch, build := parseVersion() // TODO move this out of here
 
 	log.Infof("sparks project version %d.%d.%d.%d", major, minor, patch, build)
-	cm.AddDefine("SPARKS_VERSION_MAJOR", string(major))
-	cm.AddDefine("SPARKS_VERSION_MINOR", string(minor))
-	cm.AddDefine("SPARKS_VERSION_PATCH", string(build))
-	cm.AddDefine("SPARKS_VERSION_BUILD", string(patch))
-	width, height := widthAndHeight[0], widthAndHeight[1]
+	cm.AddDefine("SPARKS_VERSION_MAJOR", strconv.Itoa(major))
+	cm.AddDefine("SPARKS_VERSION_MINOR", strconv.Itoa(minor))
+	cm.AddDefine("SPARKS_VERSION_PATCH", strconv.Itoa(build))
+	cm.AddDefine("SPARKS_VERSION_BUILD", strconv.Itoa(patch))
 	cm.AddDefine("PRODUCT_WIDTH", width)
 	cm.AddDefine("PRODUCT_HEIGHT", height)
-	cm.AddDefine("PRODUCT_DEFAULT_ORIENTATION=\"%s\"", CurrentProduct.View.DefaultOrientation)          // TODO Proper listing of orientations
-	cm.AddDefine("PRODUCT_SUPPORTED_ORIENTATIONS=\"%s\"", CurrentProduct.View.SupportedOrientations[0]) // TODO Proper listing of orientations
+	cm.AddDefine("PRODUCT_DEFAULT_ORIENTATION", CurrentProduct.View.DefaultOrientation)          // TODO Proper listing of orientations
+	cm.AddDefine("PRODUCT_SUPPORTED_ORIENTATIONS", CurrentProduct.View.SupportedOrientations[0]) // TODO Proper listing of orientations
 	cm.AddDefine("CMAKE_INSTALL_PREFIX", filepath.Join(config.OutputDirectory, "lib", cm.platform.Title()+"-"+cm.configuration.Title()))
 }
 
