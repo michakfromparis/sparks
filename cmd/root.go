@@ -12,8 +12,7 @@ var rootCmd = &cobra.Command{
 	PersistentPreRun: PreRunAllCommands,
 	Use:              "sparks",
 	Short:            "command line interface to the sparks framework",
-	Long: `
-Sparks command line interface`,
+	Long:             `Sparks command line interface`,
 }
 
 // Init is calling all cobra command functions here to avoid a race condition
@@ -23,6 +22,8 @@ func Init() {
 	initGet()
 	initClean()
 	initBuild()
+	initCode()
+	initRun()
 }
 
 // PreRunAllCommands is called by cobra for every commands just before executing a command
