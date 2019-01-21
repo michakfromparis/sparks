@@ -1,7 +1,10 @@
 package platform
 
 import (
+	"fmt"
 	"path/filepath"
+
+	"github.com/michaKFromParis/sparks/sys"
 
 	"github.com/michaKFromParis/sparks/config"
 	"github.com/michaKFromParis/sparks/errx"
@@ -47,7 +50,19 @@ func (l *Linux) SetEnabled(enabled bool) {
 // Get installs the platform dependencies
 func (l *Linux) Get() error {
 	log.Info("Installing dependencies for " + l.Title())
+	_, err := sys.Execute("apt-get", "update")
+	err = l.aptGet("cmake")
+	return err
+}
+
+func (l *Linux) aptGet(packageName string) error {
+	log.Debug("sparks get " + packageName)
+	output, err := sys.Execute("apt-get", "install", "-y", packageName)
+	if err != nil {
+		return fmt.Errorf("failed to install %s: %s", packageName, output)
+	}
 	return nil
+
 }
 
 // Clean cleans the platform build

@@ -87,7 +87,7 @@ run-docker: check
 		-v "$(OUTPUT_DIRECTORY)/linux":/build   \
 		-v "$(SPARKS_SDK_ROOT)":/sparks 		\
 		golang:latest                           \
-		/build/$(OUTPUT_NAME) get -d && /build/$(OUTPUT_NAME) $(ARGS)
+		/build/$(OUTPUT_NAME) get -d --v && /build/$(OUTPUT_NAME) $(ARGS)
 
 # linux build inside a docker container, see build-docker rule above
 build-docker-linux: check deps
