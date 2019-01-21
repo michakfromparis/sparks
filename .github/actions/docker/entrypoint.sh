@@ -19,6 +19,9 @@ if [[ "$1" == "build" ]]; then
 fi
 
 if [[ "$1" == "publish" ]]; then
+   docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} \
+   --build-arg REPOSITORY=${GITHUB_REPOSITORY} \
+   --build-arg SHA=${GITHUB_SHA} -f $2 .
    docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
    echo "Docker image pushed to ${DOCKER_IMAGE}:${DOCKER_TAG}"
 fi
