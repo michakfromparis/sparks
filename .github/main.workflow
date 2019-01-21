@@ -4,18 +4,18 @@ workflow "Build and Publish" {
 }
 
 action "Format" {
-  uses = ".github/actions/go"
+  uses = "./.github/actions/go"
   args = "format"
 }
 
 action "Test" {
-  uses = ".github/actions/go"
+  uses = "./.github/actions/go"
   args = "test"
 }
 
 action "Build" {
   needs = ["Format", "Test"]
-  uses = ".github/actions/go"
+  uses = "./.github/actions/go"
   secrets = ["DOCKER_IMAGE"]
   args = "build"
 }
@@ -34,6 +34,6 @@ action "Docker Login" {
 
 action "Publish" {
   needs = ["Docker Login"]
-  uses = ".github/actions/docker"
+  uses = "./.github/actions/docker"
   args = "publish"
 }
