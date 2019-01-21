@@ -87,7 +87,7 @@ run-docker: check
 		-v "$(OUTPUT_DIRECTORY)/linux":/build   \
 		-v "$(SPARKS_SDK_ROOT)":/sparks 		\
 		golang:latest                           \
-		/build/$(OUTPUT_NAME) get -d --v && /build/$(OUTPUT_NAME) $(ARGS)
+		bash -c "/build/$(OUTPUT_NAME) get -d --v && /build/$(OUTPUT_NAME) $(ARGS)"
 
 # linux build inside a docker container, see build-docker rule above
 build-docker-linux: check deps
@@ -108,3 +108,13 @@ run: check build
 
 # build and run in docker
 rund: build-docker run-docker
+
+release: #clean build-docker
+	github-release upload \
+	-s "$(GITHUB_TOKEN)" \
+	--user michaKFromParis \
+	--repo sparks-cli \
+	--tag "v0.1.0" \
+	--name "v0.1.0" \
+	--file "$(OUTPUT_DIRECTORY)/Linux/$(OUTPUT_NAME)"
+  
