@@ -32,11 +32,20 @@ func RegisterConfiguration(configuration Configuration) {
 // SetEnabledConfigurations is used to enable / disable build configurations, configurations comes ordered like ConfigurationNames
 func SetEnabledConfigurations(configurations []bool) {
 	i := 0
+	enabledOne := false
 	for _, name := range ConfigurationNames {
 		if i < len(configurations) && configurations[i] {
 			Configurations[name].SetEnabled(true)
+			enabledOne = true
 			log.Debug("enabled configuration " + Configurations[name].Title())
 		}
 		i++
 	}
+	if !enabledOne {
+		// os, _ := sys.GetOs()
+		if Configurations["release"] != nil {
+			Configurations["release"].SetEnabled(true)
+		}
+	}
+
 }

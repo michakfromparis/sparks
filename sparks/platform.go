@@ -2,6 +2,7 @@ package sparks
 
 import (
 	log "github.com/Sirupsen/logrus"
+	"github.com/michaKFromParis/sparks/sys"
 )
 
 // Platform Interface used to represent a sparks supported platform
@@ -39,11 +40,19 @@ func RegisterPlatform(platform Platform) {
 // SetEnabledPlatforms is used to enable / disable build platforms, platforms parameter comes ordered like PlatformNames
 func SetEnabledPlatforms(platforms []bool) {
 	i := 0
+	enabledOne := false
 	for _, name := range PlatformNames {
 		if i < len(platforms) && platforms[i] {
 			Platforms[name].SetEnabled(true)
+			enabledOne = true
 			log.Debugf("enabled platform %s", Platforms[name].Title())
 		}
 		i++
+	}
+	if !enabledOne {
+		os, _ := sys.GetOs()
+		if Platforms[os.Name()] != nil {
+			Platforms[os.Name()].SetEnabled(true)
+		}
 	}
 }

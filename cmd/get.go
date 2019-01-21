@@ -16,7 +16,8 @@ var getCmd = &cobra.Command{
 }
 
 func get(cmd *cobra.Command, args []string) {
-	sparks.Init()
+	//	sparks.Init()
+	// panic(fmt.Sprintf("%+V", enabledPlatforms))
 	sparks.SetEnabledPlatforms(enabledPlatforms)
 	if err := sparks.Get(); err != nil {
 		errx.Fatal(err)
