@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"path"
 	"path/filepath"
 
@@ -140,17 +139,6 @@ func Init() error {
 	}
 	SDKDirectory = SourceDirectory
 	OutputDirectory = path.Join(SourceDirectory, "build")
-	log.Debug(String())
+	log.Debug("loaded product configuration for " + ProductName)
 	return nil
-}
-
-// String returns a string representation of the config
-func String() string {
-	return fmt.Sprintf(`Loaded Configuration:
-ProductName: %s
-SourceDirectory: %s
-OutputDirectory: %s
-Verbose: %t`, ProductName, SourceDirectory, OutputDirectory, Verbose)
-	// Platforms: %s`, ProductName, SourceDirectory, OutputDirectory, Debug, Release, Shipping, Verbose, platforms)
-
 }

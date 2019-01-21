@@ -132,7 +132,7 @@ func (i *Ios) generate(projectDirectory string) {
 	cmake.AddArg("-GXcode")
 	cmake.AddDefine("OS_IOS", "1")
 	cmake.AddDefine("IOS_PLATFORM", "OS")
-	cmake.AddDefine("XCODE_SIGNING_IDENTITY", "\""+i.SigningIdentity+"\"")
+	cmake.AddDefine("XCODE_SIGNING_IDENTITY", i.SigningIdentity)
 	cmake.AddDefine("CMAKE_TOOLCHAIN_FILE", cmakeToolchainFile)
 	cmake.AddDefine("XCODE_PROVISIONING_PROFILE_UUID", i.udid)
 	cmake.AddDefine("PRODUCT_BUNDLE_IDENTIFIER", config.BundleIdentifier)
