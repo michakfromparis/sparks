@@ -23,6 +23,34 @@ const (
 	Windows
 )
 
+var osNames = []string{
+	"unknown",
+	"osx",
+	"linux",
+	"windows",
+}
+
+var osTitles = []string{
+	"Unknown",
+	"OSX",
+	"Linux",
+	"Windows",
+}
+
+// Name is the operating system lowercase name / identifier
+func (o Os) Name() string {
+	return osNames[o]
+}
+
+// Title is the operating system pretty name
+func (o Os) Title() string {
+	return osTitles[o]
+}
+
+func (o Os) String() string {
+	return o.Title()
+}
+
 var hostOs Os
 
 // GetOs returns the Os enum representing the currently running operating system
