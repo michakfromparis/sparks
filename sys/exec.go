@@ -3,7 +3,6 @@
 package sys
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"os"
@@ -12,8 +11,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/michaKFromParis/sparks/errx"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/joomcode/errorx"
@@ -36,7 +33,7 @@ func ExecuteEx(filename string, directoryName string, environment bool, args ...
 		cmd.Dir = directoryName
 		header += " in directory " + directoryName
 	} else {
-		header += " in default directory (" + filepath.Dir(os.Args[0]) + ")"
+		header += " in current working directory (" + filepath.Dir(os.Args[0]) + ")"
 	}
 	if environment {
 		cmd.Env = os.Environ()
@@ -105,107 +102,4 @@ func ExecuteOutputWriter(r io.Reader) {
 			break
 		}
 	}
-}
-
-// ExecutePipe converts a shell command with a series of pipes into
-// a correspondingly piped list of *exec.Cmd
-// TODO replace this -> If an arg has spaces, this will fail
-func ExecutePipe(s string) (string, error) {
-	log.Trace("Executing piped command: " + s)
-	buf := bytes.NewBuffer([]byte{})
-	sp := strings.Split(s, "|")
-	cmds := make([]*exec.Cmd, len(sp))
-	// create the commands
-	for i, c := range sp {
-		cs := strings.Split(strings.TrimSpace(c), " ")
-		cmd := cmdFromString(cs)
-		cmds[i] = cmd
-	}
-
-	cmds = AssemblePipes(cmds, nil, buf)
-	if err := runCmds(cmds); err != nil {
-		return "", err
-	}
-
-	b := buf.Bytes()
-	return string(b), nil
-}
-
-func cmdFromString(cs []string) *exec.Cmd {
-	if len(cs) == 1 {
-		return exec.Command(cs[0])
-	} else if len(cs) == 2 {
-		return exec.Command(cs[0], cs[1])
-	}
-	return exec.Command(cs[0], cs[1:]...)
-}
-
-// ExecutePipes converts a sequence of tokens into commands,
-// using "|" as a delimiter
-func ExecutePipes(tokens ...string) (string, error) {
-	if len(tokens) == 0 {
-		return "", nil
-	}
-	buf := bytes.NewBuffer([]byte{})
-	cmds := []*exec.Cmd{}
-	args := []string{}
-	// accumulate tokens until a |
-	for _, t := range tokens {
-		if t != "|" {
-			args = append(args, t)
-		} else {
-			cmds = append(cmds, cmdFromString(args))
-			args = []string{}
-		}
-	}
-	cmds = append(cmds, cmdFromString(args))
-	cmds = AssemblePipes(cmds, nil, buf)
-	if err := runCmds(cmds); err != nil {
-		return "", fmt.Errorf("%s; %s", err.Error(), buf.String())
-	}
-
-	b := buf.Bytes()
-	return string(b), nil
-}
-
-// AssemblePipes pipes stdout of each command into stdin of the next
-func AssemblePipes(cmds []*exec.Cmd, stdin io.Reader, stdout io.Writer) []*exec.Cmd {
-	cmds[0].Stdin = stdin
-	cmds[0].Stderr = stdout
-	// assemble pipes
-	for i, c := range cmds {
-		if i < len(cmds)-1 {
-			var err error
-			cmds[i+1].Stdin, err = c.StdoutPipe()
-			if err != nil {
-				errx.Fatalf(err, "Failed to assemble pipes while executing piped command")
-			}
-			cmds[i+1].Stderr = stdout
-		} else {
-			c.Stdout = stdout
-			c.Stderr = stdout
-		}
-	}
-	return cmds
-}
-
-// Run series of piped commands
-func runCmds(cmds []*exec.Cmd) error {
-	// start processes in descending order
-	for i := len(cmds) - 1; i > 0; i-- {
-		if err := cmds[i].Start(); err != nil {
-			return err
-		}
-	}
-	// run the first process
-	if err := cmds[0].Run(); err != nil {
-		return err
-	}
-	// wait on processes in ascending order
-	for i := 1; i < len(cmds); i++ {
-		if err := cmds[i].Wait(); err != nil {
-			return err
-		}
-	}
-	return nil
 }
