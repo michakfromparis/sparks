@@ -6,7 +6,7 @@ LABEL "version"="1.0.0"
 LABEL "maintainer"="Michel Courtine <github@michak.net>"
 
 LABEL "com.github.actions.icon"="code"
-LABEL "com.github.actions.color"="violet"
+LABEL "com.github.actions.color"="purple"
 LABEL "com.github.actions.name"="Go"
 LABEL "com.github.actions.description"="Runs go format, golint or go test. Possible args: format, test, build"
 
