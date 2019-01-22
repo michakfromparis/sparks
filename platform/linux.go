@@ -132,7 +132,7 @@ func (l *Linux) compile() {
 	projectsPath := filepath.Join(config.OutputDirectory, "projects", l.Title()+"-"+l.configuration.Title())
 	out, err := sys.ExecuteEx("make", projectsPath, true, "-j8")
 	if err != nil {
-		errx.Fatal(err, "sparks project compile failed: "+out)
+		errx.Fatalf(err, "sparks project compile failed: "+out)
 	}
 }
 
