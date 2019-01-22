@@ -50,5 +50,5 @@ action "Publish" {
   needs = ["Version Tag Filter"]
   secrets = ["GITHUB_TOKEN"]
   uses = "docker://goreleaser/goreleaser:v0.97"
-  args = "release"
+  args = ["--debug", "release"] 
   }
