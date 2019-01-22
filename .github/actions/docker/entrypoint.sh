@@ -4,6 +4,10 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+# APP_DIR="/go/src/github.com/${GITHUB_REPOSITORY}/"
+
+# mkdir -p ${APP_DIR} && cp -r ./ ${APP_DIR} && cd ${APP_DIR}
+
 DOCKER_TAG="latest"
 if [[ "${GITHUB_REF}" == "refs/tags"* ]]; then
     DOCKER_TAG=$(echo ${GITHUB_REF} | rev | cut -d/ -f1 | rev)
@@ -14,14 +18,14 @@ fi
 if [[ "$1" == "build" ]]; then
    docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} \
    --build-arg REPOSITORY=${GITHUB_REPOSITORY} \
-   --build-arg SHA=${GITHUB_SHA} .
+   --build-arg SHA=${GITHUB_SHA} -f "$2" .
    echo "Docker image tagged as ${DOCKER_IMAGE}:${DOCKER_TAG}"
 fi
 
 if [[ "$1" == "publish" ]]; then
    docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} \
    --build-arg REPOSITORY=${GITHUB_REPOSITORY} \
-   --build-arg SHA=${GITHUB_SHA} .
+   --build-arg SHA=${GITHUB_SHA} -f "$2" .
    docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
    echo "Docker image pushed to ${DOCKER_IMAGE}:${DOCKER_TAG}"
 fi
