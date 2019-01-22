@@ -20,14 +20,21 @@ action "Build" {
   args = "build"
 }
 
-action "Publish Filter" {
+action "Version Tag Filter" {
+  needs = ["Build"]
+  uses = "actions/bin/filter@master"
+  args = "tag v*"
+}
+
+
+action "Master Branch Filter" {
   needs = ["Build"]
   uses = "actions/bin/filter@master"
   args = "branch master"
 }
 
 action "Docker Login" {
-  needs = ["Publish Filter"]
+  needs = ["Master Branch Filter"]
   uses = "actions/docker/login@master"
   secrets = ["DOCKER_USERNAME", "DOCKER_PASSWORD"]
 }
@@ -40,7 +47,7 @@ action "Docker Publish" {
 }
 
 action "Publish" {
-  needs = ["Publish Filter"]
+  needs = ["Master Branch Filter"]
   secrets = ["GITHUB_TOKEN"]
   uses = "docker://goreleaser/goreleaser:v0.97"
   args = "release"
