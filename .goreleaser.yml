@@ -14,7 +14,7 @@ builds:
   goos:
     - darwin
     - linux
-    # - windows
+    - windows
   goarch:
     - amd64
 checksum:
@@ -36,7 +36,7 @@ archive:
     format: zip
 brew:
   github:
-    owner: ivoltage
+    owner: michaKFromParis
     name: homebrew-tap
   folder: Formula
   homepage:  https://github.com/michaKFromParis/sparks

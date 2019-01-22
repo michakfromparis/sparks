@@ -23,7 +23,7 @@ action "Build" {
 action "Version Tag Filter" {
   needs = ["Build"]
   uses = "actions/bin/filter@master"
-  args = "tag v*"
+  args = "tag 'v*'"
 }
 
 
