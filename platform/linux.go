@@ -128,6 +128,7 @@ func (l *Linux) generate() {
 }
 
 func (l *Linux) compile() {
+	
 	log.Info("sparks project compile --linux")
 	projectsPath := filepath.Join(config.OutputDirectory, "projects", l.Title()+"-"+l.configuration.Title())
 	out, err := sys.ExecuteEx("make", projectsPath, true, "-j8")
