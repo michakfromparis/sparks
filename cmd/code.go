@@ -23,8 +23,8 @@ import (
 // codeCmd represents the code command
 var codeCmd = &cobra.Command{
 	Use:   "code",
-	Short: "open the cmake generated project",
-	Long:  "open the cmake generated project",
+	Short: "Open the generated project",
+	Long:  "Open the generated project",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("code called")
 	},
