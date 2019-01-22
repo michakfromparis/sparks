@@ -15,21 +15,15 @@ var rootCmd = &cobra.Command{
 	Long:             `Sparks command line interface`,
 }
 
-// Init is calling all cobra command functions here to avoid a race condition
-// with the loading of the sparks platforms / configurations first
-func Init() {
-	initRoot()
-	initGet()
-	initClean()
-	initBuild()
-	initCode()
-	initRun()
-}
-
 // PreRunAllCommands is called by cobra for every commands just before executing a command
 func PreRunAllCommands(cmd *cobra.Command, args []string) {
 	// reinitialized here to take the --verbose command line flag into account
 	logger.Init()
+}
+
+// SetVersion passes the current version to the cli
+func SetVersion(version string, commit string, date string) {
+	rootCmd.Version = version
 }
 
 // Execute is the main blocking entry point, usually called from main
@@ -40,6 +34,17 @@ func Execute() error {
 		return err
 	}
 	return nil
+}
+
+// Init is calling all cobra command functions here to avoid a race condition
+// with the loading of the sparks platforms / configurations first
+func Init() {
+	initRoot()
+	initGet()
+	initClean()
+	initBuild()
+	initCode()
+	initRun()
 }
 
 func initRoot() {

@@ -8,10 +8,10 @@ import (
 )
 
 func main() {
-	// logger.Init()
 	platform.RegisterPlatforms()
 	configuration.RegisterConfigurations()
 	cmd.Init()
+	cmd.SetVersion(version, commit, date)
 	if err := cmd.Execute(); err != nil {
 		errx.Fatal(err)
 	}
