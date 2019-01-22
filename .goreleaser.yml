@@ -2,12 +2,12 @@
 # Make sure to check the documentation at http://goreleaser.com
 before:
   hooks:
+    - make deps
+    # - go get github.com/inconshreveable/mousetrap
     # you may remove this if you don't use vgo
-    - go mod download
-    - go get -d
-    - go get github.com/inconshreveable/mousetrap
+    # - go mod download
     # you may remove this if you don't need go generate
- #   - go generate ./...
+    # - go generate ./...
 builds:
 - env:
   - CGO_ENABLED=0
