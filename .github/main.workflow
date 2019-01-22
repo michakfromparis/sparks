@@ -32,9 +32,16 @@ action "Docker Login" {
   secrets = ["DOCKER_USERNAME", "DOCKER_PASSWORD"]
 }
 
-action "Publish" {
+action "Docker Publish" {
   needs = ["Docker Login"]
   uses = "./.github/actions/docker"
   secrets = ["DOCKER_IMAGE"]
   args = ["publish", "Dockerfile"]
 }
+
+action "Publish" {
+  needs = ["Publish Filter"]
+  secrets = ["GITHUB_TOKEN"]
+  uses = "docker://goreleaser/goreleaser:v0.97"
+  args = "release"
+  }
