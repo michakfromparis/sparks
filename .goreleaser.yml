@@ -3,6 +3,7 @@
 before:
   hooks:
     - go get github.com/inconshreveable/mousetrap
+    - go get -d
     # you may remove this if you don't use vgo
  #   - go mod download
     # you may remove this if you don't need go generate
