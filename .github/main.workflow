@@ -34,7 +34,7 @@ action "Master Branch Filter" {
 }
 
 action "Docker Login" {
-  needs = ["Master Branch Filter"]
+  needs = ["Version Tag Filter"]
   uses = "actions/docker/login@master"
   secrets = ["DOCKER_USERNAME", "DOCKER_PASSWORD"]
 }
@@ -47,7 +47,7 @@ action "Docker Publish" {
 }
 
 action "Publish" {
-  needs = ["Master Branch Filter"]
+  needs = ["Version Tag Filter"]
   secrets = ["GITHUB_TOKEN"]
   uses = "docker://goreleaser/goreleaser:v0.97"
   args = "release"
