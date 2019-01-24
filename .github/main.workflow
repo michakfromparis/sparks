@@ -1,6 +1,6 @@
 workflow "Build, test and Publish" {
   on = "push"
-  resolves = ["Publish to Github Release", "Publish to Docker Hub"]
+  resolves = ["Github Release Publish", "Docker Hub Publish"]
 }
 
 action "Format" {
