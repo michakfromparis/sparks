@@ -8,13 +8,18 @@ action "Format" {
   args = "format"
 }
 
+action "Lint" {
+  uses = "./.github/actions/go"
+  args = "lint"
+}
+
 action "Test" {
   uses = "./.github/actions/go"
   args = "test"
 }
 
 action "Build" {
-  needs = ["Format", "Test"]
+  needs = ["Format", "Lint", "Test"]
   uses = "./.github/actions/go"
   secrets = ["DOCKER_IMAGE"]
   args = "build"
