@@ -1,6 +1,6 @@
-workflow "Build and Publish" {
+workflow "Build, test and Publish" {
   on = "push"
-  resolves = "Publish"
+  resolves = ["Publish to Github Release", "Publish to Docker Hub"]
 }
 
 action "Format" {
@@ -37,20 +37,20 @@ action "If branch is master" {
   args = "branch master"
 }
 
-action "Publish" {
+action "Publish to Github Release" {
   needs = ["If repo was tagged"]
   secrets = ["GITHUB_TOKEN"]
   uses = "docker://goreleaser/goreleaser:v0.97"
   args = ["release", "--debug"] 
   }
 
-action "Docker Hub Login" {
+action "Login to Docker Hub" {
   needs = ["If repo was tagged"]
   uses = "actions/docker/login@master"
   secrets = ["DOCKER_USERNAME", "DOCKER_PASSWORD"]
 }
 
-action "Docker Hub Publish" {
+action "Publish to Docker Hub" {
   needs = ["Docker Hub Login"]
   uses = "./.github/actions/docker"
   secrets = ["DOCKER_IMAGE"]
