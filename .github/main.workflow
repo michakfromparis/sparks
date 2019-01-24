@@ -51,7 +51,7 @@ action "Docker Hub Login" {
 }
 
 action "Docker Hub Publish" {
-  needs = ["Docker Login"]
+  needs = ["Docker Hub Login"]
   uses = "./.github/actions/docker"
   secrets = ["DOCKER_IMAGE"]
   args = ["publish", "Dockerfile"]
