@@ -21,7 +21,7 @@ fi
 
 if [[ "$1" == "lint" ]]; then
     echo "Running golint"
-    files=$(gofmt -l $(find . -type f -name '*.go' -not -path "./vendor/*") 2>&1)
+    files=$(golint $(go list ./... | grep -v /vendor/))
     if [ "$files" ]; then
       echo "These files did not pass the gofmt checks:"
       echo ${files}
@@ -41,4 +41,3 @@ if [[ "$1" == "build" ]]; then
     go get ./...
     go build $(go list ./... | grep -v /vendor/)
 fi
-
