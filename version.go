@@ -1,7 +1,7 @@
 package main
 
 // set through command line at build time by goreleaser
-var version = "0.0.1"
+var version = "1.0.2"
 
 // set through command line at build time by goreleaser
 var commit = ""
