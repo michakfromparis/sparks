@@ -37,23 +37,22 @@ action "If branch is master" {
   args = "branch master"
 }
 
-action "Publish to Github Release" {
+action "Github Release Publish" {
   needs = ["If repo was tagged"]
   secrets = ["GITHUB_TOKEN"]
   uses = "docker://goreleaser/goreleaser:v0.97"
   args = ["release", "--debug"] 
   }
 
-action "Login to Docker Hub" {
+action "Docker Hub Login" {
   needs = ["If repo was tagged"]
   uses = "actions/docker/login@master"
   secrets = ["DOCKER_USERNAME", "DOCKER_PASSWORD"]
 }
 
-action "Publish to Docker Hub" {
-  needs = ["Login to Docker Hub"]
+action "Docker Hub Publish" {
+  needs = ["Docker Hub Login"]
   uses = "./.github/actions/docker"
   secrets = ["DOCKER_IMAGE"]
   args = ["publish", "Dockerfile"]
 }
-
