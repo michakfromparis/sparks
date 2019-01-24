@@ -15,13 +15,27 @@ projectName=$(git config --local remote.origin.url|sed -n 's#.*/\([^.]*\)\.git#\
 # set master branch
 masterBranch=$branch
 
-version="$1"
+# release version, set from command line
+version=""
 
-newVersion="$2"
+# version to set right after the release, set from command line
+newVersion=""
 
-version ()
+# v1.0.0, v1.7.8, etc..
+versionLabel=""
+
+# release branch name
+releaseBranch=""
+
+# release branch name
+tagName=""
+
+# file in which to update version number
+versionFile="version.go"
+
+init ()
 {
-	# master branch validation
+		# master branch validation
 	if [ $branch != "master" ]; then
 		echo "needs to run on master branch"
 		exit -1
@@ -33,24 +47,27 @@ version ()
 	fi
 
 	if [ "$newVersion" = "" ]; then
-		echo "Enter version number for $projectName after the release"
+		echo "Enter version number to set for $projectName immediately after the release"
 		read newVersion
 	fi
 
-	# v1.0.0, v1.7.8, etc..
 	versionLabel="v$version"
-
-	# establish branch and tag name variables
 	releaseBranch=release-$version
 	tagName=$versionLabel
+	versionFile="version.go"
 
+	echo "version: $version"
+	echo "version label: $versionLabel"
+	echo "release branch: $releaseBranch"
+	echo "tag name: $tagName"
+	echo "version file: $versionFile"
+}
+
+prerelease ()
+{
 	echo "Started releasing $versionLabel for $projectName ..."
-
 	# pull the latest version of the code from master
 	git pull
-
-	# file in which to update version number
-	versionFile="version.go"
  
 	# find version number ("1.5.5" for example)
 	# and replace it with newly specified version number
@@ -66,7 +83,7 @@ version ()
 	git commit -m "[Pre Release] Setting version to $versionLabel, Creating branch $releaseBranch"
 }
 
-version2 ()
+postrelease ()
 {
 		# create the release branch from the -master branch
 	git checkout -b $releaseBranch $masterBranch
@@ -75,7 +92,7 @@ version2 ()
 	git push -u origin $releaseBranch
 
 	echo "$projectName $versionLabel successfully released and labeled as $versionLabel"
-	echo "Incrementing $masterBranch version for new builds after the release"
+	echo "Incrementing $masterBranch version for all builds after the release"
 
 	# checkout to master branch
 	git checkout $masterBranch
@@ -94,11 +111,7 @@ version2 ()
 	git add $versionFile
 
 	# Commit setting new master branch version	
-	git commit -m "[Post Release] Setting version to $newVersionNumer"
-
-	# push commit to remote origin
-	git push
-
+	git commit -m "[Post Release] Setting version to $newVersion"
 }
 
 tag ()
@@ -110,7 +123,7 @@ tag ()
 push ()
 {
 	# push tag to remote origin. This will actually trigger CI
-	git push -f --tags origin
+	git push --tags origin
 }
 
 release ()
@@ -118,14 +131,13 @@ release ()
 	local version=$1
 	local newVersion=$2
 
+	init
 	echo "[$1] -> [$2]"
-	version "$version"
-	tag "v$version"
+	prerelease "$version"
+	tag "$versionLabel"
 	push
-	if [ post = true ]; then
-		version2 newVersion
-		push
-	fi
+	postrelease "$newVersion"
+	push
 }
 
 release $1 $2
