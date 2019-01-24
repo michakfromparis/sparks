@@ -1,6 +1,9 @@
 workflow "Build, test and Publish" {
   on = "push"
-  resolves = ["Github Release Publish", "Docker Hub Publish"]
+  resolves = [
+    "Docker Hub Publish",
+    "Slack Release",
+  ]
 }
 
 action "Format" {
@@ -41,8 +44,8 @@ action "Github Release Publish" {
   needs = ["If repo was tagged"]
   secrets = ["GITHUB_TOKEN"]
   uses = "docker://goreleaser/goreleaser:v0.97"
-  args = ["release", "--debug"] 
-  }
+  args = ["release", "--debug"]
+}
 
 action "Docker Hub Login" {
   needs = ["If repo was tagged"]
@@ -55,4 +58,11 @@ action "Docker Hub Publish" {
   uses = "./.github/actions/docker"
   secrets = ["DOCKER_IMAGE"]
   args = ["publish", "Dockerfile"]
+}
+
+action "Slack Release" {
+  uses = "Ilshidur/action-slack@36bb029ce9b69ef9c14fa6e1ef96c5634688b2ab"
+  needs = ["Github Release Publish"]
+  secrets = ["SLACK_WEBHOOK"]
+  args = "A new release was pushed to GitHub (https://github.com/michaKFromParis/sparks/releases)"
 }
