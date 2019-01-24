@@ -10,7 +10,17 @@ APP_DIR="/go/src/github.com/${GITHUB_REPOSITORY}/"
 mkdir -p ${APP_DIR} && cp -r ./ ${APP_DIR} && cd ${APP_DIR}
 
 if [[ "$1" == "format" ]]; then
-    echo "Running go format "
+    echo "Running gofmt"
+    files=$(gofmt -l $(find . -type f -name '*.go' -not -path "./vendor/*") 2>&1)
+    if [ "$files" ]; then
+      echo "These files did not pass the gofmt checks:"
+      echo ${files}
+      exit 1
+    fi
+fi
+
+if [[ "$1" == "lint" ]]; then
+    echo "Running golint"
     files=$(gofmt -l $(find . -type f -name '*.go' -not -path "./vendor/*") 2>&1)
     if [ "$files" ]; then
       echo "These files did not pass the gofmt checks:"
