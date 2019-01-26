@@ -14,7 +14,7 @@ import (
 // Osx represents the OSX platform
 type Osx struct {
 	enabled         bool
-	SigningIdentity string
+	signingIdentity *sparks.SigningIdentity
 }
 
 // Name is the lowercase name of the platform
@@ -76,7 +76,7 @@ func (o *Osx) prebuild() {
 	if err != nil {
 		log.Warnf("could not select a %s signing identity. The build will fail to sign", signing)
 	}
-	o.SigningIdentity = identity
+	o.signingIdentity = identity
 	log.Debugf("signing identity: %s", signing)
 }
 
@@ -108,7 +108,7 @@ func (o *Osx) generate(configuration sparks.Configuration, projectDirectory stri
 	cmake.AddDefine("CMAKE_OSX_SYSROOT", osxSysRoot)
 	cmake.AddDefine("CMAKE_C_COMPILER", cc)
 	cmake.AddDefine("CMAKE_CXX_COMPILER", cpp)
-	cmake.AddDefine("XCODE_SIGNING_IDENTITY", o.SigningIdentity)
+	cmake.AddDefine("XCODE_SIGNING_IDENTITY", o.signingIdentity.Name)
 	cmake.AddDefine("CMAKE_OSX_ARCHITECTURES", config.SparksOSXArchitecture)
 	cmake.AddDefine("CMAKE_OSX_DEPLOYMENT_TARGET", config.SparksOSXDeploymentTarget)
 

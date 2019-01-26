@@ -16,7 +16,7 @@ import (
 // Ios represents the iOS platform
 type Ios struct {
 	enabled         bool
-	SigningIdentity string
+	signingIdentity *sparks.SigningIdentity
 	configuration   sparks.Configuration
 	udid            string
 }
@@ -83,7 +83,7 @@ func (i *Ios) prebuild() {
 	if err != nil {
 		log.Warnf("could not select a %s signing identity.", signing)
 	}
-	i.SigningIdentity = identity
+	i.signingIdentity = identity
 	log.Debugf("signing identity: %s", identity)
 	i.importProvisioningProfile()
 }
@@ -129,10 +129,17 @@ func (i *Ios) generate(projectDirectory string) {
 
 	cmake := sparks.NewCMake(i, i.configuration)
 
+	var automaticSigning = false
+
 	cmake.AddArg("-GXcode")
 	cmake.AddDefine("OS_IOS", "1")
 	cmake.AddDefine("IOS_PLATFORM", "OS")
-	cmake.AddDefine("XCODE_SIGNING_IDENTITY", i.SigningIdentity)
+	if automaticSigning {
+	} else {
+		cmake.AddDefine("XCODE_SIGNING_IDENTITY", i.signingIdentity.Name)
+		cmake.AddDefine("DEVELOPMENT_TEAM", i.signingIdentity.TeamID)
+		// cmake.AddDefine("PROVISIONING_PROFILE_SPECIFIER", i.signingIdentity)
+	}
 	cmake.AddDefine("CMAKE_TOOLCHAIN_FILE", cmakeToolchainFile)
 	cmake.AddDefine("XCODE_PROVISIONING_PROFILE_UUID", i.udid)
 	cmake.AddDefine("PRODUCT_BUNDLE_IDENTIFIER", config.BundleIdentifier)
