@@ -50,6 +50,11 @@ func (w *WebGl) Clean() error {
 	return nil
 }
 
+// Code opens the code editor for the project
+func (w *WebGl) Code(configuration sparks.Configuration) error {
+	return nil
+}
+
 // Build builds the platform
 func (w *WebGl) Build(configuration sparks.Configuration) error {
 	w.prebuild()

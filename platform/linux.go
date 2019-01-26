@@ -100,6 +100,11 @@ func (l *Linux) Clean() error {
 	return nil
 }
 
+// Code opens the code editor for the project
+func (l *Linux) Code(configuration sparks.Configuration) error {
+	return nil
+}
+
 // Build builds the platform
 func (l *Linux) Build(configuration sparks.Configuration) error {
 	l.configuration = configuration

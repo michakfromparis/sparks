@@ -56,6 +56,11 @@ func (a *Android) Clean() error {
 	return nil
 }
 
+// Code opens the code editor for the project
+func (a *Android) Code(configuration sparks.Configuration) error {
+	return nil
+}
+
 // Build builds the platform
 func (a *Android) Build(configuration sparks.Configuration) error {
 	a.prebuild()

@@ -56,7 +56,33 @@ func Get() error {
 	return nil
 }
 
-// Build builds a product in its defined && enabled platforms / configurations
+// Code opens the default code editor for the defined & enabled platforms / configurations
+func Code(sourceDirectory string, outputDirectory string) error {
+	log.Info("sparks code " + sourceDirectory)
+	checkParameters(sourceDirectory, outputDirectory)
+	if err := Load(); err != nil {
+		return errorx.Decorate(err, "could not load sparks project at %s", sourceDirectory)
+	}
+	log.Tracef("loaded product:%s%+v", sys.NewLine, CurrentProduct)
+	createBuildDirectoryStructure()
+	for _, platformName := range PlatformNames {
+		platform := Platforms[platformName]
+		if platform != nil && platform.Enabled() {
+			for _, configurationName := range ConfigurationNames {
+				configuration := Configurations[configurationName]
+				if configuration != nil && configuration.Enabled() {
+					log.Infof("sparks code --%s --%s --name %s", platform.Name(), configuration.Name(), config.ProductName)
+					if err := platform.Code(configuration); err != nil {
+						return errorx.Decorate(err, "sparks code failed for %s-%s", platform.Title(), configuration.Title())
+					}
+				}
+			}
+		}
+	}
+	return nil
+}
+
+// Build builds a product in its defined & enabled platforms / configurations
 func Build(sourceDirectory string, outputDirectory string) error {
 	log.Info("sparks build " + sourceDirectory)
 	checkParameters(sourceDirectory, outputDirectory)

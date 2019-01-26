@@ -56,6 +56,11 @@ func (o *Osx) Clean() error {
 	return nil
 }
 
+// Code opens the code editor for the project
+func (o *Osx) Code(configuration sparks.Configuration) error {
+	return nil
+}
+
 // Build builds the platform
 func (o *Osx) Build(configuration sparks.Configuration) error {
 	projectDirectory := filepath.Join(config.OutputDirectory, "projects", o.Title()+"-"+configuration.Title())

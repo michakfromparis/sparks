@@ -55,6 +55,11 @@ func (w *Windows) Clean() error {
 	return nil
 }
 
+// Code opens the code editor for the project
+func (w *Windows) Code(configuration sparks.Configuration) error {
+	return nil
+}
+
 // Build builds the platform
 func (w *Windows) Build(configuration sparks.Configuration) error {
 	w.prebuild()
