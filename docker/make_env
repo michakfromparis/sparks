@@ -1,7 +1,10 @@
 # constants
+# docker image name
 IMAGE_NAME=sparks-builder
+# Makefile directory
+MAKEFILE_DIRECTORY=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 # default build output directory
-ROOT_DIRECTORY=$(CURDIR)/..
+ROOT_DIRECTORY=$(MAKEFILE_DIRECTORY)..
 # default build output directory
 SPARKS_EXECUTABLE=$(ROOT_DIRECTORY)/build/sparks/linux/sparks
 # sparks sdk root directory
@@ -13,7 +16,7 @@ PREBUILD=\
 cp $(SPARKS_EXECUTABLE) .
 
 POSTBUILD=\
-rm -f sparks
+rm -f $(MAKEFILE_DIRECTORY)/sparks
 
 PRERUN=\
 mkdir -p $(BUILD_ROOT)

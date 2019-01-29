@@ -7,7 +7,7 @@ IMAGE_NAME ?= sparks-builder
 CONTAINER_NAME ?= $(IMAGE_NAME)
 CONTAINER_INSTANCE ?= default
 
-all: build
+all: run
 
 build: Dockerfile
 	$(PREBUILD)
