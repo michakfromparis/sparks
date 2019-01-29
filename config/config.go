@@ -116,8 +116,10 @@ var VolleyAndroidAPILevel = 19
 // EmscriptenSDKRoot points to the location where the Emscripten sdk is installed
 var EmscriptenSDKRoot = "Emscripten"
 
-// EmscriptenVersion defines the version of the Emscripten SDK to use. Possible values: '1.27.0', '1.29.0' 'latest', 'master' or 'incoming' for the latest version
-var EmscriptenVersion = "incoming"
+// EmscriptenVersion defines the version of the Emscripten SDK to use.
+// Possible values: '1.27.0', '1.29.0' 'latest', 'master' or 'incoming' for the latest version
+// Note: incoming implies building the sdk from source which is very long
+var EmscriptenVersion = "latest"
 
 // EmscriptenBrowser defines the browser started when using emrun to start an Emscripten application. Possible values: 'chrome' 'firefox' 'safari'
 var EmscriptenBrowser = "firefox"
