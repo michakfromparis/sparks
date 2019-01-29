@@ -103,10 +103,10 @@ func (p *Product) findSparksFile() (string, error) {
 	if err = f.Close(); err != nil {
 		return "", errorx.Decorate(err, "Could not close SourceDirectory: "+config.SourceDirectory)
 	}
-	log.Trace("files in SourceDirectory:")
+	// log.Trace("files in SourceDirectory:")
 	p.sparksFilename = ""
 	for _, file := range files {
-		log.Trace(file.Name())
+		// log.Trace(file.Name())
 		if strings.HasSuffix(file.Name(), ".sparks") {
 			p.sparksFilename = filepath.Join(config.SourceDirectory, file.Name())
 			log.Debugf("found a .sparks file at: %s", p.sparksFilename)

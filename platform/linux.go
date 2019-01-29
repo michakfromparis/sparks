@@ -58,9 +58,6 @@ func (l *Linux) Get() error {
 	if err = l.aptGet("zlib1g-dev"); err != nil {
 		return err
 	}
-	// if err = l.aptGet("gcc"); err != nil {
-	// 	return err
-	// }
 	if err = l.aptGet("ccache"); err != nil {
 		return err
 	}
@@ -92,7 +89,6 @@ func (l *Linux) aptGet(name string) error {
 		return fmt.Errorf("failed to install %s: %s", name, output)
 	}
 	return nil
-
 }
 
 // Clean cleans the platform build
