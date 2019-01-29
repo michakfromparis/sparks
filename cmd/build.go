@@ -55,12 +55,8 @@ func build(cmd *cobra.Command, args []string) {
 }
 
 func initBuild() {
-
 	log.Trace("build init")
 	rootCmd.AddCommand(buildCmd)
-
-	enabledPlatforms = make([]bool, len(sparks.Platforms))
-	enabledConfigurations = make([]bool, len(sparks.Configurations))
 	log.Tracef("registered platforms: %d", len(sparks.Platforms))
 	log.Tracef("registered configurations: %d", len(sparks.Configurations))
 	buildCmd.Flags().SortFlags = false
@@ -68,6 +64,6 @@ func initBuild() {
 	buildCmd.Flags().StringVarP(&config.OutputDirectory, "output", "", "", "output directory for all selected builds")
 	buildCmd.Flags().StringVarP(&config.ProductName, "name", "", "", "set the product name / filename of the built binaries")
 	buildCmd.Flags().BoolVarP(&config.GenerateLua, "lua", "L", false, "generate lua bindings")
-	addPlatforms(buildCmd, "build")
-	addConfigurations(buildCmd)
+	addCommandPlatforms(buildCmd, "build")
+	addCommandConfigurations(buildCmd)
 }

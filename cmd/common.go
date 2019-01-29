@@ -8,7 +8,7 @@ import (
 var enabledPlatforms []bool
 var enabledConfigurations []bool
 
-func addPlatforms(cmd *cobra.Command, prefix string) {
+func addCommandPlatforms(cmd *cobra.Command, prefix string) {
 	i := 0
 	for _, name := range sparks.PlatformNames {
 		p := sparks.Platforms[name]
@@ -19,7 +19,7 @@ func addPlatforms(cmd *cobra.Command, prefix string) {
 	}
 }
 
-func addConfigurations(cmd *cobra.Command) {
+func addCommandConfigurations(cmd *cobra.Command) {
 	i := 0
 	for _, name := range sparks.ConfigurationNames {
 		c := sparks.Configurations[name]

@@ -4,6 +4,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/michaKFromParis/sparks/config"
 	"github.com/michaKFromParis/sparks/logger"
+	"github.com/michaKFromParis/sparks/sparks"
 	"github.com/spf13/cobra"
 )
 
@@ -39,6 +40,8 @@ func Execute() error {
 // Init is calling all cobra command functions here to avoid a race condition
 // with the loading of the sparks platforms / configurations first
 func Init() {
+	enabledPlatforms = make([]bool, len(sparks.Platforms))
+	enabledConfigurations = make([]bool, len(sparks.Configurations))
 	initRoot()
 	initGet()
 	initClean()

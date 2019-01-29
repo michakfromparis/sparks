@@ -27,6 +27,6 @@ var codeCmd = &cobra.Command{
 
 func initCode() {
 	rootCmd.AddCommand(codeCmd)
-	addPlatforms(codeCmd, "code")
-	addConfigurations(codeCmd)
+	addCommandPlatforms(codeCmd, "code")
+	addCommandConfigurations(codeCmd)
 }
