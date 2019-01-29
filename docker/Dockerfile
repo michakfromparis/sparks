@@ -3,6 +3,4 @@ FROM ubuntu:latest
 
 COPY sparks /usr/local/bin
 
-RUN apt-get update
-
-RUN sparks get -d --linux --webgl -v
+RUN sparks get -d --webgl --v

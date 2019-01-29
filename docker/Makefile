@@ -1,4 +1,4 @@
-include make_env
+include Makefile.config
 
 NS ?= michak
 VERSION ?= latest
@@ -7,7 +7,7 @@ IMAGE_NAME ?= sparks-builder
 CONTAINER_NAME ?= $(IMAGE_NAME)
 CONTAINER_INSTANCE ?= default
 
-all: run
+all: build run
 
 build: Dockerfile
 	$(PREBUILD)
