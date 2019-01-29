@@ -3,7 +3,7 @@ IMAGE_NAME=sparks-builder
 # default build output directory
 ROOT_DIRECTORY=$(CURDIR)/..
 # default build output directory
-SPARKS_EXECUTABLE=$(ROOT_DIRECTORY)/build/linux/sparks
+SPARKS_EXECUTABLE=$(ROOT_DIRECTORY)/build/sparks/linux/sparks
 # sparks sdk root directory
 SPARKS_SDK_ROOT?=$(HOME)/Sources/Sparks
 # sparks build root directory
