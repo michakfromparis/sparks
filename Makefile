@@ -1,11 +1,10 @@
 # constants
-
-# default source directory
+# default binary name to current directory name
+OUTPUT_NAME=$(shell basename $(CURDIR))
+# default go source directory
 SOURCE_DIRECTORY=$(GOPATH)/src
 # default build output directory
-OUTPUT_DIRECTORY=$(CURDIR)/build
-# default to current directory name
-OUTPUT_NAME=$(shell basename $(CURDIR))
+OUTPUT_DIRECTORY=$(CURDIR)/build/sparks
 # substracting GOPATH from source directory to deduct import path. i.e. github.com/user/project
 IMPORT_PATH=$(subst $(SOURCE_DIRECTORY)/,,$(CURDIR))
 # sparks sdk root directory
