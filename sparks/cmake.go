@@ -8,7 +8,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	version "github.com/hashicorp/go-version"
-	"github.com/michaKFromParis/sparks/config"
+	conf "github.com/michaKFromParis/sparks/config"
 	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/sys"
 )
@@ -64,24 +64,24 @@ func (cm *CMake) Run(outputDirectory string, args ...[]string) (string, error) {
 	if err := sys.MkDir(outputDirectory); err != nil {
 		return "could not create " + outputDirectory, err
 	}
-	cm.cmakelistsPath = filepath.Join(config.SDKDirectory, "scripts", "CMake", "Sparks")
+	cm.cmakelistsPath = filepath.Join(conf.SDKDirectory, "scripts", "CMake", "Sparks")
 	cm.AddArg(cm.cmakelistsPath)
 	return sys.ExecuteEx(cm.command, cm.outputDirectory, true, cm.arguments[0:]...)
 }
 
 func (cm *CMake) generateArgs() {
-	cm.AddDefine("SPARKS_ROOT", config.SDKDirectory)
-	cm.AddDefine("BUILD_ROOT", config.OutputDirectory)
-	cm.AddDefine("PRODUCT_ROOT", config.SourceDirectory)
-	cm.AddDefine("PRODUCT_NAME", config.ProductName)
+	cm.AddDefine("SPARKS_ROOT", conf.SDKDirectory)
+	cm.AddDefine("BUILD_ROOT", conf.OutputDirectory)
+	cm.AddDefine("PRODUCT_ROOT", conf.SourceDirectory)
+	cm.AddDefine("PRODUCT_NAME", conf.ProductName)
 
-	// if config.VeryVerbose == true {
+	// if conf.VeryVerbose == true {
 	// 	cm.AddArg("CMAKE_VERBOSE_MAKEFILE=ON --debug-output --trace")))
-	// } else if config.Verbose {
+	// } else if conf.Verbose {
 	// 	cm.AddArg(fmt.Sprintf("--debug-output --trace")))
 	// }
 
-	if config.IncludeSparksSource {
+	if conf.IncludeSparksSource {
 		cm.AddDefine("INCLUDE_SPARKS_SOURCE", "ON")
 	} else {
 		cm.AddDefine("INCLUDE_SPARKS_SOURCE", "`OFF")
@@ -111,7 +111,7 @@ func (cm *CMake) generateArgs() {
 	cm.AddDefine("PRODUCT_HEIGHT", height)
 	cm.AddDefine("PRODUCT_DEFAULT_ORIENTATION", CurrentProduct.View.DefaultOrientation)          // TODO Proper listing of orientations
 	cm.AddDefine("PRODUCT_SUPPORTED_ORIENTATIONS", CurrentProduct.View.SupportedOrientations[0]) // TODO Proper listing of orientations
-	cm.AddDefine("CMAKE_INSTALL_PREFIX", filepath.Join(config.OutputDirectory, "lib", cm.platform.Title()+"-"+cm.configuration.Title()))
+	cm.AddDefine("CMAKE_INSTALL_PREFIX", filepath.Join(conf.OutputDirectory, "lib", cm.platform.Title()+"-"+cm.configuration.Title()))
 }
 
 func parseVersion() (int, int, int, int) {

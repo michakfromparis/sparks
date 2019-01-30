@@ -76,10 +76,10 @@ func (w *Windows) generate(configuration sparks.Configuration) {
 	log.Info("sparks project generate --windows")
 
 	cmake := sparks.NewCMake(w, configuration)
-	cmake.AddArg("-G" + config.WindowsCompiler)
+	cmake.AddArg("-G" + conf.WindowsCompiler)
 	cmake.AddDefine("OS_WINDOWS", "1")
 	cmake.AddDefine("CMAKE_SYSTEM_NAME", "Windows")
-	projectsPath := filepath.Join(config.OutputDirectory, "projects", w.Title()+"-"+configuration.Title())
+	projectsPath := filepath.Join(conf.OutputDirectory, "projects", w.Title()+"-"+configuration.Title())
 	out, err := cmake.Run(projectsPath)
 	if err != nil {
 		errx.Fatalf(err, "sparks project generate failed: "+out)

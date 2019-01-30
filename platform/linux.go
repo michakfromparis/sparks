@@ -6,7 +6,7 @@ import (
 
 	"github.com/michaKFromParis/sparks/sys"
 
-	"github.com/michaKFromParis/sparks/config"
+	conf "github.com/michaKFromParis/sparks/config"
 	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/sparks"
 
@@ -120,7 +120,7 @@ func (l *Linux) generate() {
 	cmake := sparks.NewCMake(l, l.configuration)
 	cmake.AddArg("-GCodeBlocks - Unix Makefiles")
 	cmake.AddDefine("OS_LINUX", "1")
-	projectsPath := filepath.Join(config.OutputDirectory, "projects", l.Title()+"-"+l.configuration.Title())
+	projectsPath := filepath.Join(conf.OutputDirectory, "projects", l.Title()+"-"+l.configuration.Title())
 	out, err := cmake.Run(projectsPath)
 	if err != nil {
 		errx.Fatalf(err, "sparks project generate failed: "+out)
@@ -130,7 +130,7 @@ func (l *Linux) generate() {
 
 func (l *Linux) compile() {
 	log.Info("sparks project compile --linux")
-	projectsPath := filepath.Join(config.OutputDirectory, "projects", l.Title()+"-"+l.configuration.Title())
+	projectsPath := filepath.Join(conf.OutputDirectory, "projects", l.Title()+"-"+l.configuration.Title())
 	out, err := sys.ExecuteEx("make", projectsPath, true, "-j8")
 	if err != nil {
 		errx.Fatalf(err, "sparks project compile failed: "+out)

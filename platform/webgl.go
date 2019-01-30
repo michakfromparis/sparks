@@ -68,31 +68,31 @@ func (w *WebGl) Get() error {
 		return err
 	}
 	if installNeeded {
-		output, err := sys.Execute("git", "clone", "--depth", "1", "https://github.com/juj/emsdk.git", config.EmscriptenSDKRoot)
+		output, err := sys.Execute("git", "clone", "--depth", "1", "https://github.com/juj/emsdk.git", conf.EmscriptenSDKRoot)
 		if err != nil {
 			return errorx.Decorate(err, "failed to clone Emscripten repo: %s", output)
 		}
 	}
-	log.Debug("Emscripten SDK installed at: " + config.EmscriptenSDKRoot)
+	log.Debug("Emscripten SDK installed at: " + conf.EmscriptenSDKRoot)
 
 	if installVersion, err = w.checkEmscriptenSDKVersionInstallion(); err != nil {
 		return err
 	}
 	if installVersion {
 		if !installNeeded {
-			output, err := sys.Execute("git", "pull", config.EmscriptenSDKRoot)
+			output, err := sys.Execute("git", "pull", conf.EmscriptenSDKRoot)
 			if err != nil {
 				return errorx.Decorate(err, "failed to update Emscripten SDK: %s", output)
 			}
 		}
-		emsdkPath := filepath.Join(config.EmscriptenSDKRoot, "emsdk")
-		output, err := sys.Execute(emsdkPath, "install", "--build=Release", "sdk-"+config.EmscriptenVersion+"-64bit", "binaryen-master-64bit")
+		emsdkPath := filepath.Join(conf.EmscriptenSDKRoot, "emsdk")
+		output, err := sys.Execute(emsdkPath, "install", "--build=Release", "sdk-"+conf.EmscriptenVersion+"-64bit", "binaryen-master-64bit")
 		if err != nil {
-			return errorx.Decorate(err, "failed to emsdk install version %s: %s", config.EmscriptenVersion, output)
+			return errorx.Decorate(err, "failed to emsdk install version %s: %s", conf.EmscriptenVersion, output)
 		}
-		output, err = sys.Execute(emsdkPath, "activate", "--build=Release", "sdk-"+config.EmscriptenVersion+"-64bit", "binaryen-master-64bit")
+		output, err = sys.Execute(emsdkPath, "activate", "--build=Release", "sdk-"+conf.EmscriptenVersion+"-64bit", "binaryen-master-64bit")
 		if err != nil {
-			return errorx.Decorate(err, "failed to emsdk install version %s: %s", config.EmscriptenVersion, output)
+			return errorx.Decorate(err, "failed to emsdk install version %s: %s", conf.EmscriptenVersion, output)
 		}
 
 		if err = w.createLatestSymlink(); err != nil {
@@ -140,12 +140,12 @@ func (w *WebGl) prebuild() {
 func (w *WebGl) generate() {
 	log.Info("sparks project generate --webgl")
 
-	cmakeToolchainFile := filepath.Join(config.SDKDirectory, "scripts", "CMake", "toolchains", "Emscripten.cmake")
+	cmakeToolchainFile := filepath.Join(conf.SDKDirectory, "scripts", "CMake", "toolchains", "Emscripten.cmake")
 	cmake := sparks.NewCMake(w, w.configuration)
 	cmake.AddDefine("OS_EMSCRIPTEN", "1")
 	cmake.AddDefine("CMAKE_TOOLCHAIN_FILE", cmakeToolchainFile)
-	cmake.AddDefine("EMSCRIPTEN_ROOT_PATH", filepath.Join(filepath.Join(config.EmscriptenSDKRoot, "emscripten"), config.EmscriptenVersion))
-	projectsPath := filepath.Join(config.OutputDirectory, "projects", w.Title()+"-"+w.configuration.Title())
+	cmake.AddDefine("EMSCRIPTEN_ROOT_PATH", filepath.Join(filepath.Join(conf.EmscriptenSDKRoot, "emscripten"), conf.EmscriptenVersion))
+	projectsPath := filepath.Join(conf.OutputDirectory, "projects", w.Title()+"-"+w.configuration.Title())
 	out, err := cmake.Run(projectsPath)
 	if err != nil {
 		errx.Fatalf(err, "sparks project generate failed: "+out)
@@ -155,7 +155,7 @@ func (w *WebGl) generate() {
 
 func (w *WebGl) compile() {
 	log.Info("sparks project compile --webgl")
-	projectsPath := filepath.Join(config.OutputDirectory, "projects", w.Title()+"-"+w.configuration.Title())
+	projectsPath := filepath.Join(conf.OutputDirectory, "projects", w.Title()+"-"+w.configuration.Title())
 	out, err := sys.ExecuteEx("make", projectsPath, true, "-j8")
 	if err != nil {
 		errx.Fatalf(err, "sparks project compile failed: "+out)

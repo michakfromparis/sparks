@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/michaKFromParis/sparks/config"
 	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/sparks"
 	"github.com/michaKFromParis/sparks/sys"
@@ -63,7 +62,7 @@ func (o *Osx) Code(configuration sparks.Configuration) error {
 
 // Build builds the platform
 func (o *Osx) Build(configuration sparks.Configuration) error {
-	projectDirectory := filepath.Join(config.OutputDirectory, "projects", o.Title()+"-"+configuration.Title())
+	projectDirectory := filepath.Join(conf.OutputDirectory, "projects", o.Title()+"-"+configuration.Title())
 	o.prebuild()
 	o.generate(configuration, projectDirectory)
 	o.compile(configuration, projectDirectory)
@@ -114,8 +113,8 @@ func (o *Osx) generate(configuration sparks.Configuration, projectDirectory stri
 	cmake.AddDefine("CMAKE_C_COMPILER", cc)
 	cmake.AddDefine("CMAKE_CXX_COMPILER", cpp)
 	cmake.AddDefine("XCODE_SIGNING_IDENTITY", o.signingIdentity.Name)
-	cmake.AddDefine("CMAKE_OSX_ARCHITECTURES", config.SparksOSXArchitecture)
-	cmake.AddDefine("CMAKE_OSX_DEPLOYMENT_TARGET", config.SparksOSXDeploymentTarget)
+	cmake.AddDefine("CMAKE_OSX_ARCHITECTURES", conf.SparksOSXArchitecture)
+	cmake.AddDefine("CMAKE_OSX_DEPLOYMENT_TARGET", conf.SparksOSXDeploymentTarget)
 
 	out, err := cmake.Run(projectDirectory)
 	//log.Trace("cmake output" + out)

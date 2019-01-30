@@ -7,7 +7,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/joomcode/errorx"
-	"github.com/michaKFromParis/sparks/config"
+	conf "github.com/michaKFromParis/sparks/config"
 	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/sys"
 )
@@ -18,7 +18,7 @@ var CurrentProduct = Product{}
 // Init needs to be called once at the beggining of the program to Initialize Sparks
 func Init() {
 	log.Info("sparks init")
-	if err := config.Init(); err != nil {
+	if err := conf.Init(); err != nil {
 		errx.Fatalf(err, "Configuration initialization failed")
 	}
 }
@@ -44,7 +44,7 @@ func Get() error {
 	for _, platformName := range PlatformNames {
 		platform := Platforms[platformName]
 		if platform != nil && platform.Enabled() {
-			if config.GetDependencies {
+			if conf.GetDependencies {
 				log.Info("sparks get --dependencies --" + platform.Name())
 				err := platform.Get()
 				if err != nil {
@@ -71,7 +71,7 @@ func Code(sourceDirectory string, outputDirectory string) error {
 			for _, configurationName := range ConfigurationNames {
 				configuration := Configurations[configurationName]
 				if configuration != nil && configuration.Enabled() {
-					log.Infof("sparks code --%s --%s --name %s", platform.Name(), configuration.Name(), config.ProductName)
+					log.Infof("sparks code --%s --%s --name %s", platform.Name(), configuration.Name(), conf.ProductName)
 					if err := platform.Code(configuration); err != nil {
 						return errorx.Decorate(err, "sparks code failed for %s-%s", platform.Title(), configuration.Title())
 					}
@@ -91,19 +91,19 @@ func Build(sourceDirectory string, outputDirectory string) error {
 	}
 	log.Tracef("loaded product:%s%+v", sys.NewLine, CurrentProduct)
 	createBuildDirectoryStructure()
-	sparksSourceDirectory := filepath.Join(config.SDKDirectory, "src", config.SDKName)
-	sparksPlayerSourceDirectory := filepath.Join(config.SDKDirectory, "src", config.PlayerName)
-	if config.GenerateLua {
-		GenerateLuaBindings(sparksSourceDirectory, config.SDKName)
+	sparksSourceDirectory := filepath.Join(conf.SDKDirectory, "src", conf.SDKName)
+	sparksPlayerSourceDirectory := filepath.Join(conf.SDKDirectory, "src", conf.PlayerName)
+	if conf.GenerateLua {
+		GenerateLuaBindings(sparksSourceDirectory, conf.SDKName)
 		// TODO fix math constants sys.Sed(filename, regex, newContent)
 		GenerateLuaBindings(sparksSourceDirectory, "SparksNetworksLua")
 		// TODO the line below probably should stay like this to build other c++ projects
-		// GenerateLuaBindings(sparksPlayerSourceDirectory, config.ProductName)
-		GenerateLuaBindings(sparksPlayerSourceDirectory, config.PlayerName)
+		// GenerateLuaBindings(sparksPlayerSourceDirectory, conf.ProductName)
+		GenerateLuaBindings(sparksPlayerSourceDirectory, conf.PlayerName)
 	}
-	generateIcons(filepath.Join(config.SDKDirectory, "Assets", "Icon"))
-	generateIcons(filepath.Join(config.SDKDirectory, "Assets", "SparksPlayerIcon"))
-	generateSplash(filepath.Join(config.SDKDirectory, "Assets", "Splash"))
+	generateIcons(filepath.Join(conf.SDKDirectory, "Assets", "Icon"))
+	generateIcons(filepath.Join(conf.SDKDirectory, "Assets", "SparksPlayerIcon"))
+	generateSplash(filepath.Join(conf.SDKDirectory, "Assets", "Splash"))
 	// iterating through all enabled platforms in all enabled configurations
 	// to call Platform.Build
 	for _, platformName := range PlatformNames {
@@ -113,7 +113,7 @@ func Build(sourceDirectory string, outputDirectory string) error {
 				configuration := Configurations[configurationName]
 				if configuration != nil && configuration.Enabled() {
 					start := time.Now()
-					log.Infof("sparks build --%s --%s --name %s", platform.Name(), configuration.Name(), config.ProductName)
+					log.Infof("sparks build --%s --%s --name %s", platform.Name(), configuration.Name(), conf.ProductName)
 
 					if err := platform.Build(configuration); err != nil {
 						return errorx.Decorate(err, "sparks build failed for %s-%s", platform.Title(), configuration.Title())
@@ -155,18 +155,18 @@ func checkParameters(sourceDirectory string, outputDirectory string) { // TODO C
 	if !file.IsDir() {
 		errx.Fatalf(err, "source directory is not a directory: "+sourceDirectory)
 	}
-	config.SourceDirectory = sourceDirectory
-	config.OutputDirectory = outputDirectory
-	config.SDKDirectory = sourceDirectory
-	log.Debugf("SDK Directory: %s", config.SDKDirectory)
-	log.Debugf("Source Directory: %s", config.SourceDirectory)
+	conf.SourceDirectory = sourceDirectory
+	conf.OutputDirectory = outputDirectory
+	conf.SDKDirectory = sourceDirectory
+	log.Debugf("SDK Directory: %s", conf.SDKDirectory)
+	log.Debugf("Source Directory: %s", conf.SourceDirectory)
 }
 
 func createBuildDirectoryStructure() {
 	log.Trace("creating build/bin, build/lib, build/projects")
-	var binPath = filepath.Join(config.OutputDirectory, "bin")
-	var libPath = filepath.Join(config.OutputDirectory, "lib")
-	var projectsPath = filepath.Join(config.OutputDirectory, "projects")
+	var binPath = filepath.Join(conf.OutputDirectory, "bin")
+	var libPath = filepath.Join(conf.OutputDirectory, "lib")
+	var projectsPath = filepath.Join(conf.OutputDirectory, "projects")
 	if err := os.MkdirAll(binPath, os.ModePerm); err != nil {
 		log.Warn("failed to create build bin directory: " + binPath)
 	}

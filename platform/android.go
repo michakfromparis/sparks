@@ -80,15 +80,15 @@ func (a *Android) generate(configuration sparks.Configuration) {
 	if err != nil {
 		errx.Fatal(err)
 	}
-	cmakeToolchainFile := filepath.Join(config.SDKDirectory, "scripts", "CMake", "toolchains", "Android.cmake")
+	cmakeToolchainFile := filepath.Join(conf.SDKDirectory, "scripts", "CMake", "toolchains", "Android.cmake")
 
 	cmake := sparks.NewCMake(a, configuration)
 	cmake.AddArg("-GEclipse CDT4 - Unix Makefiles")
 	cmake.AddDefine("OS_ANDROID", "1")
 	cmake.AddDefine("CMAKE_TOOLCHAIN_FILE", cmakeToolchainFile)
 	cmake.AddDefine("NDK_CCACHE", ccachePath)
-	cmake.AddDefine("ANDROID_NDK_RELEASE", config.SpakrsAndroidNDKVersion)
-	cmake.AddDefine("ANDROID_NATIVE_API_LEVEL", "android-"+string(config.SparksAndroidAPILevel))
+	cmake.AddDefine("ANDROID_NDK_RELEASE", conf.SpakrsAndroidNDKVersion)
+	cmake.AddDefine("ANDROID_NATIVE_API_LEVEL", "android-"+string(conf.SparksAndroidAPILevel))
 	// "-DLIBRARY_OUTPUT_PATH_ROOT=${buildRoot}/lib/${platformName}-${buildConfiguration}"
 }
 

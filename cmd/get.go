@@ -2,7 +2,7 @@ package cmd
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/michaKFromParis/sparks/config"
+	conf "github.com/michaKFromParis/sparks/config"
 	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/sparks"
 	"github.com/spf13/cobra"
@@ -27,7 +27,7 @@ func get(cmd *cobra.Command, args []string) {
 func initGet() {
 	log.Tracef("registered platforms: %d", len(sparks.Platforms))
 	getCmd.Flags().SortFlags = false
-	getCmd.Flags().BoolVarP(&config.GetDependencies, "dependencies", "d", true, "get system dependencies")
+	getCmd.Flags().BoolVarP(&conf.GetDependencies, "dependencies", "d", true, "get system dependencies")
 	addCommandPlatforms(getCmd, "get")
 	rootCmd.AddCommand(getCmd)
 }

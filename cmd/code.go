@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/michaKFromParis/sparks/config"
+	conf "github.com/michaKFromParis/sparks/config"
 	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/sparks"
 	"github.com/spf13/cobra"
@@ -17,7 +17,7 @@ var codeCmd = &cobra.Command{
 		sparks.SetEnabledPlatforms(enabledPlatforms)
 		sparks.SetEnabledConfigurations(enabledConfigurations)
 		for _, sourceDirectory := range args {
-			if err := sparks.Code(sourceDirectory, config.OutputDirectory); err != nil {
+			if err := sparks.Code(sourceDirectory, conf.OutputDirectory); err != nil {
 				errx.Fatal(err)
 			}
 		}

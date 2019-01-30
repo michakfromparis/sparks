@@ -65,8 +65,8 @@ func (i *Ios) Clean() error {
 // Code opens the code editor for the project
 func (i *Ios) Code(configuration sparks.Configuration) error {
 	i.configuration = configuration
-	projectDirectory := filepath.Join(config.OutputDirectory, "projects", i.Title()+"-"+i.configuration.Title())
-	projectFilename := filepath.Join(projectDirectory, "iphoneos", config.ProductName+".xcodeproj")
+	projectDirectory := filepath.Join(conf.OutputDirectory, "projects", i.Title()+"-"+i.configuration.Title())
+	projectFilename := filepath.Join(projectDirectory, "iphoneos", conf.ProductName+".xcodeproj")
 	i.prebuild()
 	i.generate(projectDirectory)
 	_, err := sys.Execute("open", projectFilename)
@@ -79,7 +79,7 @@ func (i *Ios) Code(configuration sparks.Configuration) error {
 // Build builds the platform
 func (i *Ios) Build(configuration sparks.Configuration) error {
 	i.configuration = configuration
-	projectDirectory := filepath.Join(config.OutputDirectory, "projects", i.Title()+"-"+configuration.Title())
+	projectDirectory := filepath.Join(conf.OutputDirectory, "projects", i.Title()+"-"+configuration.Title())
 	i.prebuild()
 	i.generate(projectDirectory)
 	i.compile(projectDirectory)
@@ -104,9 +104,9 @@ func (i *Ios) prebuild() {
 
 func (i *Ios) importProvisioningProfile() {
 	log.Debug("looking for provioning profile")
-	keysDirectory := filepath.Join(config.SourceDirectory, "conf", "keys", "ios", "development")
+	keysDirectory := filepath.Join(conf.SourceDirectory, "conf", "keys", "ios", "development")
 	if i.configuration.Name() == "shipping" {
-		keysDirectory = filepath.Join(config.SourceDirectory, "conf", "keys", "ios", "distribution")
+		keysDirectory = filepath.Join(conf.SourceDirectory, "conf", "keys", "ios", "distribution")
 	}
 	provisioningFilename, err := sys.Execute("find", keysDirectory, "-name", "*.mobileprovision")
 	provisioningFilename = strings.TrimSpace(provisioningFilename)
@@ -134,15 +134,15 @@ func (i *Ios) importProvisioningProfile() {
 func (i *Ios) generate(projectDirectory string) {
 	log.Info("sparks project generate --ios")
 
-	iosSysRoot, err := sys.ExecuteEx("xcodebuild", "", true, "-sdk", config.SparksiOSSDK, "-version", "Path")
+	iosSysRoot, err := sys.ExecuteEx("xcodebuild", "", true, "-sdk", conf.SparksiOSSDK, "-version", "Path")
 	if err != nil {
 		errx.Fatalf(err, "could not determine ios sysroot")
 	}
 	iosSysRoot = strings.TrimSpace(iosSysRoot)
 	log.Tracef("ios sysroot: %s", iosSysRoot)
 
-	cmakeToolchainFile := filepath.Join(config.SDKDirectory, "scripts", "CMake", "toolchains", "iOS.cmake")
-	libraryPath := filepath.Join(config.OutputDirectory, "lib", i.Title()+"-"+i.configuration.Title())
+	cmakeToolchainFile := filepath.Join(conf.SDKDirectory, "scripts", "CMake", "toolchains", "iOS.cmake")
+	libraryPath := filepath.Join(conf.OutputDirectory, "lib", i.Title()+"-"+i.configuration.Title())
 
 	cmake := sparks.NewCMake(i, i.configuration)
 
@@ -158,7 +158,7 @@ func (i *Ios) generate(projectDirectory string) {
 		cmake.AddDefine("XCODE_PROVISIONING_PROFILE_UUID", i.provisioningID)
 	}
 	cmake.AddDefine("CMAKE_TOOLCHAIN_FILE", cmakeToolchainFile)
-	cmake.AddDefine("PRODUCT_BUNDLE_IDENTIFIER", config.BundleIdentifier)
+	cmake.AddDefine("PRODUCT_BUNDLE_IDENTIFIER", conf.BundleIdentifier)
 	cmake.AddDefine("CMAKE_OSX_SYSROOT", iosSysRoot)
 	cmake.AddDefine("CMAKE_IOS_SYSROOT", iosSysRoot)
 

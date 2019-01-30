@@ -7,7 +7,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/joomcode/errorx"
-	"github.com/michaKFromParis/sparks/config"
+	conf "github.com/michaKFromParis/sparks/config"
 	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/sys"
 )
@@ -77,10 +77,10 @@ func (xc *XCode) Build(directory string, arg ...string) error {
 	xc.arguments = append(xc.arguments, "-parallelizeTargets")
 	xc.arguments = append(xc.arguments, "-verbose")
 	xc.arguments = append(xc.arguments, "build")
-	xc.arguments = append(xc.arguments, "-project", config.ProductName+".xcodeproj")
-	xc.arguments = append(xc.arguments, "-target", config.ProductName)
+	xc.arguments = append(xc.arguments, "-project", conf.ProductName+".xcodeproj")
+	xc.arguments = append(xc.arguments, "-target", conf.ProductName)
 	if xc.platform.Name() != "ios" {
-		xc.arguments = append(xc.arguments, "-sdk", config.SparksOSXSDK)
+		xc.arguments = append(xc.arguments, "-sdk", conf.SparksOSXSDK)
 	}
 	xc.arguments = append(xc.arguments, "-configuration", xc.configuration.Title())
 	xc.arguments = append(xc.arguments, arg...)

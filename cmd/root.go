@@ -53,6 +53,6 @@ func Init() {
 func initRoot() {
 	log.Trace("root init")
 	rootCmd.Flags().SortFlags = false
-	rootCmd.PersistentFlags().BoolVarP(&config.Verbose, "verbose", "v", false, "set log verbose level to debug")
-	rootCmd.PersistentFlags().BoolVarP(&config.VeryVerbose, "v", "", false, "set log verbose level to trace")
+	rootCmd.PersistentFlags().BoolVarP(&conf.Verbose, "verbose", "v", false, "set log verbose level to debug")
+	rootCmd.PersistentFlags().BoolVarP(&conf.VeryVerbose, "v", "", false, "set log verbose level to trace")
 }

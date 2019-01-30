@@ -8,7 +8,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/joomcode/errorx"
-	"github.com/michaKFromParis/sparks/config"
+	conf "github.com/michaKFromParis/sparks/config"
 	"github.com/michaKFromParis/sparks/errx"
 	yaml "gopkg.in/yaml.v2"
 )
@@ -52,7 +52,7 @@ type Product struct {
 func (p *Product) Load() error {
 	filename, err := p.findSparksFile()
 	if err != nil {
-		errx.Fatalf(err, "Could not find a sparks file at "+config.SourceDirectory)
+		errx.Fatalf(err, "Could not find a sparks file at "+conf.SourceDirectory)
 	}
 	log.Debug("loading product from " + filename)
 	bytes, err := ioutil.ReadFile(filename)
@@ -70,7 +70,7 @@ func (p *Product) Load() error {
 func (p *Product) Save() {
 	filename, err := p.findSparksFile()
 	if err != nil {
-		errx.Fatalf(err, "Could not find a sparks file at "+config.SourceDirectory)
+		errx.Fatalf(err, "Could not find a sparks file at "+conf.SourceDirectory)
 	}
 	log.Debug("saving product to " + filename)
 	data, err := yaml.Marshal(p)
@@ -83,38 +83,38 @@ func (p *Product) Save() {
 	}
 }
 
-// look for a .sparks file in config.SourceDirectory) and return it
+// look for a .sparks file in conf.SourceDirectory) and return it
 func (p *Product) findSparksFile() (string, error) {
 	if p.sparksFilename != "" {
 		return p.sparksFilename, nil
 	}
-	log.Tracef("opening %s", config.SourceDirectory)
-	f, err := os.Open(config.SourceDirectory)
+	log.Tracef("opening %s", conf.SourceDirectory)
+	f, err := os.Open(conf.SourceDirectory)
 	if err != nil {
-		return "", errorx.Decorate(err, "Could not open SourceDirectory: "+config.SourceDirectory)
+		return "", errorx.Decorate(err, "Could not open SourceDirectory: "+conf.SourceDirectory)
 	}
 	files, err := f.Readdir(-1)
 	if err != nil {
 		if err = f.Close(); err != nil {
-			return "", errorx.Decorate(err, "Could not close SourceDirectory: "+config.SourceDirectory)
+			return "", errorx.Decorate(err, "Could not close SourceDirectory: "+conf.SourceDirectory)
 		}
-		return "", errorx.Decorate(err, "Could not read SourceDirectory: "+config.SourceDirectory)
+		return "", errorx.Decorate(err, "Could not read SourceDirectory: "+conf.SourceDirectory)
 	}
 	if err = f.Close(); err != nil {
-		return "", errorx.Decorate(err, "Could not close SourceDirectory: "+config.SourceDirectory)
+		return "", errorx.Decorate(err, "Could not close SourceDirectory: "+conf.SourceDirectory)
 	}
 	// log.Trace("files in SourceDirectory:")
 	p.sparksFilename = ""
 	for _, file := range files {
 		// log.Trace(file.Name())
 		if strings.HasSuffix(file.Name(), ".sparks") {
-			p.sparksFilename = filepath.Join(config.SourceDirectory, file.Name())
+			p.sparksFilename = filepath.Join(conf.SourceDirectory, file.Name())
 			log.Debugf("found a .sparks file at: %s", p.sparksFilename)
 			break
 		}
 	}
 	if p.sparksFilename == "" {
-		return "", errorx.Decorate(nil, "could not find a .sparks file at "+config.SourceDirectory)
+		return "", errorx.Decorate(nil, "could not find a .sparks file at "+conf.SourceDirectory)
 	}
 	return p.sparksFilename, nil
 }
