@@ -1,11 +1,9 @@
 package platform
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
 
 	"github.com/joomcode/errorx"
 	"github.com/michaKFromParis/sparks/sys"
@@ -111,107 +109,6 @@ func (w *WebGl) Get() error {
 		if err != nil {
 			return fmt.Errorf("failed to build sdl test: %s", output)
 		}
-	}
-	return nil
-}
-
-func (w *WebGl) createEmscriptenSDKRoot() error {
-	file, err := os.Stat(config.EmscriptenSDKRoot)
-	if err != nil {
-		if os.IsNotExist(err) {
-			log.Debug("could not find Emscripten SDK directory at: " + config.EmscriptenSDKRoot)
-			log.Debug("Creating it.")
-			if err := os.MkdirAll(config.EmscriptenSDKRoot, os.ModePerm); err != nil {
-				return errorx.Decorate(err, "Could not create Emscripten SDK directory: "+config.EmscriptenSDKRoot)
-			}
-		} else {
-			return errorx.Decorate(err, "Could not open Emscripten directory: "+config.EmscriptenSDKRoot)
-		}
-	} else if !file.IsDir() {
-		return errorx.Decorate(err, "Emscripten SDK path is not a directory: "+config.EmscriptenSDKRoot)
-	}
-	return nil
-}
-
-func (w *WebGl) checkEmscriptenSDKInstallion() (bool, error) {
-	emsdkPath := filepath.Join(config.EmscriptenSDKRoot, "emsdk")
-	file, err := os.Stat(emsdkPath)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return true, nil
-		}
-		return false, errorx.Decorate(err, "Could not open emsdk: "+emsdkPath)
-	}
-	if file.IsDir() {
-		return false, errorx.Decorate(err, "emscripten emsdk is a directory: "+emsdkPath)
-	}
-	return true, nil
-}
-
-func (w *WebGl) checkEmscriptenSDKVersionInstallion() (bool, error) {
-	sdkVersionPath := filepath.Join(config.EmscriptenSDKRoot, "emscripten", config.EmscriptenVersion)
-	file, err := os.Stat(sdkVersionPath)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return true, nil
-		}
-		return false, errorx.Decorate(err, "Could not open emscripten SDK version "+config.EmscriptenVersion+"at: "+sdkVersionPath)
-	}
-	if !file.IsDir() {
-		return false, errorx.Decorate(err, "Emscripten sdk version is not a directory: "+sdkVersionPath)
-	}
-	return true, nil
-}
-
-func (w *WebGl) createLatestSymlink() error {
-	log.Debug("creating emscripten latest symlink")
-	w.SetEnv()
-	target := os.Getenv("EMSCRIPTEN")
-	symlink := filepath.Join(config.EmscriptenSDKRoot, "emscripten", "latest")
-	if err := os.Symlink(target, symlink); err != nil {
-		return errorx.Decorate(err, "failed to create latest symlink")
-	}
-	return nil
-}
-
-// SetEnv generates the emsdk environment variable file, parses it and sets system env variables accordingly
-func (w *WebGl) SetEnv() (rerr error) {
-	log.Debug("Setting emscripten environment variables")
-	emsdkEnv := filepath.Join(config.EmscriptenSDKRoot, "emsdk_env.sh")
-	output, err := sys.ExecuteEx("bash", "", true, "-c", emsdkEnv)
-	if err != nil {
-		return errorx.Decorate(err, "failed to call emsdk_env.sh: "+output)
-	}
-	emsdkSetEnv := filepath.Join(config.EmscriptenSDKRoot, "emsdk_set_env.sh")
-	file, err := os.Open(emsdkSetEnv)
-	if err != nil {
-		return errorx.Decorate(err, "could not open emsdk_set_env.sh")
-	}
-	defer func() {
-		err := file.Close()
-		if err != nil {
-			rerr = err
-		}
-	}()
-
-	scanner := bufio.NewScanner(file)
-	re := regexp.MustCompile("export (.*)=\"(.*)\"")
-	lineNumber := 0
-	for scanner.Scan() {
-		line := scanner.Text()
-		lineNumber++
-		if !re.MatchString(line) {
-			return fmt.Errorf("could not parse line %d of emsdk_set_env.sh: %s", lineNumber, line)
-		}
-		envVarName := re.FindStringSubmatch(line)[1]
-		envVarValue := re.FindStringSubmatch(line)[2]
-		log.Debugf("%s=%s", envVarName, envVarValue)
-		if err = os.Setenv(envVarName, envVarValue); err != nil {
-			return errorx.Decorate(err, "failed to set environment variable %s to %s", envVarName, envVarValue)
-		}
-	}
-	if err := scanner.Err(); err != nil {
-		return errorx.Decorate(err, "could not read lines of emsdk_set_env.sh")
 	}
 	return nil
 }
