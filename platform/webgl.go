@@ -49,17 +49,15 @@ func (w *WebGl) SetEnabled(enabled bool) {
 func (w *WebGl) Get() error {
 	log.Info("Installing dependencies for " + w.Title())
 	deps := sparks.Deps{}
-	if err := deps.Update(); err != nil {
+	var err error
+
+	if err = deps.Update(); err != nil {
 		return err
 	}
-	deps.Get("python")
-	deps.Get("unzip")
-	deps.Get("cmake")
-	deps.Get("git")
-	deps.Get("g++")
-	deps.Get("default-jre")
+	if err = deps.Get("python", "unzip", "cmake", "git", "g++", "default-jre"); err != nil {
+		return err
+	}
 
-	var err error
 	installNeeded := false
 	installVersion := false
 

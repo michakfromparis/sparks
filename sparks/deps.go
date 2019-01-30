@@ -2,6 +2,7 @@ package sparks
 
 import (
 	"fmt"
+	"strings"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/michaKFromParis/sparks/sys"
@@ -31,7 +32,8 @@ func (d *Deps) Update() error {
 }
 
 // Get install a package from its name
-func (d *Deps) Get(name string) error {
+func (d *Deps) Get(names ...string) error {
+	name := strings.Join(names, " ")
 	log.Debugf("sparks get %s", name)
 	os, _ := sys.GetOs()
 	switch os {
