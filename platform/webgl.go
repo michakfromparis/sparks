@@ -18,7 +18,8 @@ import (
 
 // WebGl represents the WebGl platform
 type WebGl struct {
-	enabled bool
+	enabled       bool
+	configuration sparks.Configuration
 }
 
 // Name is the lowercase name of the platform
@@ -227,8 +228,9 @@ func (w *WebGl) Code(configuration sparks.Configuration) error {
 
 // Build builds the platform
 func (w *WebGl) Build(configuration sparks.Configuration) error {
+	w.configuration = configuration
 	w.prebuild()
-	w.generate(configuration)
+	w.generate()
 	w.compile()
 	w.postbuild()
 	return nil
@@ -238,15 +240,15 @@ func (w *WebGl) prebuild() {
 
 }
 
-func (w *WebGl) generate(configuration sparks.Configuration) {
+func (w *WebGl) generate() {
 	log.Info("sparks project generate --webgl")
 
 	cmakeToolchainFile := filepath.Join(config.SDKDirectory, "scripts", "CMake", "toolchains", "Emscripten.cmake")
-	cmake := sparks.NewCMake(w, configuration)
+	cmake := sparks.NewCMake(w, w.configuration)
 	cmake.AddDefine("OS_EMSCRIPTEN", "1")
 	cmake.AddDefine("CMAKE_TOOLCHAIN_FILE", cmakeToolchainFile)
 	cmake.AddDefine("EMSCRIPTEN_ROOT_PATH", filepath.Join(filepath.Join(config.EmscriptenSDKRoot, "emscripten"), config.EmscriptenVersion))
-	projectsPath := filepath.Join(config.OutputDirectory, "projects", w.Title()+"-"+configuration.Title())
+	projectsPath := filepath.Join(config.OutputDirectory, "projects", w.Title()+"-"+w.configuration.Title())
 	out, err := cmake.Run(projectsPath)
 	if err != nil {
 		errx.Fatalf(err, "sparks project generate failed: "+out)
@@ -255,6 +257,12 @@ func (w *WebGl) generate(configuration sparks.Configuration) {
 }
 
 func (w *WebGl) compile() {
+	log.Info("sparks project compile --webgl")
+	projectsPath := filepath.Join(config.OutputDirectory, "projects", w.Title()+"-"+w.configuration.Title())
+	out, err := sys.ExecuteEx("make", projectsPath, true, "-j8")
+	if err != nil {
+		errx.Fatalf(err, "sparks project compile failed: "+out)
+	}
 }
 
 func (w *WebGl) postbuild() {
