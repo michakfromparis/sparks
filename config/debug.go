@@ -1,4 +1,4 @@
-package configuration
+package config
 
 // Debug represents the Debug build configuration
 type Debug struct {

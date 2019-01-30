@@ -1,4 +1,4 @@
-package configuration
+package config
 
 // Release represents the Debug build configuration
 type Release struct {
