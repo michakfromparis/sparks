@@ -96,6 +96,10 @@ func (w *WebGl) Get() error {
 			return errorx.Decorate(err, "failed to emsdk install version %s: %s", config.EmscriptenVersion, output)
 		}
 
+		if err = w.createLatestSymlink(); err != nil {
+			return err
+		}
+
 		log.Debug("Building a simple test to download and build SDL2 port")
 		log.Debug("Otherwise, the build fails when calling make -j 8")
 		if err = w.SetEnv(); err != nil {
@@ -156,6 +160,17 @@ func (w *WebGl) checkEmscriptenSDKVersionInstallion() (bool, error) {
 		return false, errorx.Decorate(err, "Emscripten sdk version is not a directory: "+sdkVersionPath)
 	}
 	return true, nil
+}
+
+func (w *WebGl) createLatestSymlink() error {
+	log.Debug("creating emscripten latest symlink")
+	w.SetEnv()
+	target := os.Getenv("EMSCRIPTEN")
+	symlink := filepath.Join(config.EmscriptenSDKRoot, "emscripten", "latest")
+	if err := os.Symlink(target, symlink); err != nil {
+		return errorx.Decorate(err, "failed to create latest symlink")
+	}
+	return nil
 }
 
 // SetEnv generates the emsdk environment variable file, parses it and sets system env variables accordingly
