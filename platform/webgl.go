@@ -1,10 +1,13 @@
 package platform
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 
+	"github.com/joomcode/errorx"
 	"github.com/michaKFromParis/sparks/sys"
 
 	log "github.com/Sirupsen/logrus"
@@ -53,75 +56,146 @@ func (w *WebGl) Get() error {
 	deps.Get("cmake")
 	deps.Get("git")
 	deps.Get("g++")
+	deps.Get("default-jre")
 
+	var err error
+	installNeeded := false
+	installVersion := false
+
+	if err = w.createEmscriptenSDKRoot(); err != nil {
+		return err
+	}
+	if installNeeded, err = w.checkEmscriptenSDKInstallion(); err != nil {
+		return err
+	}
+	if installNeeded {
+		output, err := sys.Execute("git", "clone", "--depth", "1", "https://github.com/juj/emsdk.git", config.EmscriptenSDKRoot)
+		if err != nil {
+			return errorx.Decorate(err, "failed to clone Emscripten repo: %s", output)
+		}
+	}
+	log.Debug("Emscripten SDK installed at: " + config.EmscriptenSDKRoot)
+
+	if installVersion, err = w.checkEmscriptenSDKVersionInstallion(); err != nil {
+		return err
+	}
+	if installVersion {
+		if !installNeeded {
+			output, err := sys.Execute("git", "pull", config.EmscriptenSDKRoot)
+			if err != nil {
+				return errorx.Decorate(err, "failed to update Emscripten SDK: %s", output)
+			}
+		}
+		emsdkPath := filepath.Join(config.EmscriptenSDKRoot, "emsdk")
+		output, err := sys.Execute(emsdkPath, "install", "--build=Release", "sdk-"+config.EmscriptenVersion+"-64bit", "binaryen-master-64bit")
+		if err != nil {
+			return errorx.Decorate(err, "failed to emsdk install version %s: %s", config.EmscriptenVersion, output)
+		}
+		output, err = sys.Execute(emsdkPath, "activate", "--build=Release", "sdk-"+config.EmscriptenVersion+"-64bit", "binaryen-master-64bit")
+		if err != nil {
+			return errorx.Decorate(err, "failed to emsdk install version %s: %s", config.EmscriptenVersion, output)
+		}
+
+		log.Debug("Building a simple test to download and build SDL2 port")
+		log.Debug("Otherwise, the build fails when calling make -j 8")
+		if err = w.SetEnv(); err != nil {
+			return errorx.Decorate(err, "failed to set emscripten environment")
+		}
+		emscriptenPath := os.Getenv("EMSCRIPTEN")
+		output, err = sys.ExecuteEx("emcc", "/tmp", true, "-s", "USE_SDL=2", filepath.Join(emscriptenPath, "tests", "hello_world.c"))
+		if err != nil {
+			return fmt.Errorf("failed to build sdl test: %s", output)
+		}
+	}
+	return nil
+}
+
+func (w *WebGl) createEmscriptenSDKRoot() error {
 	file, err := os.Stat(config.EmscriptenSDKRoot)
 	if err != nil {
 		if os.IsNotExist(err) {
 			log.Debug("could not find Emscripten SDK directory at: " + config.EmscriptenSDKRoot)
 			log.Debug("Creating it.")
 			if err := os.MkdirAll(config.EmscriptenSDKRoot, os.ModePerm); err != nil {
-				errx.Fatalf(err, "Could not create Emscripten SDK directory: "+config.EmscriptenSDKRoot)
+				return errorx.Decorate(err, "Could not create Emscripten SDK directory: "+config.EmscriptenSDKRoot)
 			}
 		} else {
-			errx.Fatalf(err, "Could not open Emscripten directory: "+config.EmscriptenSDKRoot)
+			return errorx.Decorate(err, "Could not open Emscripten directory: "+config.EmscriptenSDKRoot)
 		}
 	} else if !file.IsDir() {
-		errx.Fatalf(err, "Emscripten SDK path is not a directory: "+config.EmscriptenSDKRoot)
+		return errorx.Decorate(err, "Emscripten SDK path is not a directory: "+config.EmscriptenSDKRoot)
 	}
+	return nil
+}
 
-	install := false
+func (w *WebGl) checkEmscriptenSDKInstallion() (bool, error) {
 	emsdkPath := filepath.Join(config.EmscriptenSDKRoot, "emsdk")
-	file, err = os.Stat(emsdkPath)
+	file, err := os.Stat(emsdkPath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			install = true
-		} else {
-			errx.Fatalf(err, "Could not open emsdk: "+emsdkPath)
+			return true, nil
 		}
-	} else if file.IsDir() {
-		errx.Fatalf(err, "Emscripten emsdk is a directory: "+emsdkPath)
+		return false, errorx.Decorate(err, "Could not open emsdk: "+emsdkPath)
 	}
-
-	if install {
-		output, err := sys.Execute("git", "clone", "--depth", "1", "https://github.com/juj/emsdk.git", config.EmscriptenSDKRoot)
-		if err != nil {
-			return fmt.Errorf("failed to clone Emscripten repo: %s", output)
-		}
+	if file.IsDir() {
+		return false, errorx.Decorate(err, "emscripten emsdk is a directory: "+emsdkPath)
 	}
-	log.Debug("Emscripten SDK installed at: " + config.EmscriptenSDKRoot)
+	return true, nil
+}
 
-	installVersion := false
+func (w *WebGl) checkEmscriptenSDKVersionInstallion() (bool, error) {
 	sdkVersionPath := filepath.Join(config.EmscriptenSDKRoot, "emscripten", config.EmscriptenVersion)
-	file, err = os.Stat(sdkVersionPath)
+	file, err := os.Stat(sdkVersionPath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			installVersion = true
-		} else {
-			errx.Fatalf(err, "Could not open emscripten SDK version "+config.EmscriptenVersion+"at: "+sdkVersionPath)
+			return true, nil
 		}
-	} else if !file.IsDir() {
-		errx.Fatalf(err, "Emscripten sdk version is not a directory: "+sdkVersionPath)
+		return false, errorx.Decorate(err, "Could not open emscripten SDK version "+config.EmscriptenVersion+"at: "+sdkVersionPath)
 	}
+	if !file.IsDir() {
+		return false, errorx.Decorate(err, "Emscripten sdk version is not a directory: "+sdkVersionPath)
+	}
+	return true, nil
+}
 
-	if installVersion {
-		if !install {
-			output, err := sys.Execute("git", "pull", config.EmscriptenSDKRoot)
-			if err != nil {
-				return fmt.Errorf("failed to update Emscripten SDK: %s", output)
-			}
-		}
-		output, err := sys.Execute(emsdkPath, "install", "--build=Release", "sdk-"+config.EmscriptenVersion+"-64bit", "binaryen-master-64bit")
+// SetEnv generates the emsdk environment variable file, parses it and sets system env variables accordingly
+func (w *WebGl) SetEnv() (rerr error) {
+	log.Debug("Setting emscripten environment variables")
+	emsdkEnv := filepath.Join(config.EmscriptenSDKRoot, "emsdk_env.sh")
+	output, err := sys.ExecuteEx("bash", "", true, "-c", emsdkEnv)
+	if err != nil {
+		return errorx.Decorate(err, "failed to call emsdk_env.sh: "+output)
+	}
+	emsdkSetEnv := filepath.Join(config.EmscriptenSDKRoot, "emsdk_set_env.sh")
+	file, err := os.Open(emsdkSetEnv)
+	if err != nil {
+		return errorx.Decorate(err, "could not open emsdk_set_env.sh")
+	}
+	defer func() {
+		err := file.Close()
 		if err != nil {
-			return fmt.Errorf("failed to emsdk install version %s: %s", config.EmscriptenVersion, output)
+			rerr = err
 		}
-		output, err = sys.Execute(emsdkPath, "activate", "--build=Release", "sdk-"+config.EmscriptenVersion+"-64bit", "binaryen-master-64bit")
-		if err != nil {
-			return fmt.Errorf("failed to emsdk install version %s: %s", config.EmscriptenVersion, output)
-		}
-		log.Debug("Building a simple test to download and build SDL2 port")
-		log.Debug("Otherwise, the build fails when calling make -j 8")
-		// source "$EmscriptenSDKRoot/emsdk_env.sh" > /dev/null
+	}()
 
+	scanner := bufio.NewScanner(file)
+	re := regexp.MustCompile("export (.*)=\"(.*)\"")
+	lineNumber := 0
+	for scanner.Scan() {
+		line := scanner.Text()
+		lineNumber++
+		if !re.MatchString(line) {
+			return fmt.Errorf("could not parse line %d of emsdk_set_env.sh: %s", lineNumber, line)
+		}
+		envVarName := re.FindStringSubmatch(line)[1]
+		envVarValue := re.FindStringSubmatch(line)[2]
+		log.Debugf("%s=%s", envVarName, envVarValue)
+		if err = os.Setenv(envVarName, envVarValue); err != nil {
+			return errorx.Decorate(err, "failed to set environment variable %s to %s", envVarName, envVarValue)
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		return errorx.Decorate(err, "could not read lines of emsdk_set_env.sh")
 	}
 	return nil
 }
@@ -153,7 +227,6 @@ func (w *WebGl) generate(configuration sparks.Configuration) {
 	log.Info("sparks project generate --webgl")
 
 	cmakeToolchainFile := filepath.Join(config.SDKDirectory, "scripts", "CMake", "toolchains", "Emscripten.cmake")
-
 	cmake := sparks.NewCMake(w, configuration)
 	cmake.AddDefine("OS_EMSCRIPTEN", "1")
 	cmake.AddDefine("CMAKE_TOOLCHAIN_FILE", cmakeToolchainFile)

@@ -61,8 +61,7 @@ func (cm *CMake) AddDefine(key string, value string) {
 func (cm *CMake) Run(outputDirectory string, args ...[]string) (string, error) {
 	log.Debugf("running cmake in %s", outputDirectory)
 	cm.outputDirectory = outputDirectory
-	var err error
-	if err = sys.MkDir(outputDirectory); err != nil {
+	if err := sys.MkDir(outputDirectory); err != nil {
 		return "could not create " + outputDirectory, err
 	}
 	cm.cmakelistsPath = filepath.Join(config.SDKDirectory, "scripts", "CMake", "Sparks")

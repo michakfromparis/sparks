@@ -120,9 +120,15 @@ func Build(sourceDirectory string, outputDirectory string) error {
 					}
 					buildPath := filepath.Join(outputDirectory, "bin", platform.Title()+"-"+configuration.Title())
 					libPath := filepath.Join(outputDirectory, "lib", platform.Title()+"-"+configuration.Title())
-					stat, err := os.Stat(buildPath)
-					if err != nil || !stat.IsDir() {
-						return errorx.Decorate(err, "build directory does not exist: "+buildPath)
+					_, err := os.Stat(buildPath)
+					if err != nil {
+						if os.IsNotExist(err) {
+							if err := os.MkdirAll(buildPath, os.ModePerm); err != nil {
+								return errorx.Decorate(err, "Could not create build directory: "+buildPath)
+							}
+						} else {
+							return errorx.Decorate(err, "build directory does not exist: "+buildPath)
+						}
 					}
 					buildSize, err := sys.DirSize(buildPath)
 					if err != nil {

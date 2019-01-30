@@ -9,7 +9,7 @@ import (
 )
 
 // DownloadFile downloads the file at url and saves it to filepath
-func DownloadFile(filepath string, url string) error {
+func DownloadFile(filepath string, url string) (rerr error) {
 
 	log.Debugf("sparks download %s %s", url, filepath)
 	// Create the file
@@ -18,6 +18,12 @@ func DownloadFile(filepath string, url string) error {
 		return err
 	}
 	defer out.Close()
+
+	defer func() {
+		if err := out.Close(); err != nil {
+			rerr = err
+		}
+	}()
 
 	// Get the data
 	resp, err := http.Get(url)
