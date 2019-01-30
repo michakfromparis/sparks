@@ -117,5 +117,5 @@ release:
 	--name "v0.1.0" \
 	--file "$(OUTPUT_DIRECTORY)/Linux/$(OUTPUT_NAME)"
 
-image: build build-docker
+image: build-docker
 	make -C docker
