@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	conf "github.com/michaKFromParis/sparks/config"
+	"github.com/michaKFromParis/sparks/conf"
 	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/sparks"
 	"github.com/spf13/cobra"

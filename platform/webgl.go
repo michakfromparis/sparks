@@ -9,7 +9,7 @@ import (
 	"github.com/michaKFromParis/sparks/sys"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/michaKFromParis/sparks/config"
+	"github.com/michaKFromParis/sparks/conf"
 	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/sparks"
 )
@@ -49,7 +49,9 @@ func (w *WebGl) SetEnabled(enabled bool) {
 func (w *WebGl) Get() error {
 	log.Info("Installing dependencies for " + w.Title())
 	deps := sparks.Deps{}
-	deps.Update()
+	if err := deps.Update(); err != nil {
+		return err
+	}
 	deps.Get("python")
 	deps.Get("unzip")
 	deps.Get("cmake")

@@ -6,7 +6,7 @@ import (
 
 	"github.com/michaKFromParis/sparks/sys"
 
-	conf "github.com/michaKFromParis/sparks/config"
+	"github.com/michaKFromParis/sparks/conf"
 	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/sparks"
 

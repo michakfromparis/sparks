@@ -9,7 +9,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/joomcode/errorx"
-	"github.com/michaKFromParis/sparks/config"
+	"github.com/michaKFromParis/sparks/conf"
 	"github.com/michaKFromParis/sparks/sys"
 )
 
@@ -63,7 +63,9 @@ func (w *WebGl) checkEmscriptenSDKVersionInstallion() (bool, error) {
 
 func (w *WebGl) createLatestSymlink() error {
 	log.Debug("creating emscripten latest symlink")
-	w.SetEnv()
+	if err := w.SetEnv(); err != nil {
+		return err
+	}
 	target := os.Getenv("EMSCRIPTEN")
 	symlink := filepath.Join(conf.EmscriptenSDKRoot, "emscripten", "latest")
 	if err := os.Symlink(target, symlink); err != nil {
@@ -86,8 +88,7 @@ func (w *WebGl) SetEnv() (rerr error) {
 		return errorx.Decorate(err, "could not open emsdk_set_env.sh")
 	}
 	defer func() {
-		err := file.Close()
-		if err != nil {
+		if err := file.Close(); err != nil {
 			rerr = err
 		}
 	}()

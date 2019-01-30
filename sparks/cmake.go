@@ -8,7 +8,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	version "github.com/hashicorp/go-version"
-	conf "github.com/michaKFromParis/sparks/config"
+	"github.com/michaKFromParis/sparks/conf"
 	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/sys"
 )

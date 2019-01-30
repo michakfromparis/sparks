@@ -17,8 +17,6 @@ func DownloadFile(filepath string, url string) (rerr error) {
 	if err != nil {
 		return err
 	}
-	defer out.Close()
-
 	defer func() {
 		if err := out.Close(); err != nil {
 			rerr = err
@@ -30,7 +28,11 @@ func DownloadFile(filepath string, url string) (rerr error) {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			rerr = err
+		}
+	}()
 
 	// Write the body to file
 	_, err = io.Copy(out, resp.Body)

@@ -19,12 +19,12 @@ func (d *Deps) Update() error {
 	case sys.Linux:
 		output, err := sys.Execute("apt-get", "update")
 		if err != nil {
-			return fmt.Errorf("failed to update: %s", output)
+			return fmt.Errorf("failed to update package list: %s", output)
 		}
 	case sys.Osx:
 		output, err := sys.Execute("brew", "update")
 		if err != nil {
-			return fmt.Errorf("failed to update: %s", output)
+			return fmt.Errorf("failed to update package list: %s", output)
 		}
 	}
 	return nil
