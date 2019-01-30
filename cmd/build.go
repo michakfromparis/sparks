@@ -2,7 +2,7 @@ package cmd
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/michaKFromParis/sparks/config"
+	"github.com/michaKFromParis/sparks/conf"
 	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/sparks"
 	"github.com/spf13/cobra"
@@ -47,7 +47,7 @@ func build(cmd *cobra.Command, args []string) {
 	sparks.SetEnabledPlatforms(enabledPlatforms)
 	sparks.SetEnabledConfigurations(enabledConfigurations)
 	for _, sourceDirectory := range args {
-		if err := sparks.Build(sourceDirectory, config.OutputDirectory); err != nil {
+		if err := sparks.Build(sourceDirectory, conf.OutputDirectory); err != nil {
 			errx.Fatal(err)
 		}
 	}
@@ -55,19 +55,15 @@ func build(cmd *cobra.Command, args []string) {
 }
 
 func initBuild() {
-
 	log.Trace("build init")
 	rootCmd.AddCommand(buildCmd)
-
-	enabledPlatforms = make([]bool, len(sparks.Platforms))
-	enabledConfigurations = make([]bool, len(sparks.Configurations))
 	log.Tracef("registered platforms: %d", len(sparks.Platforms))
 	log.Tracef("registered configurations: %d", len(sparks.Configurations))
 	buildCmd.Flags().SortFlags = false
-	buildCmd.Flags().StringVarP(&config.SourceDirectory, "source", "", "", "source directory to build")
-	buildCmd.Flags().StringVarP(&config.OutputDirectory, "output", "", "", "output directory for all selected builds")
-	buildCmd.Flags().StringVarP(&config.ProductName, "name", "", "", "set the product name / filename of the built binaries")
-	buildCmd.Flags().BoolVarP(&config.GenerateLua, "lua", "L", false, "generate lua bindings")
-	addPlatforms(buildCmd, "build")
-	addConfigurations(buildCmd)
+	buildCmd.Flags().StringVarP(&conf.SourceDirectory, "source", "", "", "source directory to build")
+	buildCmd.Flags().StringVarP(&conf.OutputDirectory, "output", "", "", "output directory for all selected builds")
+	buildCmd.Flags().StringVarP(&conf.ProductName, "name", "", "", "set the product name / filename of the built binaries")
+	buildCmd.Flags().BoolVarP(&conf.GenerateLua, "lua", "L", false, "generate lua bindings")
+	addCommandPlatforms(buildCmd, "build")
+	addCommandConfigurations(buildCmd)
 }

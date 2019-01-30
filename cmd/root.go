@@ -2,8 +2,9 @@ package cmd
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/michaKFromParis/sparks/config"
+	"github.com/michaKFromParis/sparks/conf"
 	"github.com/michaKFromParis/sparks/logger"
+	"github.com/michaKFromParis/sparks/sparks"
 	"github.com/spf13/cobra"
 )
 
@@ -39,6 +40,8 @@ func Execute() error {
 // Init is calling all cobra command functions here to avoid a race condition
 // with the loading of the sparks platforms / configurations first
 func Init() {
+	enabledPlatforms = make([]bool, len(sparks.Platforms))
+	enabledConfigurations = make([]bool, len(sparks.Configurations))
 	initRoot()
 	initGet()
 	initClean()
@@ -50,6 +53,6 @@ func Init() {
 func initRoot() {
 	log.Trace("root init")
 	rootCmd.Flags().SortFlags = false
-	rootCmd.PersistentFlags().BoolVarP(&config.Verbose, "verbose", "v", false, "set log verbose level to debug")
-	rootCmd.PersistentFlags().BoolVarP(&config.VeryVerbose, "v", "", false, "set log verbose level to trace")
+	rootCmd.PersistentFlags().BoolVarP(&conf.Verbose, "verbose", "v", false, "set log verbose level to debug")
+	rootCmd.PersistentFlags().BoolVarP(&conf.VeryVerbose, "v", "", false, "set log verbose level to trace")
 }

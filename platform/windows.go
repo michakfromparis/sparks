@@ -3,7 +3,7 @@ package platform
 import (
 	"path/filepath"
 
-	"github.com/michaKFromParis/sparks/config"
+	"github.com/michaKFromParis/sparks/conf"
 	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/sparks"
 
@@ -55,6 +55,11 @@ func (w *Windows) Clean() error {
 	return nil
 }
 
+// Code opens the code editor for the project
+func (w *Windows) Code(configuration sparks.Configuration) error {
+	return nil
+}
+
 // Build builds the platform
 func (w *Windows) Build(configuration sparks.Configuration) error {
 	w.prebuild()
@@ -71,10 +76,10 @@ func (w *Windows) generate(configuration sparks.Configuration) {
 	log.Info("sparks project generate --windows")
 
 	cmake := sparks.NewCMake(w, configuration)
-	cmake.AddArg("-G" + config.WindowsCompiler)
+	cmake.AddArg("-G" + conf.WindowsCompiler)
 	cmake.AddDefine("OS_WINDOWS", "1")
 	cmake.AddDefine("CMAKE_SYSTEM_NAME", "Windows")
-	projectsPath := filepath.Join(config.OutputDirectory, "projects", w.Title()+"-"+configuration.Title())
+	projectsPath := filepath.Join(conf.OutputDirectory, "projects", w.Title()+"-"+configuration.Title())
 	out, err := cmake.Run(projectsPath)
 	if err != nil {
 		errx.Fatalf(err, "sparks project generate failed: "+out)

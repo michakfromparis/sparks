@@ -1,4 +1,4 @@
-package configuration
+package config
 
 // Shipping represents the Shipping build configuration
 type Shipping struct {

@@ -1,4 +1,4 @@
-package config
+package conf
 
 import (
 	"path"
@@ -113,11 +113,22 @@ var VolleyAndroidAPILevel = 19
 
 // Emscripten specific
 
-// EmscriptenSDKRoot points to the location where the Emscripten sdk is installed
-var EmscriptenSDKRoot = "Emscripten"
+// HomeDirectory points to the user's home directory
+var HomeDirectory, _ = sys.GetHome()
 
-// EmscriptenVersion defines the version of the Emscripten SDK to use. Possible values: '1.27.0', '1.29.0' 'latest', 'master' or 'incoming' for the latest version
-var EmscriptenVersion = "incoming"
+// SparksHome points to the root of sparks sdks, projects, etc
+var SparksHome = filepath.Join(HomeDirectory, "sparks")
+
+// SDKHome points to the root of sparks sdks
+var SDKHome = filepath.Join(SparksHome, "sdks")
+
+// EmscriptenSDKRoot points to the location where the Emscripten sdk is installed
+var EmscriptenSDKRoot = filepath.Join(SDKHome, "emscripten")
+
+// EmscriptenVersion defines the version of the Emscripten SDK to use.
+// Possible values: '1.27.0', '1.29.0' 'latest', 'master' or 'incoming' for the latest version
+// Note: incoming implies building the sdk from source which is very long
+var EmscriptenVersion = "latest"
 
 // EmscriptenBrowser defines the browser started when using emrun to start an Emscripten application. Possible values: 'chrome' 'firefox' 'safari'
 var EmscriptenBrowser = "firefox"

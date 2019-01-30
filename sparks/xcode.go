@@ -2,11 +2,12 @@ package sparks
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/joomcode/errorx"
-	"github.com/michaKFromParis/sparks/config"
+	"github.com/michaKFromParis/sparks/conf"
 	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/sys"
 )
@@ -37,11 +38,22 @@ func (st SigningType) String() string {
 	return SigningTypeNames[st]
 }
 
-// SigningIdentities holds the list of detected signing type identities
-var SigningIdentities = map[SigningType]string{}
+// SigningIdentity is a class representing all the fields of an OSX / iOS signing identity
+type SigningIdentity struct {
+	ID     string
+	Name   string
+	TeamID string
+}
 
-// SigningIdentity holds the name of the signing identity that will be used
-var SigningIdentity string
+func (s *SigningIdentity) String() string {
+	return fmt.Sprintf("%s %s", s.ID, s.Name)
+}
+
+// SigningIdentities holds the list of detected signing identities mapped by SigningType
+var SigningIdentities = map[SigningType]*SigningIdentity{}
+
+// CurrentSigningIdentity holds a reference to the signing identity that will be used
+var CurrentSigningIdentity *SigningIdentity
 
 // XCode is a wrapper class around the xcodebuild command
 type XCode struct {
@@ -65,10 +77,10 @@ func (xc *XCode) Build(directory string, arg ...string) error {
 	xc.arguments = append(xc.arguments, "-parallelizeTargets")
 	xc.arguments = append(xc.arguments, "-verbose")
 	xc.arguments = append(xc.arguments, "build")
-	xc.arguments = append(xc.arguments, "-project", config.ProductName+".xcodeproj")
-	xc.arguments = append(xc.arguments, "-target", config.ProductName)
+	xc.arguments = append(xc.arguments, "-project", conf.ProductName+".xcodeproj")
+	xc.arguments = append(xc.arguments, "-target", conf.ProductName)
 	if xc.platform.Name() != "ios" {
-		xc.arguments = append(xc.arguments, "-sdk", config.SparksOSXSDK)
+		xc.arguments = append(xc.arguments, "-sdk", conf.SparksOSXSDK)
 	}
 	xc.arguments = append(xc.arguments, "-configuration", xc.configuration.Title())
 	xc.arguments = append(xc.arguments, arg...)
@@ -88,32 +100,46 @@ func (xc *XCode) Clean() {
 // and fills the sparks.SigningIdentities array with them
 func (xc *XCode) DetectSigning() {
 	log.Debug("detecting xcode signing identity")
-	s, err := sys.Execute("security", "find-identity", "-v", "-p", "codesigning")
+	s, err := sys.Execute("/usr/bin/env", "xcrun", "security", "find-identity", "-v", "-p", "codesigning")
 	if err != nil {
 		errx.Fatalf(err, "security find-identity failed")
 		return
 	}
 	lines := strings.Split(s, sys.NewLine)
+	lines = lines[:len(lines)-2]
 	for _, line := range lines {
-		parts := strings.Split(line, "\"")
-		if len(parts) == 3 {
-			identity := parts[1]
-			for i := 0; i < len(SigningTypeNames); i++ {
-				if strings.Contains(identity, SigningTypeNames[i]) {
-					SigningIdentities[SigningType(i)] = identity
-					log.Tracef("detected identity: %s", identity)
-				}
+		re := regexp.MustCompile("\\s+[0-9]+\\)\\s([0-9a-fA-F]+)\\s\"(.*\\((.*)\\))")
+		matched := re.MatchString(line)
+		if !matched {
+			log.Warnf("Could not parse xcode signing identity: " + line)
+			continue
+		}
+		matches := re.FindStringSubmatch(line)
+		if len(matches) != 4 {
+			log.Warnf("Could not parse xcode signing identity: " + line)
+			continue
+		}
+		ID := matches[1]
+		name := matches[2]
+		teamID := matches[3]
+		identity := SigningIdentity{ID: ID, Name: name, TeamID: teamID}
+		// fmt.Printf("%+v", identity.String())
+
+		for i := 0; i < len(SigningTypeNames); i++ {
+			if strings.Contains(identity.Name, SigningTypeNames[i]) {
+				SigningIdentities[SigningType(i)] = &identity
+				log.Tracef("detected identity: %s", identity.String())
 			}
 		}
 	}
 }
 
 // SelectSigning returns the configured signing identity provided a signing type
-func (xc *XCode) SelectSigning(signingType SigningType) (string, error) {
-	if SigningIdentities[signingType] == "" {
-		return "", fmt.Errorf("Could not select a %+v signing identity", signingType)
+func (xc *XCode) SelectSigning(signingType SigningType) (*SigningIdentity, error) {
+	if SigningIdentities[signingType] == nil {
+		return nil, fmt.Errorf("Could not select a %+v signing identity", signingType)
 	}
-	SigningIdentity = SigningIdentities[signingType]
+	CurrentSigningIdentity = SigningIdentities[signingType]
 	// log.Tracef("xcode signing identity: %s", SigningIdentity)
-	return SigningIdentity, nil
+	return CurrentSigningIdentity, nil
 }

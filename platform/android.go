@@ -3,7 +3,7 @@ package platform
 import (
 	"path/filepath"
 
-	"github.com/michaKFromParis/sparks/config"
+	"github.com/michaKFromParis/sparks/conf"
 	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/sparks"
 	"github.com/michaKFromParis/sparks/sys"
@@ -56,6 +56,11 @@ func (a *Android) Clean() error {
 	return nil
 }
 
+// Code opens the code editor for the project
+func (a *Android) Code(configuration sparks.Configuration) error {
+	return nil
+}
+
 // Build builds the platform
 func (a *Android) Build(configuration sparks.Configuration) error {
 	a.prebuild()
@@ -75,15 +80,15 @@ func (a *Android) generate(configuration sparks.Configuration) {
 	if err != nil {
 		errx.Fatal(err)
 	}
-	cmakeToolchainFile := filepath.Join(config.SDKDirectory, "scripts", "CMake", "toolchains", "Android.cmake")
+	cmakeToolchainFile := filepath.Join(conf.SDKDirectory, "scripts", "CMake", "toolchains", "Android.cmake")
 
 	cmake := sparks.NewCMake(a, configuration)
 	cmake.AddArg("-GEclipse CDT4 - Unix Makefiles")
 	cmake.AddDefine("OS_ANDROID", "1")
 	cmake.AddDefine("CMAKE_TOOLCHAIN_FILE", cmakeToolchainFile)
 	cmake.AddDefine("NDK_CCACHE", ccachePath)
-	cmake.AddDefine("ANDROID_NDK_RELEASE", config.SpakrsAndroidNDKVersion)
-	cmake.AddDefine("ANDROID_NATIVE_API_LEVEL", "android-"+string(config.SparksAndroidAPILevel))
+	cmake.AddDefine("ANDROID_NDK_RELEASE", conf.SpakrsAndroidNDKVersion)
+	cmake.AddDefine("ANDROID_NATIVE_API_LEVEL", "android-"+string(conf.SparksAndroidAPILevel))
 	// "-DLIBRARY_OUTPUT_PATH_ROOT=${buildRoot}/lib/${platformName}-${buildConfiguration}"
 }
 

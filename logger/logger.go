@@ -10,7 +10,7 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/michaKFromParis/sparks/config"
+	"github.com/michaKFromParis/sparks/conf"
 	"github.com/michaKFromParis/sparks/sys"
 )
 
@@ -28,9 +28,9 @@ func Init() {
 
 	log.SetLevel(log.TraceLevel)
 
-	if config.Verbose {
+	if conf.Verbose {
 		log.SetLevel(log.DebugLevel)
-	} else if config.VeryVerbose {
+	} else if conf.VeryVerbose {
 		log.SetLevel(log.TraceLevel)
 		sys.ExecuteStreamingToStdout = true
 	} else {

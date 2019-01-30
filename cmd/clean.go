@@ -4,7 +4,7 @@ import (
 	"os"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/michaKFromParis/sparks/config"
+	"github.com/michaKFromParis/sparks/conf"
 	"github.com/michaKFromParis/sparks/errx"
 	"github.com/spf13/cobra"
 )
@@ -25,7 +25,7 @@ to quickly create a Cobra application.`,
 func clean(cmd *cobra.Command, args []string) {
 
 	log.Info("Cleaning")
-	if err := os.RemoveAll(config.OutputDirectory); err != nil {
+	if err := os.RemoveAll(conf.OutputDirectory); err != nil {
 		errx.Fatalf(err, "failed to clean")
 	}
 }

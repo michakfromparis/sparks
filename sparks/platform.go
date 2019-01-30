@@ -15,6 +15,7 @@ type Platform interface {
 
 	Get() error
 	Clean() error
+	Code(Configuration) error
 	Build(Configuration) error
 }
 

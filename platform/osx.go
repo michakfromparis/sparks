@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/michaKFromParis/sparks/config"
+	"github.com/michaKFromParis/sparks/conf"
 	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/sparks"
 	"github.com/michaKFromParis/sparks/sys"
@@ -14,7 +14,7 @@ import (
 // Osx represents the OSX platform
 type Osx struct {
 	enabled         bool
-	SigningIdentity string
+	signingIdentity *sparks.SigningIdentity
 }
 
 // Name is the lowercase name of the platform
@@ -56,9 +56,14 @@ func (o *Osx) Clean() error {
 	return nil
 }
 
+// Code opens the code editor for the project
+func (o *Osx) Code(configuration sparks.Configuration) error {
+	return nil
+}
+
 // Build builds the platform
 func (o *Osx) Build(configuration sparks.Configuration) error {
-	projectDirectory := filepath.Join(config.OutputDirectory, "projects", o.Title()+"-"+configuration.Title())
+	projectDirectory := filepath.Join(conf.OutputDirectory, "projects", o.Title()+"-"+configuration.Title())
 	o.prebuild()
 	o.generate(configuration, projectDirectory)
 	o.compile(configuration, projectDirectory)
@@ -76,7 +81,7 @@ func (o *Osx) prebuild() {
 	if err != nil {
 		log.Warnf("could not select a %s signing identity. The build will fail to sign", signing)
 	}
-	o.SigningIdentity = identity
+	o.signingIdentity = identity
 	log.Debugf("signing identity: %s", signing)
 }
 
@@ -108,9 +113,9 @@ func (o *Osx) generate(configuration sparks.Configuration, projectDirectory stri
 	cmake.AddDefine("CMAKE_OSX_SYSROOT", osxSysRoot)
 	cmake.AddDefine("CMAKE_C_COMPILER", cc)
 	cmake.AddDefine("CMAKE_CXX_COMPILER", cpp)
-	cmake.AddDefine("XCODE_SIGNING_IDENTITY", o.SigningIdentity)
-	cmake.AddDefine("CMAKE_OSX_ARCHITECTURES", config.SparksOSXArchitecture)
-	cmake.AddDefine("CMAKE_OSX_DEPLOYMENT_TARGET", config.SparksOSXDeploymentTarget)
+	cmake.AddDefine("XCODE_SIGNING_IDENTITY", o.signingIdentity.Name)
+	cmake.AddDefine("CMAKE_OSX_ARCHITECTURES", conf.SparksOSXArchitecture)
+	cmake.AddDefine("CMAKE_OSX_DEPLOYMENT_TARGET", conf.SparksOSXDeploymentTarget)
 
 	out, err := cmake.Run(projectDirectory)
 	//log.Trace("cmake output" + out)

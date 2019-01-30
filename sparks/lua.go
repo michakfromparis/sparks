@@ -5,13 +5,13 @@ import (
 	"path/filepath"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/michaKFromParis/sparks/config"
+	"github.com/michaKFromParis/sparks/conf"
 	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/sys"
 )
 
 func getToluaPath() string {
-	toluapp := filepath.Join(config.SDKDirectory, "dependencies", "toluapp", "bin")
+	toluapp := filepath.Join(conf.SDKDirectory, "dependencies", "toluapp", "bin")
 	os, err := sys.GetOs()
 	if err != nil {
 		errx.Fatal(err)
@@ -20,7 +20,7 @@ func getToluaPath() string {
 	case sys.Osx:
 		toluapp = filepath.Join(toluapp, "toluapp_osx")
 	case sys.Linux:
-		toluapp = filepath.Join(config.SDKDirectory, "scripts", "bin", "tolua++")
+		toluapp = filepath.Join(conf.SDKDirectory, "scripts", "bin", "tolua++")
 	case sys.Windows:
 		toluapp = filepath.Join(toluapp, "toluapp_script.exe")
 	}
@@ -34,7 +34,7 @@ func GenerateLuaBindings(sourceDirectory string, packageName string) {
 
 	log.Info("sparks lua bind " + packageName)
 	toluapp := getToluaPath()
-	toluaHooksPath := filepath.Join(config.SDKDirectory, "src", "Sparks", "tolua.hooks.lua")
+	toluaHooksPath := filepath.Join(conf.SDKDirectory, "src", "Sparks", "tolua.hooks.lua")
 	dofileWithCorrectPath := fmt.Sprintf("dofile(\"%s\")", toluaHooksPath)
 	reflectionFile := filepath.Join(sourceDirectory, packageName+".Reflection.lua")
 	sys.SedFile(reflectionFile, "dofile\\(.*\\)", dofileWithCorrectPath)

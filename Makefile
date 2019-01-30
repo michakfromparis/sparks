@@ -1,11 +1,10 @@
 # constants
-
-# default source directory
+# default binary name to current directory name
+OUTPUT_NAME=$(shell basename $(CURDIR))
+# default go source directory
 SOURCE_DIRECTORY=$(GOPATH)/src
 # default build output directory
-OUTPUT_DIRECTORY=$(CURDIR)/build
-# default to current directory name
-OUTPUT_NAME=$(shell basename $(CURDIR))
+OUTPUT_DIRECTORY=$(CURDIR)/build/sparks
 # substracting GOPATH from source directory to deduct import path. i.e. github.com/user/project
 IMPORT_PATH=$(subst $(SOURCE_DIRECTORY)/,,$(CURDIR))
 # sparks sdk root directory
@@ -64,7 +63,7 @@ errcheck: check
 # build
 build: check format lint errcheck
 	go build -v -o "$(OUTPUT_DIRECTORY)/$(HOST_OS)/$(OUTPUT_NAME)"
-	@du -h "$(OUTPUT_DIRECTORY)/$(HOST_OS)/$(OUTPUT_NAME)"
+	@du -h "$(OUTPUT_DIRECTORY)/$(HOST_OS)/$(OUTPUT_NAME)" | sed 's|$(OUTPUT_DIRECTORY)/||'
 
 # install into "$(GOPATH)/bin"
 install: build
@@ -79,7 +78,7 @@ build-docker: check
 		-w "/go/src/$(IMPORT_PATH)"             \
 		golang:latest                           \
 		make build-docker-linux
-	@du -h "$(OUTPUT_DIRECTORY)/linux/$(OUTPUT_NAME)"
+	@du -h "$(OUTPUT_DIRECTORY)/linux/$(OUTPUT_NAME)" | sed 's|$(OUTPUT_DIRECTORY)/||'
 
 # build linux binary inside a docker container
 run-docker: check
@@ -109,7 +108,7 @@ run: check build
 # build and run in docker
 rund: build-docker run-docker
 
-release: #clean build-docker
+release:
 	github-release upload \
 	-s "$(GITHUB_TOKEN)" \
 	--user michaKFromParis \
@@ -117,4 +116,6 @@ release: #clean build-docker
 	--tag "v0.1.0" \
 	--name "v0.1.0" \
 	--file "$(OUTPUT_DIRECTORY)/Linux/$(OUTPUT_NAME)"
-  
+
+image: build-docker
+	make -C docker

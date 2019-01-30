@@ -2,7 +2,7 @@ package cmd
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/michaKFromParis/sparks/config"
+	"github.com/michaKFromParis/sparks/conf"
 	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/sparks"
 	"github.com/spf13/cobra"
@@ -16,8 +16,7 @@ var getCmd = &cobra.Command{
 }
 
 func get(cmd *cobra.Command, args []string) {
-	//	sparks.Init()
-	// panic(fmt.Sprintf("%+V", enabledPlatforms))
+	sparks.Init()
 	sparks.SetEnabledPlatforms(enabledPlatforms)
 	if err := sparks.Get(); err != nil {
 		errx.Fatal(err)
@@ -26,10 +25,9 @@ func get(cmd *cobra.Command, args []string) {
 }
 
 func initGet() {
-	enabledPlatforms = make([]bool, len(sparks.Platforms))
 	log.Tracef("registered platforms: %d", len(sparks.Platforms))
 	getCmd.Flags().SortFlags = false
-	getCmd.Flags().BoolVarP(&config.GetDependencies, "dependencies", "d", true, "get system dependencies")
-	addPlatforms(getCmd, "get")
+	getCmd.Flags().BoolVarP(&conf.GetDependencies, "dependencies", "d", true, "get system dependencies")
+	addCommandPlatforms(getCmd, "get")
 	rootCmd.AddCommand(getCmd)
 }

@@ -16,10 +16,10 @@ projectName=$(git config --local remote.origin.url|sed -n 's#.*/\([^.]*\)\.git#\
 masterBranch=$branch
 
 # release version, set from command line
-version=""
+releaseVersion=""
 
 # version to set right after the release, set from command line
-newVersion=""
+postReleaseVersion=""
 
 # v1.0.0, v1.7.8, etc..
 versionLabel=""
@@ -43,20 +43,20 @@ init ()
 
 	if [ "$version" = "" ]; then
 		echo "Enter the release version number without a leading v"
-		read version
+		read releaseVersion
 	fi
 
-	if [ "$newVersion" = "" ]; then
+	if [ "$postReleaseVersion" = "" ]; then
 		echo "Enter version number to set for $projectName immediately after the release"
-		read newVersion
+		read postReleaseVersion
 	fi
 
-	versionLabel="v$version"
-	releaseBranch=release-$version
+	versionLabel="v$releaseVersion"
+	releaseBranch=release-$releaseVersion
 	tagName=$versionLabel
 	versionFile="version.go"
 
-	echo "version: $version"
+	echo "release version: $releaseVersion"
 	echo "version label: $versionLabel"
 	echo "release branch: $releaseBranch"
 	echo "tag name: $tagName"
@@ -102,7 +102,7 @@ postrelease ()
 	
 	# find version number ("1.5.5" for example)
 	# and replace it with newly specified version number
-	sed -i.backup -E "s/[0-9.]+[0-9]+/$newVersion/" $versionFile $versionFile
+	sed -i.backup -E "s/[0-9.]+[0-9]+/$postReleaseVersion/" $versionFile $versionFile
 
 	# remove backup file created by sed command
 	rm -f $versionFile.backup
@@ -111,7 +111,7 @@ postrelease ()
 	git add $versionFile
 
 	# Commit setting new master branch version	
-	git commit -m "[Post Release] Setting version to $newVersion"
+	git commit -m "[Post Release] Setting version to $postReleaseVersion"
 }
 
 tag ()
@@ -128,15 +128,15 @@ push ()
 
 release ()
 {
-	local version=$1
-	local newVersion=$2
+	local releaseVersion=$1
+	local postReleaseVersion=$2
 
 	init
 	echo "[$1] -> [$2]"
-	prerelease "$version"
+	prerelease "$releaseVersion"
 	tag "$versionLabel"
 	push
-	postrelease "$newVersion"
+	postrelease "$postReleaseVersion"
 	push
 }
 

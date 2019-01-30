@@ -6,7 +6,7 @@ import (
 
 	"github.com/michaKFromParis/sparks/sys"
 
-	"github.com/michaKFromParis/sparks/config"
+	"github.com/michaKFromParis/sparks/conf"
 	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/sparks"
 
@@ -58,9 +58,6 @@ func (l *Linux) Get() error {
 	if err = l.aptGet("zlib1g-dev"); err != nil {
 		return err
 	}
-	// if err = l.aptGet("gcc"); err != nil {
-	// 	return err
-	// }
 	if err = l.aptGet("ccache"); err != nil {
 		return err
 	}
@@ -92,11 +89,15 @@ func (l *Linux) aptGet(name string) error {
 		return fmt.Errorf("failed to install %s: %s", name, output)
 	}
 	return nil
-
 }
 
 // Clean cleans the platform build
 func (l *Linux) Clean() error {
+	return nil
+}
+
+// Code opens the code editor for the project
+func (l *Linux) Code(configuration sparks.Configuration) error {
 	return nil
 }
 
@@ -119,7 +120,7 @@ func (l *Linux) generate() {
 	cmake := sparks.NewCMake(l, l.configuration)
 	cmake.AddArg("-GCodeBlocks - Unix Makefiles")
 	cmake.AddDefine("OS_LINUX", "1")
-	projectsPath := filepath.Join(config.OutputDirectory, "projects", l.Title()+"-"+l.configuration.Title())
+	projectsPath := filepath.Join(conf.OutputDirectory, "projects", l.Title()+"-"+l.configuration.Title())
 	out, err := cmake.Run(projectsPath)
 	if err != nil {
 		errx.Fatalf(err, "sparks project generate failed: "+out)
@@ -129,7 +130,7 @@ func (l *Linux) generate() {
 
 func (l *Linux) compile() {
 	log.Info("sparks project compile --linux")
-	projectsPath := filepath.Join(config.OutputDirectory, "projects", l.Title()+"-"+l.configuration.Title())
+	projectsPath := filepath.Join(conf.OutputDirectory, "projects", l.Title()+"-"+l.configuration.Title())
 	out, err := sys.ExecuteEx("make", projectsPath, true, "-j8")
 	if err != nil {
 		errx.Fatalf(err, "sparks project compile failed: "+out)

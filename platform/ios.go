@@ -7,7 +7,8 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/michaKFromParis/sparks/config"
+	"github.com/joomcode/errorx"
+	"github.com/michaKFromParis/sparks/conf"
 	"github.com/michaKFromParis/sparks/errx"
 	"github.com/michaKFromParis/sparks/sparks"
 	"github.com/michaKFromParis/sparks/sys"
@@ -16,9 +17,9 @@ import (
 // Ios represents the iOS platform
 type Ios struct {
 	enabled         bool
-	SigningIdentity string
+	signingIdentity *sparks.SigningIdentity
 	configuration   sparks.Configuration
-	udid            string
+	provisioningID  string
 }
 
 // Name is the lowercase name of the platform
@@ -61,15 +62,28 @@ func (i *Ios) Clean() error {
 	return nil
 }
 
+// Code opens the code editor for the project
+func (i *Ios) Code(configuration sparks.Configuration) error {
+	i.configuration = configuration
+	projectDirectory := filepath.Join(conf.OutputDirectory, "projects", i.Title()+"-"+i.configuration.Title())
+	projectFilename := filepath.Join(projectDirectory, "iphoneos", conf.ProductName+".xcodeproj")
+	i.prebuild()
+	i.generate(projectDirectory)
+	_, err := sys.Execute("open", projectFilename)
+	if err != nil {
+		return errorx.Decorate(err, "could not open xcode for project: "+projectFilename)
+	}
+	return nil
+}
+
 // Build builds the platform
 func (i *Ios) Build(configuration sparks.Configuration) error {
 	i.configuration = configuration
-	projectDirectory := filepath.Join(config.OutputDirectory, "projects", i.Title()+"-"+configuration.Title())
+	projectDirectory := filepath.Join(conf.OutputDirectory, "projects", i.Title()+"-"+configuration.Title())
 	i.prebuild()
 	i.generate(projectDirectory)
 	i.compile(projectDirectory)
 	i.postbuild()
-
 	return nil
 }
 
@@ -83,16 +97,16 @@ func (i *Ios) prebuild() {
 	if err != nil {
 		log.Warnf("could not select a %s signing identity.", signing)
 	}
-	i.SigningIdentity = identity
+	i.signingIdentity = identity
 	log.Debugf("signing identity: %s", identity)
 	i.importProvisioningProfile()
 }
 
 func (i *Ios) importProvisioningProfile() {
 	log.Debug("looking for provioning profile")
-	keysDirectory := filepath.Join(config.SourceDirectory, "conf", "keys", "ios", "development")
+	keysDirectory := filepath.Join(conf.SourceDirectory, "conf", "keys", "ios", "development")
 	if i.configuration.Name() == "shipping" {
-		keysDirectory = filepath.Join(config.SourceDirectory, "conf", "keys", "ios", "distribution")
+		keysDirectory = filepath.Join(conf.SourceDirectory, "conf", "keys", "ios", "distribution")
 	}
 	provisioningFilename, err := sys.Execute("find", keysDirectory, "-name", "*.mobileprovision")
 	provisioningFilename = strings.TrimSpace(provisioningFilename)
@@ -111,31 +125,40 @@ func (i *Ios) importProvisioningProfile() {
 	if !matched {
 		log.Warnf("Could not parse provisioning profile at " + provisioningFilename)
 	}
-	i.udid = re.FindStringSubmatch(output)[1]
+	// basename := filepath.Base(provisioningFilename)
+	// i.provisioningID = strings.TrimSuffix(basename, filepath.Ext(basename))
+	i.provisioningID = re.FindStringSubmatch(output)[1]
+	log.Debugf("Provisioning Profile Name: %s", i.provisioningID)
 }
 
 func (i *Ios) generate(projectDirectory string) {
 	log.Info("sparks project generate --ios")
 
-	iosSysRoot, err := sys.ExecuteEx("xcodebuild", "", true, "-sdk", config.SparksiOSSDK, "-version", "Path")
+	iosSysRoot, err := sys.ExecuteEx("xcodebuild", "", true, "-sdk", conf.SparksiOSSDK, "-version", "Path")
 	if err != nil {
 		errx.Fatalf(err, "could not determine ios sysroot")
 	}
 	iosSysRoot = strings.TrimSpace(iosSysRoot)
 	log.Tracef("ios sysroot: %s", iosSysRoot)
 
-	cmakeToolchainFile := filepath.Join(config.SDKDirectory, "scripts", "CMake", "toolchains", "iOS.cmake")
-	libraryPath := filepath.Join(config.OutputDirectory, "lib", i.Title()+"-"+i.configuration.Title())
+	cmakeToolchainFile := filepath.Join(conf.SDKDirectory, "scripts", "CMake", "toolchains", "iOS.cmake")
+	libraryPath := filepath.Join(conf.OutputDirectory, "lib", i.Title()+"-"+i.configuration.Title())
 
 	cmake := sparks.NewCMake(i, i.configuration)
+
+	var automaticSigning = false
 
 	cmake.AddArg("-GXcode")
 	cmake.AddDefine("OS_IOS", "1")
 	cmake.AddDefine("IOS_PLATFORM", "OS")
-	cmake.AddDefine("XCODE_SIGNING_IDENTITY", i.SigningIdentity)
+	if automaticSigning {
+	} else {
+		cmake.AddDefine("XCODE_SIGNING_IDENTITY", i.signingIdentity.Name)
+		cmake.AddDefine("XCODE_SIGNING_DEVELOPMENT_TEAM", i.signingIdentity.TeamID)
+		cmake.AddDefine("XCODE_PROVISIONING_PROFILE_UUID", i.provisioningID)
+	}
 	cmake.AddDefine("CMAKE_TOOLCHAIN_FILE", cmakeToolchainFile)
-	cmake.AddDefine("XCODE_PROVISIONING_PROFILE_UUID", i.udid)
-	cmake.AddDefine("PRODUCT_BUNDLE_IDENTIFIER", config.BundleIdentifier)
+	cmake.AddDefine("PRODUCT_BUNDLE_IDENTIFIER", conf.BundleIdentifier)
 	cmake.AddDefine("CMAKE_OSX_SYSROOT", iosSysRoot)
 	cmake.AddDefine("CMAKE_IOS_SYSROOT", iosSysRoot)
 
