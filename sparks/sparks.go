@@ -5,11 +5,11 @@ import (
 	"path/filepath"
 	"time"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/joomcode/errorx"
-	"github.com/michaKFromParis/sparks/conf"
-	"github.com/michaKFromParis/sparks/errx"
-	"github.com/michaKFromParis/sparks/sys"
+	"github.com/michakfromparis/sparks/conf"
+	"github.com/michakfromparis/sparks/errx"
+	"github.com/michakfromparis/sparks/sys"
 )
 
 // CurrentProduct holds a reference to the currently loaded Sparks product from a .sparks file

@@ -4,11 +4,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	log "github.com/Sirupsen/logrus"
-	"github.com/michaKFromParis/sparks/conf"
-	"github.com/michaKFromParis/sparks/errx"
-	"github.com/michaKFromParis/sparks/sparks"
-	"github.com/michaKFromParis/sparks/sys"
+	log "github.com/sirupsen/logrus"
+	"github.com/michakfromparis/sparks/conf"
+	"github.com/michakfromparis/sparks/errx"
+	"github.com/michakfromparis/sparks/sparks"
+	"github.com/michakfromparis/sparks/sys"
 )
 
 // Osx represents the OSX platform

@@ -1,8 +1,8 @@
 package sparks
 
 import (
-	log "github.com/Sirupsen/logrus"
-	"github.com/michaKFromParis/sparks/sys"
+	log "github.com/sirupsen/logrus"
+	"github.com/michakfromparis/sparks/sys"
 )
 
 // Platform Interface used to represent a sparks supported platform

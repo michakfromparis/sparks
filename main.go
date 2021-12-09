@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/michaKFromParis/sparks/cmd"
-	"github.com/michaKFromParis/sparks/config"
-	"github.com/michaKFromParis/sparks/errx"
-	"github.com/michaKFromParis/sparks/platform"
+	"github.com/michakfromparis/sparks/cmd"
+	"github.com/michakfromparis/sparks/config"
+	"github.com/michakfromparis/sparks/errx"
+	"github.com/michakfromparis/sparks/platform"
 )
 
 func main() {

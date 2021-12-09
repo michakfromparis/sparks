@@ -1,9 +1,9 @@
 package cmd
 
 import (
-	"github.com/michaKFromParis/sparks/conf"
-	"github.com/michaKFromParis/sparks/errx"
-	"github.com/michaKFromParis/sparks/sparks"
+	"github.com/michakfromparis/sparks/conf"
+	"github.com/michakfromparis/sparks/errx"
+	"github.com/michakfromparis/sparks/sparks"
 	"github.com/spf13/cobra"
 )
 

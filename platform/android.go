@@ -3,12 +3,12 @@ package platform
 import (
 	"path/filepath"
 
-	"github.com/michaKFromParis/sparks/conf"
-	"github.com/michaKFromParis/sparks/errx"
-	"github.com/michaKFromParis/sparks/sparks"
-	"github.com/michaKFromParis/sparks/sys"
+	"github.com/michakfromparis/sparks/conf"
+	"github.com/michakfromparis/sparks/errx"
+	"github.com/michakfromparis/sparks/sparks"
+	"github.com/michakfromparis/sparks/sys"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 // Android represents the Android platform

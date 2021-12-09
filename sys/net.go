@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 // DownloadFile downloads the file at url and saves it to filepath

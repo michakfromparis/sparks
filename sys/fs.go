@@ -7,8 +7,8 @@ import (
 	"regexp"
 	"strings"
 
-	log "github.com/Sirupsen/logrus"
-	"github.com/michaKFromParis/sparks/errx"
+	log "github.com/sirupsen/logrus"
+	"github.com/michakfromparis/sparks/errx"
 )
 
 // MkDir creates the directory at path and all subdirectories

@@ -1,10 +1,10 @@
 package cmd
 
 import (
-	log "github.com/Sirupsen/logrus"
-	"github.com/michaKFromParis/sparks/conf"
-	"github.com/michaKFromParis/sparks/logger"
-	"github.com/michaKFromParis/sparks/sparks"
+	log "github.com/sirupsen/logrus"
+	"github.com/michakfromparis/sparks/conf"
+	"github.com/michakfromparis/sparks/logger"
+	"github.com/michakfromparis/sparks/sparks"
 	"github.com/spf13/cobra"
 )
 

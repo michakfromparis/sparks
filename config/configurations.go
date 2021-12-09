@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/michaKFromParis/sparks/sparks"
+	"github.com/michakfromparis/sparks/sparks"
 )
 
 // RegisterConfigurations registers all existing configurations into sparks

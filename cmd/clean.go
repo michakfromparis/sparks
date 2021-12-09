@@ -3,9 +3,9 @@ package cmd
 import (
 	"os"
 
-	log "github.com/Sirupsen/logrus"
-	"github.com/michaKFromParis/sparks/conf"
-	"github.com/michaKFromParis/sparks/errx"
+	log "github.com/sirupsen/logrus"
+	"github.com/michakfromparis/sparks/conf"
+	"github.com/michakfromparis/sparks/errx"
 	"github.com/spf13/cobra"
 )
 

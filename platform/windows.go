@@ -3,11 +3,11 @@ package platform
 import (
 	"path/filepath"
 
-	"github.com/michaKFromParis/sparks/conf"
-	"github.com/michaKFromParis/sparks/errx"
-	"github.com/michaKFromParis/sparks/sparks"
+	"github.com/michakfromparis/sparks/conf"
+	"github.com/michakfromparis/sparks/errx"
+	"github.com/michakfromparis/sparks/sparks"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 // Windows represents the Windows platform

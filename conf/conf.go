@@ -4,9 +4,9 @@ import (
 	"path"
 	"path/filepath"
 
-	log "github.com/Sirupsen/logrus"
-	"github.com/michaKFromParis/sparks/errx"
-	"github.com/michaKFromParis/sparks/sys"
+	log "github.com/sirupsen/logrus"
+	"github.com/michakfromparis/sparks/errx"
+	"github.com/michakfromparis/sparks/sys"
 )
 
 // GetDependencies stores the command line flag of go get --dependencies

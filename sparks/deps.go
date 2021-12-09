@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	log "github.com/Sirupsen/logrus"
-	"github.com/michaKFromParis/sparks/sys"
+	log "github.com/sirupsen/logrus"
+	"github.com/michakfromparis/sparks/sys"
 )
 
 // Deps is a wrapper class around platform specific dependencies installer

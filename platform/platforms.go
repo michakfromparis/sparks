@@ -1,7 +1,7 @@
 package platform
 
 import (
-	"github.com/michaKFromParis/sparks/sparks"
+	"github.com/michakfromparis/sparks/sparks"
 )
 
 // RegisterPlatforms registers all existing platforms into sparks

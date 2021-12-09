@@ -9,22 +9,22 @@ before:
     # you may remove this if you don't need go generate
     # - go generate ./...
 builds:
-- env:
-  - CGO_ENABLED=0
-  goos:
-    - darwin
-    - linux
-    - windows
-  goarch:
-    - amd64
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
 snapshot:
   name_template: "{{ .Tag }}-next"
 # snapshot:
 #   name_template: "{{ .Env.SNAPSHOT_VERSION }}"
 archive:
-  name_template: '{{ .ProjectName }}-{{ .Os }}'
+  name_template: "{{ .ProjectName }}-{{ .Os }}"
   replacements:
     darwin: osx
     linux: linux
@@ -32,18 +32,18 @@ archive:
     386: i386
     amd64: x86_64
   format_overrides:
-  - goos: windows
-    format: zip
+    - goos: windows
+      format: zip
 brew:
   github:
-    owner: michaKFromParis
+    owner: michakfromparis
     name: homebrew-tap
   folder: Formula
-  homepage:  https://github.com/michaKFromParis/sparks
+  homepage: https://github.com/michakfromparis/sparks
   description: "Design, Build & Play Sparks applications"
 changelog:
   sort: asc
   filters:
     exclude:
-    - '^docs:'
-    - '^test:'
+      - "^docs:"
+      - "^test:"

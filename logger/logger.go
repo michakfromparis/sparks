@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	log "github.com/Sirupsen/logrus"
-	"github.com/michaKFromParis/sparks/conf"
-	"github.com/michaKFromParis/sparks/sys"
+	log "github.com/sirupsen/logrus"
+	"github.com/michakfromparis/sparks/conf"
+	"github.com/michakfromparis/sparks/sys"
 )
 
 // Init is called at the start of the program to intialize logrus

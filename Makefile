@@ -1,6 +1,7 @@
 # constants
 # default binary name to current directory name
-OUTPUT_NAME=$(shell basename $(CURDIR))
+# OUTPUT_NAME=$(shell basename $(CURDIR))
+OUTPUT_NAME=sparks
 # default go source directory
 SOURCE_DIRECTORY=$(GOPATH)/src
 # default build output directory
@@ -111,7 +112,7 @@ rund: build-docker run-docker
 release:
 	github-release upload \
 	-s "$(GITHUB_TOKEN)" \
-	--user michaKFromParis \
+	--user michakfromparis \
 	--repo sparks-cli \
 	--tag "v0.1.0" \
 	--name "v0.1.0" \

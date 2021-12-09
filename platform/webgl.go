@@ -6,12 +6,12 @@ import (
 	"path/filepath"
 
 	"github.com/joomcode/errorx"
-	"github.com/michaKFromParis/sparks/sys"
+	"github.com/michakfromparis/sparks/sys"
 
-	log "github.com/Sirupsen/logrus"
-	"github.com/michaKFromParis/sparks/conf"
-	"github.com/michaKFromParis/sparks/errx"
-	"github.com/michaKFromParis/sparks/sparks"
+	log "github.com/sirupsen/logrus"
+	"github.com/michakfromparis/sparks/conf"
+	"github.com/michakfromparis/sparks/errx"
+	"github.com/michakfromparis/sparks/sparks"
 )
 
 // WebGl represents the WebGl platform

@@ -64,5 +64,5 @@ action "Slack Release" {
   uses = "Ilshidur/action-slack@36bb029ce9b69ef9c14fa6e1ef96c5634688b2ab"
   needs = ["Github Release Publish"]
   secrets = ["SLACK_WEBHOOK"]
-  args = "A new release was pushed to GitHub (https://github.com/michaKFromParis/sparks/releases)"
+  args = "A new release was pushed to GitHub (https://github.com/michakfromparis/sparks/releases)"
 }
