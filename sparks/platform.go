@@ -2,7 +2,7 @@ package sparks
 
 import (
 	log "github.com/sirupsen/logrus"
-	"github.com/michakfromparis/sparks/sys"
+	"leblox.com/sparks-cli/v2/sys"
 )
 
 // Platform Interface used to represent a sparks supported platform

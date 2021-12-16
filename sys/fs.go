@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/michakfromparis/sparks/errx"
+	"leblox.com/sparks-cli/v2/errx"
 )
 
 // MkDir creates the directory at path and all subdirectories
@@ -44,7 +44,7 @@ func Pwd() (string, error) {
 
 // SedFile searches regex inside filename and replaces it by newContent
 func SedFile(filename string, regex string, newContent string) {
-	log.Tracef("sed %s %s in %s", regex, newContent, filename)
+	// log.Tracef("sed %s %s in %s", regex, newContent, filename)
 	bytes, err := ioutil.ReadFile(filename)
 	if err != nil {
 		errx.Fatalf(err, "Could not read: "+filename)

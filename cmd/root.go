@@ -2,10 +2,10 @@ package cmd
 
 import (
 	log "github.com/sirupsen/logrus"
-	"github.com/michakfromparis/sparks/conf"
-	"github.com/michakfromparis/sparks/logger"
-	"github.com/michakfromparis/sparks/sparks"
 	"github.com/spf13/cobra"
+	"leblox.com/sparks-cli/v2/conf"
+	"leblox.com/sparks-cli/v2/logger"
+	"leblox.com/sparks-cli/v2/sparks"
 )
 
 // rootCmd represents the base command when called without any subcommands

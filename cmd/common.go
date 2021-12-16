@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/michakfromparis/sparks/sparks"
 	"github.com/spf13/cobra"
+	"leblox.com/sparks-cli/v2/sparks"
 )
 
 var enabledPlatforms []bool

@@ -4,11 +4,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	log "github.com/sirupsen/logrus"
-	"github.com/michakfromparis/sparks/conf"
-	"github.com/michakfromparis/sparks/errx"
-	"github.com/michakfromparis/sparks/sparks"
 	"github.com/michakfromparis/sparks/sys"
+	log "github.com/sirupsen/logrus"
+	"leblox.com/sparks-cli/v2/conf"
+	"leblox.com/sparks-cli/v2/errx"
+	"leblox.com/sparks-cli/v2/sparks"
 )
 
 // Osx represents the OSX platform

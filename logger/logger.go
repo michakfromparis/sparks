@@ -10,8 +10,8 @@ import (
 	"time"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/michakfromparis/sparks/conf"
-	"github.com/michakfromparis/sparks/sys"
+	"leblox.com/sparks-cli/v2/conf"
+	"leblox.com/sparks-cli/v2/sys"
 )
 
 // Init is called at the start of the program to intialize logrus

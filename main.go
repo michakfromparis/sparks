@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/michakfromparis/sparks/cmd"
-	"github.com/michakfromparis/sparks/config"
-	"github.com/michakfromparis/sparks/errx"
-	"github.com/michakfromparis/sparks/platform"
+	"leblox.com/sparks-cli/v2/cmd"
+	"leblox.com/sparks-cli/v2/config"
+	"leblox.com/sparks-cli/v2/errx"
+	"leblox.com/sparks-cli/v2/platform"
 )
 
 func main() {

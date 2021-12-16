@@ -7,10 +7,10 @@ import (
 	"path/filepath"
 	"regexp"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/joomcode/errorx"
 	"github.com/michakfromparis/sparks/conf"
 	"github.com/michakfromparis/sparks/sys"
+	log "github.com/sirupsen/logrus"
 )
 
 func (w *WebGl) createEmscriptenSDKRoot() error {

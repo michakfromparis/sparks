@@ -6,11 +6,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/joomcode/errorx"
-	"github.com/michakfromparis/sparks/conf"
 	"github.com/michakfromparis/sparks/errx"
+	log "github.com/sirupsen/logrus"
 	yaml "gopkg.in/yaml.v2"
+	"leblox.com/sparks-cli/v2/conf"
 )
 
 // Product struct

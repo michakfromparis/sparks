@@ -3,8 +3,8 @@
 package errx
 
 import (
-	log "github.com/sirupsen/logrus"
 	"github.com/joomcode/errorx"
+	log "github.com/sirupsen/logrus"
 )
 
 // Fatal is used terminate the program with an error

@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/michakfromparis/sparks/sys"
+	"leblox.com/sparks-cli/v2/sys"
 )
 
 // Deps is a wrapper class around platform specific dependencies installer

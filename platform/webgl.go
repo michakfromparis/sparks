@@ -7,11 +7,10 @@ import (
 
 	"github.com/joomcode/errorx"
 	"github.com/michakfromparis/sparks/sys"
-
 	log "github.com/sirupsen/logrus"
-	"github.com/michakfromparis/sparks/conf"
-	"github.com/michakfromparis/sparks/errx"
-	"github.com/michakfromparis/sparks/sparks"
+	"leblox.com/sparks-cli/v2/conf"
+	"leblox.com/sparks-cli/v2/errx"
+	"leblox.com/sparks-cli/v2/sparks"
 )
 
 // WebGl represents the WebGl platform

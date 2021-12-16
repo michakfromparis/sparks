@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/michakfromparis/sparks/conf"
-	"github.com/michakfromparis/sparks/errx"
-	"github.com/michakfromparis/sparks/sys"
+	"leblox.com/sparks-cli/v2/conf"
+	"leblox.com/sparks-cli/v2/errx"
+	"leblox.com/sparks-cli/v2/sys"
 )
 
 func getToluaPath() string {

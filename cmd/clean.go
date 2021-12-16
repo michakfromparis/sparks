@@ -3,10 +3,10 @@ package cmd
 import (
 	"os"
 
-	log "github.com/sirupsen/logrus"
-	"github.com/michakfromparis/sparks/conf"
 	"github.com/michakfromparis/sparks/errx"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"leblox.com/sparks-cli/v2/conf"
 )
 
 // cleanCmd represents the clean command

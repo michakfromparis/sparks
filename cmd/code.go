@@ -1,10 +1,10 @@
 package cmd
 
 import (
-	"github.com/michakfromparis/sparks/conf"
 	"github.com/michakfromparis/sparks/errx"
-	"github.com/michakfromparis/sparks/sparks"
 	"github.com/spf13/cobra"
+	"leblox.com/sparks-cli/v2/conf"
+	"leblox.com/sparks-cli/v2/sparks"
 )
 
 // codeCmd represents the code command

@@ -12,8 +12,8 @@ import (
 	"sync"
 	"time"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/joomcode/errorx"
+	log "github.com/sirupsen/logrus"
 )
 
 // Execute runs a command naked

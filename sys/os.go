@@ -5,8 +5,8 @@ import (
 	"os/user"
 	"runtime"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/joomcode/errorx"
+	log "github.com/sirupsen/logrus"
 )
 
 // Os represents the operating system the code in running on

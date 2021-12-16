@@ -6,11 +6,11 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/hashicorp/go-version"
 	log "github.com/sirupsen/logrus"
-	version "github.com/hashicorp/go-version"
-	"github.com/michakfromparis/sparks/conf"
-	"github.com/michakfromparis/sparks/errx"
-	"github.com/michakfromparis/sparks/sys"
+	"leblox.com/sparks-cli/v2/conf"
+	"leblox.com/sparks-cli/v2/errx"
+	"leblox.com/sparks-cli/v2/sys"
 )
 
 // CMake is a wrapper class around cmake
