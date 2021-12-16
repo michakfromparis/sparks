@@ -1,6 +1,7 @@
 package platform
 
 import (
+	"fmt"
 	"path/filepath"
 
 	log "github.com/sirupsen/logrus"
@@ -87,7 +88,7 @@ func (a *Android) generate(configuration sparks.Configuration) {
 	cmake.AddDefine("CMAKE_TOOLCHAIN_FILE", cmakeToolchainFile)
 	cmake.AddDefine("NDK_CCACHE", ccachePath)
 	cmake.AddDefine("ANDROID_NDK_RELEASE", conf.SpakrsAndroidNDKVersion)
-	cmake.AddDefine("ANDROID_NATIVE_API_LEVEL", "android-"+string(conf.SparksAndroidAPILevel))
+	cmake.AddDefine("ANDROID_NATIVE_API_LEVEL", "android-"+fmt.Sprint(conf.SparksAndroidAPILevel))
 	// "-DLIBRARY_OUTPUT_PATH_ROOT=${buildRoot}/lib/${platformName}-${buildConfiguration}"
 }
 
