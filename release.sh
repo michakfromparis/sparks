@@ -131,7 +131,7 @@ release ()
 	local postReleaseVersion=$2
 
 	init
-	echo "[$1] -> [$2]"
+	echo "[$releaseVersion] -> [$postReleaseVersion]"
 	prerelease "$releaseVersion"
 	tag "$versionLabel"
 	push
