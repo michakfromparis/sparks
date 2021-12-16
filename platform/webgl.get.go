@@ -8,9 +8,9 @@ import (
 	"regexp"
 
 	"github.com/joomcode/errorx"
-	"github.com/michakfromparis/sparks/conf"
-	"github.com/michakfromparis/sparks/sys"
 	log "github.com/sirupsen/logrus"
+	"leblox.com/sparks-cli/v2/conf"
+	"leblox.com/sparks-cli/v2/sys"
 )
 
 func (w *WebGl) createEmscriptenSDKRoot() error {

@@ -7,10 +7,10 @@ import (
 	"strings"
 
 	"github.com/joomcode/errorx"
-	"github.com/michakfromparis/sparks/errx"
 	log "github.com/sirupsen/logrus"
 	yaml "gopkg.in/yaml.v2"
 	"leblox.com/sparks-cli/v2/conf"
+	"leblox.com/sparks-cli/v2/errx"
 )
 
 // Product struct

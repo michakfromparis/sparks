@@ -7,11 +7,11 @@ import (
 	"strings"
 
 	"github.com/joomcode/errorx"
-	"github.com/michakfromparis/sparks/sys"
 	log "github.com/sirupsen/logrus"
 	"leblox.com/sparks-cli/v2/conf"
 	"leblox.com/sparks-cli/v2/errx"
 	"leblox.com/sparks-cli/v2/sparks"
+	"leblox.com/sparks-cli/v2/sys"
 )
 
 // Ios represents the iOS platform
