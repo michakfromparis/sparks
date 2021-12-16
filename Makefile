@@ -39,15 +39,15 @@ check:
 # install build dependencies
 deps: check
 	go get -d
-	go get golang.org/x/tools/cmd/goimports
-	go get github.com/kisielk/errcheck
-	go get github.com/maruel/panicparse
-	go get golang.org/x/lint/golint
+	go install golang.org/x/tools/cmd/goimports
+	go install github.com/kisielk/errcheck
+	go install github.com/maruel/panicparse
+	go install golang.org/x/lint/golint
 
 # install development build dependencies
 deps-dev: check deps
-	go get golang.org/x/tools/cmd/gorename
-	go get github.com/spf13/cobra/cobra
+	go install golang.org/x/tools/cmd/gorename
+	go install github.com/spf13/cobra/cobra
 
 # format go code
 format: check
