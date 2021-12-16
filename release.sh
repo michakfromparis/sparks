@@ -4,7 +4,6 @@
 # the action with parameters from this script that will shrink to a two liner
 
 set -e
-set -x
 
 # current git branch
 branch=$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')
